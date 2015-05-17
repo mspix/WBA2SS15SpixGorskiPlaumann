@@ -1,0 +1,23 @@
+{
+  "name": "WBA2-Kickoff-Projekt",
+  "version": "0.0.1",
+  "description": "WBA2 Kickoff Tasks & Solutions",
+  "main": "app.js",
+  "dependencies": {
+    "chalk": ">=1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mspix/WBA2SS15SpixGorskiPlaumann.git"
+  },
+  "author": "mspix, TheAlgorithm, MichaelGorski",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/mspix/WBA2SS15SpixGorskiPlaumann/issues"
+  },
+  "homepage": "https://github.com/mspix/WBA2SS15SpixGorskiPlaumann"
+}
