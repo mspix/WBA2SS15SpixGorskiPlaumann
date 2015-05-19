@@ -4,20 +4,29 @@ var jsonParser = bodyParser.json();
 
 var app = express();
 
-var data = [
-  {"title" : "Hello World!"},
-  {"description" : "This is a test."}
+var kinos = [
+  {
+    "Kino-ID" : 1,
+    "Bezeichnung" : "Cinedom",
+    "Straße" : "im MediaPark 1",
+    "PLZ" : "50670 Köln",
+    "Öffnungszeiten" : "Täglich von 10:30 - 23:30 Uhr",
+    "Reservierungs-Hotline" : "0221 - 95195555",
+    "Filmangebot" : [1,2,3],
+    "Parkplätze" : "Ja",
+    "Bewertung" : ""
+  }
 ]
 
 app.get('/', function(req, res){
-  res.send('Hello World!');
+  res.send('Welcome to Cinefox!');
 });
 
-app.get('/data', function(req, res){
+app.get('/kinos', function(req, res){
   res.status(200).json(data);
 });
 
-app.post('/data', jsonParser, function(req, res){
+app.post('/kinos', jsonParser, function(req, res){
   data.push(req.body);
   res.type('plain').send('Added!')
 });
