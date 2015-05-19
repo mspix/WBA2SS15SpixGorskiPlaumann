@@ -1,0 +1,15 @@
+{
+  "filme" :[
+                {
+                    "id"                  :     "",
+                    "Titel"               :     "",
+                    "Erscheinungstermin"  :     "",
+                    "Genre"               :     "",
+                    "Regie"               :     "",
+                    "Bewertung"           :     "",
+                    "Thumbnail"           :     "",
+                    "Filmbeschreibung"    :     "",
+                    "Dauer"               :     ""
+                }
+            ]
+}
