@@ -18,6 +18,20 @@ var kinos = [
   }
 ]
 
+var filme = [
+              {
+                  "id"                  :     "1",
+                  "Titel"               :     "",
+                  "Erscheinungstermin"  :     "",
+                  "Genre"               :     "",
+                  "Regie"               :     "",
+                  "Bewertung"           :     "",
+                  "Thumbnail"           :     "",
+                  "Filmbeschreibung"    :     "",
+                  "Dauer"               :     ""
+              }
+          ];
+
 app.get('/', function(req, res){
   res.send('Welcome to Cinefox!');
 });
@@ -29,6 +43,17 @@ app.get('/kinos', function(req, res){
 app.post('/kinos', jsonParser, function(req, res){
   data.push(req.body);
   res.type('plain').send('Added!')
+});
+
+app.get('/filme', function(req, res){
+  res.status(200).json(filme);
+
+});
+
+app.post('/filme', jsonParser, function(req, res){
+    filme.push(req.body);
+    res.type('plain').send('Film Added!')
+
 });
 
 app.listen(1337);
