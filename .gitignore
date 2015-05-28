@@ -47,3 +47,4 @@ node_modules
 
 # Redis
 redis
+dump.rdb
