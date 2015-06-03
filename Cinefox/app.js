@@ -6,19 +6,17 @@ var redis = require('redis');
 var db = redis.createClient();
 var app = express();
 
-// app.use(bodyParser.json());
-// app.use(bodyParser());
-
+app.use(bodyParser.json());
 
 // var kinos = [
 //   {
-//     "Kino-ID" : 1,
 //     "Bezeichnung" : "Cinedom",
 //     "Straße" : "im MediaPark 1",
 //     "PLZ" : "50670 Köln",
 //     "Öffnungszeiten" : "Täglich von 10:30 - 23:30 Uhr",
 //     "Reservierungs-Hotline" : "0221 - 95195555",
 //     "Filmangebot" : [1,2,3],
+//     "Preise" : "",
 //     "Parkplätze" : "Ja",
 //     "Bewertung" : ""
 //   }
@@ -26,7 +24,6 @@ var app = express();
 //
 // var filme = [
 //               {
-//                   "id"                  :     "1",
 //                   "Titel"               :     "",
 //                   "Erscheinungstermin"  :     "",
 //                   "Genre"               :     "",
@@ -39,7 +36,7 @@ var app = express();
 //           ];
 
 
-app.post('/users', jsonParser, function(req, res){
+app.post('/users', function(req, res){
   var newUser = req.body;
 
   db.incr('id:users', function(err, rep){
@@ -69,7 +66,7 @@ app.get('/users/:id', function(req, res){
 });
 
 
-app.put('/users/:id', jsonParser, function(req, res){
+app.put('/users/:id', function(req, res){
   db.exists('user:'+req.params.id, function(err, rep){
     if (rep == 1){
       var updatedUser = req.body;
@@ -130,14 +127,148 @@ app.get('/', function(req, res){
   res.send('Welcome to Cinefox!');
 });
 
-app.get('/kinos', function(req, res){
-  res.status(200).json(data);
+app.post('/kinos', function(req, res){
+  var newKino = req.body;
+
+  db.incr('id:kinos', function(err, rep){
+
+    newKino.id = rep;
+
+    db.set('kino:'+newKino.id, JSON.stringify(newKino), function(err, rep){
+      res.json(newKino);
+    db.bgsave();
+
+    });
+  });
 });
 
-app.post('/kinos', function(req, res){
-  data.push(req.body);
-  res.type('plain').send('Added!')
+
+app.get('/kinos/:id', function(req, res){
+  db.get('kino:'+req.params.id, function(err, rep){
+
+    if(rep){
+      res.type('json').send(rep);
+    }
+    else{
+      res.status(404).type('text').send('Das Kino mit der ID '+req.params.id+' konnte nicht gefunden werden.');
+    }
+
+  });
 });
+
+
+app.put('/kinos/:id', function(req, res){
+  db.exists('kino:'+req.params.id, function(err, rep){
+    if (rep == 1){
+      var updatedKino = req.body;
+      updatedKino.id = req.params.id;
+      db.set('kino:' + req.params.id, JSON.stringify(updatedKino), function(err, rep){
+        res.json(updatedKino);
+      });
+    }
+    else {
+      res.status(404).type('text').send('Das Kino mit der ID' + req.params.id +'konnte nicht gefunden werden.');
+    }
+  });
+});
+
+
+app.delete('/kinos/:id', function(req, res){
+  db.del('kino:'+req.params.id, function(err, rep){
+    if (rep == 1){
+      res.status(200).type('text').send('OK - Kino gelöscht');
+    }
+    else {
+      res.status(404).type('text').send('Das Kino mit der ID' + req.params.id +' konnte nicht gefunden werden.');
+    }
+  });
+});
+
+
+app.get('/kinos', function(req, res){
+  db.keys('kino:*', function(err, rep){
+
+    var kinos = [];
+
+    if(rep.length == 0){
+      res.json(kinos);
+      return;
+    }
+
+    db.mget(rep, function(err, rep){
+
+      rep.forEach(function(val){
+        kinos.push(JSON.parse(val));
+      });
+
+      kinos = kinos.map(function(kino){
+        return {id: kino.id, name: kino.name};
+      });
+
+      res.json(kinos);
+
+    });
+  });
+});
+
+
+app.post('/filme', function(req, res){
+  var newFilm = req.body;
+
+  db.incr('id:filme', function(err, rep){
+
+    newFilm.id = rep;
+
+    db.set('film:'+newFilm.id, JSON.stringify(newFilm), function(err, rep){
+      res.json(newFilm);
+    db.bgsave();
+
+    });
+  });
+});
+
+
+app.get('/filme/:id', function(req, res){
+  db.get('film:'+req.params.id, function(err, rep){
+
+    if(rep){
+      res.type('json').send(rep);
+    }
+    else{
+      res.status(404).type('text').send('Der Film mit der ID '+req.params.id+' konnte nicht gefunden werden.');
+    }
+
+  });
+});
+
+
+app.put('/filme/:id', function(req, res){
+  db.exists('film:'+req.params.id, function(err, rep){
+    if (rep == 1){
+      var updatedFilm = req.body;
+      updatedFilm.id = req.params.id;
+      db.set('film:' + req.params.id, JSON.stringify(updatedFilm), function(err, rep){
+        res.json(updatedFilm);
+      });
+    }
+    else {
+      res.status(404).type('text').send('Der Film mit der ID' + req.params.id +'konnte nicht gefunden werden.');
+    }
+  });
+});
+
+
+app.delete('/filme/:id', function(req, res){
+  db.del('film:'+req.params.id, function(err, rep){
+    if (rep == 1){
+      res.status(200).type('text').send('OK - Film gelöscht');
+    }
+    else {
+      res.status(404).type('text').send('Der Film mit der ID' + req.params.id +' konnte nicht gefunden werden.');
+    }
+  });
+});
+
 
 app.get('/filme', function(req, res){
   db.keys('film:*', function(err, rep){
@@ -165,109 +296,90 @@ app.get('/filme', function(req, res){
   });
 });
 
-app.post('/filme', function(req, res){
-    filme.push(req.body);
-    res.type('plain').send('Film Added!')
 
-});
+app.post('/spielplaene', function(req, res){
+  var newSpielplan = req.body;
 
+  db.incr('id:spielplaene', function(err, rep){
 
-// A browser's default method is 'GET', so this
-// is the route that express uses when we visit
-// our site initially.
-app.get('/filmForm', function(req, res){
-  // The form's action is '/' and its method is 'POST',
-  // so the `app.post('/', ...` route will receive the
-  // result of our form
-  var html =  '<h1>Filmformular</h1><br>' +
-              '<form action="/filmForm" method="post">' +
-                 'Titel: ' +
-                 '<input type="text" name="title" />' +
-                 '<br>' +
-                 'Erscheinungstermin: ' +
-                 '<input type="text" name="relDate" />' +
-                 '<br>' +
-                 'Genre: ' +
-                 '<input type="text" name="genre" />' +
-                 '<br>' +
-                 'Regie: ' +
-                 '<input type="text" name="regie" />' +
-                 '<br>' +
-                 'Bewertung: ' +
-                 '<input type="text" name="evaluation" />' +
-                 '<br>' +
-                 'Thumbnail: ' +
-                 '<input type="text" name="thumbnail" />' +
-                 '<br>' +
-                 'Beschreibung: ' +
-                 '<input type="text" name="description" />' +
-                 '<br>' +
-                 'Dauer: ' +
-                 '<input type="text" name="length" />' +
-                 '<br>' +
-                 '<button type="submit">Submit</button>' +
-              '</form>';
+    newSpielplan.id = rep;
 
-
-
-  res.send(html);
-});
-
-
-app.post('/filmForm', bodyParser(), function(req, res){
-
-  // var newFilm = {
-  //                   "titel"               :     "req.body.title"
-  //               };
-
-
-
-  // var newFilm = '{
-  //                   "titel"               :     "' + req.body.title +         '",
-  //                   "Erscheinungstermin"  :     "' + req.body.relDate +       '",
-  //                   "Genre"               :     "' + req.body.genre +         '",
-  //                   "Regie"               :     "' + req.body.regie +         '",
-  //                   "Bewertung"           :     "' + req.body.evaluation +    '",
-  //                   "Thumbnail"           :     "' + req.body.thumbnail +     '",
-  //                   "Beschreibung"        :     "' + req.body.description +   '",
-  //                   "Dauer"               :     "' + req.body.length +        '"
-  //               }';
-
-  db.incr('id:filme', function(err, rep){
-
-      // var newFilm = "{
-      //                   \"Titel\"               :     \"" + req.body.title +         "\",
-      //                   \"Erscheinungstermin\"  :     \"" + req.body.relDate +       "\",
-      //                   \"Genre\"               :     \"" + req.body.genre +         "\",
-      //                   \"Regie\"               :     \"" + req.body.regie +         "\",
-      //                   \"Bewertung\"           :     \"" + req.body.evaluation +    "\",
-      //                   \"Thumbnail\"           :     \"" + req.body.thumbnail +     "\",
-      //                   \"Beschreibung\"        :     \"" + req.body.description +   "\",
-      //                   \"Dauer\"               :     \"" + req.body.length +        "\"
-      //               }";
-      var newFilm = {
-                        "titel"               :     req.body.title,
-                        "erscheinungstermin"  :     req.body.relDate,
-                        "genre"               :     req.body.genre,
-                        "regie"               :     req.body.regie,
-                        "bewertung"           :     req.body.evaluation,
-                        "thumbnail"           :     req.body.thumbnail,
-                        "beschreibung"        :     req.body.description,
-                        "dauer"               :     req.body.length
-                    };
-
-                    newFilm.id = rep;
-
-    db.set('film:'+newFilm.id, JSON.stringify(newFilm), function(err, rep){
-      res.json(newFilm);
+    db.set('spielplan:'+newSpielplan.id, JSON.stringify(newSpielplan), function(err, rep){
+      res.json(newSpielplan);
     db.bgsave();
 
     });
-
-  // var confirmationParsed = JSON.parse(newFilm);
   });
-
-  res.send('Added!');
 });
+
+
+app.get('/spielplaene/:id', function(req, res){
+  db.get('spielplan:'+req.params.id, function(err, rep){
+
+    if(rep){
+      res.type('json').send(rep);
+    }
+    else{
+      res.status(404).type('text').send('Der Spielplan mit der ID '+req.params.id+' konnte nicht gefunden werden.');
+    }
+
+  });
+});
+
+
+app.put('/spielplaene/:id', function(req, res){
+  db.exists('spielplan:'+req.params.id, function(err, rep){
+    if (rep == 1){
+      var updatedSpielplan = req.body;
+      updatedSpielplan.id = req.params.id;
+      db.set('spielplan:' + req.params.id, JSON.stringify(updatedSpielplan), function(err, rep){
+        res.json(updatedSpielplan);
+      });
+    }
+    else {
+      res.status(404).type('text').send('Der Spielplan mit der ID' + req.params.id +'konnte nicht gefunden werden.');
+    }
+  });
+});
+
+
+app.delete('/spielplaene/:id', function(req, res){
+  db.del('spielplan:'+req.params.id, function(err, rep){
+    if (rep == 1){
+      res.status(200).type('text').send('OK - Spielplan gelöscht');
+    }
+    else {
+      res.status(404).type('text').send('Der Spielplan mit der ID' + req.params.id +' konnte nicht gefunden werden.');
+    }
+  });
+});
+
+
+app.get('/spielplaene', function(req, res){
+  db.keys('spielplan:*', function(err, rep){
+
+    var spielplaene = [];
+
+    if(rep.length == 0){
+      res.json(spielplaene);
+      return;
+    }
+
+    db.mget(rep, function(err, rep){
+
+      rep.forEach(function(val){
+        filme.push(JSON.parse(val));
+      });
+
+      filme = filme.map(function(spielplan){
+        return {id: spielplan.id, titel: spielplan.titel};
+      });
+
+      res.json(spielplaene);
+
+    });
+  });
+});
+
 
 app.listen(1337);

@@ -48,3 +48,9 @@ node_modules
 # Redis
 redis
 dump.rdb
+
+# Backup Files
+backup
+
+# REST Client Files
+rest_client_requests
