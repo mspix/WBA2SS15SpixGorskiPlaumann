@@ -368,10 +368,10 @@ app.get('/spielplaene', function(req, res){
     db.mget(rep, function(err, rep){
 
       rep.forEach(function(val){
-        filme.push(JSON.parse(val));
+        spielplaene.push(JSON.parse(val));
       });
 
-      filme = filme.map(function(spielplan){
+      spielplaene = spielplaene.map(function(spielplan){
         return {id: spielplan.id, titel: spielplan.titel};
       });
 
