@@ -8,32 +8,7 @@ var app = express();
 
 app.use(bodyParser.json());
 
-// var kinos = [
-//   {
-//     "Bezeichnung" : "Cinedom",
-//     "Straße" : "im MediaPark 1",
-//     "PLZ" : "50670 Köln",
-//     "Öffnungszeiten" : "Täglich von 10:30 - 23:30 Uhr",
-//     "Reservierungs-Hotline" : "0221 - 95195555",
-//     "Filmangebot" : [1,2,3],
-//     "Preise" : "",
-//     "Parkplätze" : "Ja",
-//     "Bewertung" : ""
-//   }
-// ];
-//
-// var filme = [
-//               {
-//                   "Titel"               :     "",
-//                   "Erscheinungstermin"  :     "",
-//                   "Genre"               :     "",
-//                   "Regie"               :     "",
-//                   "Bewertung"           :     "",
-//                   "Thumbnail"           :     "",
-//                   "Filmbeschreibung"    :     "",
-//                   "Dauer"               :     ""
-//               }
-//           ];
+
 
 
 app.post('/users', function(req, res){
@@ -108,10 +83,6 @@ app.get('/users', function(req, res){
 
       rep.forEach(function(val){
         users.push(JSON.parse(val));
-      });
-
-      users = users.map(function(user){
-        return {id: user.id, name: user.name};
       });
 
       res.json(users);
@@ -201,10 +172,6 @@ app.get('/kinos', function(req, res){
         kinos.push(JSON.parse(val));
       });
 
-      kinos = kinos.map(function(kino){
-        return {id: kino.id, name: kino.name};
-      });
-
       res.json(kinos);
 
     });
@@ -286,10 +253,6 @@ app.get('/filme', function(req, res){
         filme.push(JSON.parse(val));
       });
 
-      filme = filme.map(function(film){
-        return {id: film.id, titel: film.titel};
-      });
-
       res.json(filme);
 
     });
@@ -369,10 +332,6 @@ app.get('/spielplaene', function(req, res){
 
       rep.forEach(function(val){
         spielplaene.push(JSON.parse(val));
-      });
-
-      spielplaene = spielplaene.map(function(spielplan){
-        return {id: spielplan.id, titel: spielplan.titel};
       });
 
       res.json(spielplaene);
