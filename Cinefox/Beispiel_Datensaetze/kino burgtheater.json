@@ -1,0 +1,17 @@
+{
+  "kinoID" : 3,
+  "bezeichnung" : "Burg Theater Kino",
+  "straße" : "Kaiserstr.",
+  "gebaeudeNr" : "16",
+  "ort" : "Gummersbach",
+  "plz" : "51643",
+  "oeffnungszeiten" : "",
+  "reservierungsHotline" : "02261 - 22460",
+  "reservierungsService" : true,
+  "spielplan" : 1,
+  "preise" : "",
+  "kinotag" : ,
+  "website" : "http://burgtheater-gummersbach.kino-zeit.de/",
+  "parkplaetze" : false,
+  "bewertung" : 8
+}
