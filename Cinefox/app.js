@@ -1,12 +1,58 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
 var redis = require('redis');
 
 var db = redis.createClient();
 var app = express();
 
 app.use(bodyParser.json());
+
+
+function queryFilter(dbArray, queryArray){
+
+	if(queryArray !== undefined){
+			
+			var counter = 0;
+			for (prop in queryArray) {
+				counter++;
+			}
+		
+			var queryResult = [];
+							
+				dbArray.forEach(function(dbElement) {
+					var propCounter = 0;
+					for (var queryProp in queryArray) {
+
+						for (var dbElementProp in dbElement) {
+							// Checking if Array in Array
+							if(queryProp == dbElementProp && Array.isArray(queryArray[queryProp]) && Array.isArray(dbElement[dbElementProp])){
+								for (var i=0; i < dbElement[dbElementProp].length; i++){
+								
+									if( queryArray[queryProp][0] == dbElement[dbElementProp][i]){
+										propCounter++;
+										break;
+									}
+								}
+							continue;
+							}
+							
+							if( dbElement[dbElementProp] == queryArray[queryProp] ){
+								propCounter++;
+							}
+					
+						}
+					}
+					if( propCounter == counter ){
+						queryResult.push(dbElement);
+					}
+				});
+	
+			return queryResult;	
+	}
+	else {
+		return dbArray;
+	}
+}
 
 
 
@@ -45,7 +91,7 @@ app.put('/users/:id', function(req, res){
   db.exists('user:'+req.params.id, function(err, rep){
     if (rep == 1){
       var updatedUser = req.body;
-      updatedUser.id = req.params.id;
+      updatedUser.id = Number(req.params.id); // Ohne Number() würde die ID zu einem String gewandelt werden
       db.set('user:' + req.params.id, JSON.stringify(updatedUser), function(err, rep){
         res.json(updatedUser);
       });
@@ -68,30 +114,31 @@ app.delete('/users/:id', function(req, res){
   });
 });
 
-
 app.get('/users', function(req, res){
-  db.keys('user:*', function(err, rep){
 
-    var users = [];
+		var users = [];
 
-    if(rep.length == 0){
-      res.json(users);
-      return;
-    }
+		db.keys('user:*', function(err, rep){
 
-    db.mget(rep, function(err, rep){
 
-      rep.forEach(function(val){
-        users.push(JSON.parse(val));
-      });
+			if(rep.length == 0){
+			  res.json(users);
+			  return;
+			}
+			
+			db.mget(rep, function(err, rep){
 
-      res.json(users);
+				rep.forEach(function(val){
+					users.push(JSON.parse(val));
+				});
+			
+				res.json(queryFilter(kinos, req.query));
+			
+			});
+		});
+		
 
-    });
-  });
 });
-
-
 
 
 app.get('/', function(req, res){
@@ -101,11 +148,11 @@ app.get('/', function(req, res){
 app.post('/kinos', function(req, res){
   var newKino = req.body;
 
-  db.incr('id:kinos', function(err, rep){
+  db.incr('kinoID:kinos', function(err, rep){
 
-    newKino.id = rep;
+    newKino.kinoID = rep;
 
-    db.set('kino:'+newKino.id, JSON.stringify(newKino), function(err, rep){
+    db.set('kino:'+newKino.kinoID, JSON.stringify(newKino), function(err, rep){
       res.json(newKino);
     db.bgsave();
 
@@ -114,43 +161,43 @@ app.post('/kinos', function(req, res){
 });
 
 
-app.get('/kinos/:id', function(req, res){
-  db.get('kino:'+req.params.id, function(err, rep){
+app.get('/kinos/:kinoID', function(req, res){
+  db.get('kino:'+req.params.kinoID, function(err, rep){
 
     if(rep){
       res.type('json').send(rep);
     }
     else{
-      res.status(404).type('text').send('Das Kino mit der ID '+req.params.id+' konnte nicht gefunden werden.');
+      res.status(404).type('text').send('Das Kino mit der ID '+req.params.kinoID+' konnte nicht gefunden werden.');
     }
 
   });
 });
 
 
-app.put('/kinos/:id', function(req, res){
-  db.exists('kino:'+req.params.id, function(err, rep){
+app.put('/kinos/:kinoID', function(req, res){
+  db.exists('kino:'+req.params.kinoID, function(err, rep){
     if (rep == 1){
       var updatedKino = req.body;
-      updatedKino.id = req.params.id;
-      db.set('kino:' + req.params.id, JSON.stringify(updatedKino), function(err, rep){
+      updatedKino.kinoID = Number(req.params.kinoID); // Ohne Number() würde die ID zu einem String gewandelt werden
+      db.set('kino:' + req.params.kinoID, JSON.stringify(updatedKino), function(err, rep){
         res.json(updatedKino);
       });
     }
     else {
-      res.status(404).type('text').send('Das Kino mit der ID' + req.params.id +'konnte nicht gefunden werden.');
+      res.status(404).type('text').send('Das Kino mit der ID' + req.params.kinoID +'konnte nicht gefunden werden.');
     }
   });
 });
 
 
-app.delete('/kinos/:id', function(req, res){
-  db.del('kino:'+req.params.id, function(err, rep){
+app.delete('/kinos/:kinoID', function(req, res){
+  db.del('kino:'+req.params.kinoID, function(err, rep){
     if (rep == 1){
       res.status(200).type('text').send('OK - Kino gelöscht');
     }
     else {
-      res.status(404).type('text').send('Das Kino mit der ID' + req.params.id +' konnte nicht gefunden werden.');
+      res.status(404).type('text').send('Das Kino mit der ID' + req.params.kinoID +' konnte nicht gefunden werden.');
     }
   });
 });
@@ -168,12 +215,12 @@ app.get('/kinos', function(req, res){
 
     db.mget(rep, function(err, rep){
 
-      rep.forEach(function(val){
-        kinos.push(JSON.parse(val));
-      });
-
-      res.json(kinos);
-
+		rep.forEach(function(val){
+			kinos.push(JSON.parse(val));
+		});
+		
+		res.json(queryFilter(kinos, req.query));
+		
     });
   });
 });
@@ -182,11 +229,12 @@ app.get('/kinos', function(req, res){
 app.post('/filme', function(req, res){
   var newFilm = req.body;
 
-  db.incr('id:filme', function(err, rep){
+  db.incr('filmID:filme', function(err, rep){
 
-    newFilm.id = rep;
+    newFilm.filmID = rep;
 
-    db.set('film:'+newFilm.id, JSON.stringify(newFilm), function(err, rep){
+
+    db.set('film:'+newFilm.filmID, JSON.stringify(newFilm), function(err, rep){
       res.json(newFilm);
     db.bgsave();
 
@@ -195,43 +243,43 @@ app.post('/filme', function(req, res){
 });
 
 
-app.get('/filme/:id', function(req, res){
-  db.get('film:'+req.params.id, function(err, rep){
+app.get('/filme/:filmID', function(req, res){
+  db.get('film:'+req.params.filmID, function(err, rep){
 
     if(rep){
       res.type('json').send(rep);
     }
     else{
-      res.status(404).type('text').send('Der Film mit der ID '+req.params.id+' konnte nicht gefunden werden.');
+      res.status(404).type('text').send('Der Film mit der ID '+req.params.filmID+' konnte nicht gefunden werden.');
     }
 
   });
 });
 
 
-app.put('/filme/:id', function(req, res){
-  db.exists('film:'+req.params.id, function(err, rep){
+app.put('/filme/:filmID', function(req, res){
+  db.exists('film:'+req.params.filmID, function(err, rep){
     if (rep == 1){
       var updatedFilm = req.body;
-      updatedFilm.id = req.params.id;
-      db.set('film:' + req.params.id, JSON.stringify(updatedFilm), function(err, rep){
+      updatedFilm.filmID = Number(req.params.filmID);
+      db.set('film:' + req.params.filmID, JSON.stringify(updatedFilm), function(err, rep){
         res.json(updatedFilm);
       });
     }
     else {
-      res.status(404).type('text').send('Der Film mit der ID' + req.params.id +'konnte nicht gefunden werden.');
+      res.status(404).type('text').send('Der Film mit der ID' + req.params.filmID +'konnte nicht gefunden werden.');
     }
   });
 });
 
 
-app.delete('/filme/:id', function(req, res){
-  db.del('film:'+req.params.id, function(err, rep){
+app.delete('/filme/:filmID', function(req, res){
+  db.del('film:'+req.params.filmID, function(err, rep){
     if (rep == 1){
       res.status(200).type('text').send('OK - Film gelöscht');
     }
     else {
-      res.status(404).type('text').send('Der Film mit der ID' + req.params.id +' konnte nicht gefunden werden.');
+      res.status(404).type('text').send('Der Film mit der ID' + req.params.filmID +' konnte nicht gefunden werden.');
     }
   });
 });
@@ -253,9 +301,9 @@ app.get('/filme', function(req, res){
         filme.push(JSON.parse(val));
       });
 
-      res.json(filme);
-
-    });
+	  	res.json(queryFilter(filme, req.query));
+    
+	});
   });
 });
 
@@ -263,11 +311,11 @@ app.get('/filme', function(req, res){
 app.post('/spielplaene', function(req, res){
   var newSpielplan = req.body;
 
-  db.incr('id:spielplaene', function(err, rep){
+  db.incr('spielplanID:spielplaene', function(err, rep){
 
-    newSpielplan.id = rep;
+    newSpielplan.spielplanID = rep;
 
-    db.set('spielplan:'+newSpielplan.id, JSON.stringify(newSpielplan), function(err, rep){
+    db.set('spielplan:'+newSpielplan.spielplanID, JSON.stringify(newSpielplan), function(err, rep){
       res.json(newSpielplan);
     db.bgsave();
 
@@ -276,43 +324,43 @@ app.post('/spielplaene', function(req, res){
 });
 
 
-app.get('/spielplaene/:id', function(req, res){
-  db.get('spielplan:'+req.params.id, function(err, rep){
+app.get('/spielplaene/:spielplanID', function(req, res){
+  db.get('spielplan:'+req.params.spielplanID, function(err, rep){
 
     if(rep){
       res.type('json').send(rep);
     }
     else{
-      res.status(404).type('text').send('Der Spielplan mit der ID '+req.params.id+' konnte nicht gefunden werden.');
+      res.status(404).type('text').send('Der Spielplan mit der ID '+req.params.spielplanID+' konnte nicht gefunden werden.');
     }
 
   });
 });
 
 
-app.put('/spielplaene/:id', function(req, res){
-  db.exists('spielplan:'+req.params.id, function(err, rep){
+app.put('/spielplaene/:spielplanID', function(req, res){
+  db.exists('spielplan:'+req.params.spielplanID, function(err, rep){
     if (rep == 1){
       var updatedSpielplan = req.body;
-      updatedSpielplan.id = req.params.id;
-      db.set('spielplan:' + req.params.id, JSON.stringify(updatedSpielplan), function(err, rep){
+      updatedSpielplan.spielplanID = Number(req.params.spielplanID);
+      db.set('spielplan:' + req.params.spielplanID, JSON.stringify(updatedSpielplan), function(err, rep){
         res.json(updatedSpielplan);
       });
     }
     else {
-      res.status(404).type('text').send('Der Spielplan mit der ID' + req.params.id +'konnte nicht gefunden werden.');
+      res.status(404).type('text').send('Der Spielplan mit der ID' + req.params.spielplanID +'konnte nicht gefunden werden.');
     }
   });
 });
 
 
-app.delete('/spielplaene/:id', function(req, res){
-  db.del('spielplan:'+req.params.id, function(err, rep){
+app.delete('/spielplaene/:spielplanID', function(req, res){
+  db.del('spielplan:'+req.params.spielplanID, function(err, rep){
     if (rep == 1){
       res.status(200).type('text').send('OK - Spielplan gelöscht');
     }
     else {
-      res.status(404).type('text').send('Der Spielplan mit der ID' + req.params.id +' konnte nicht gefunden werden.');
+      res.status(404).type('text').send('Der Spielplan mit der ID' + req.params.spielplanID +' konnte nicht gefunden werden.');
     }
   });
 });
@@ -334,8 +382,7 @@ app.get('/spielplaene', function(req, res){
         spielplaene.push(JSON.parse(val));
       });
 
-      res.json(spielplaene);
-
+	  	res.json(queryFilter(spielplaene, req.query));
     });
   });
 });
