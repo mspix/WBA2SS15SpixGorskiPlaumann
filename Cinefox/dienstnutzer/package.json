@@ -1,0 +1,26 @@
+{
+  "name": "Cinefox",
+  "version": "1.0.0",
+  "description": "Tool zur Absprache von Film und Kino",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.12.4",
+    "ejs": "^2.3.1",
+    "express": "^4.12.3",
+    "redis": "^0.12.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mspix/WBA2SS15SpixGorskiPlaumann.git"
+  },
+  "author": "Hannes Plaumann, Michael Gorski, Michael Spix",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mspix/WBA2SS15SpixGorskiPlaumann/issues"
+  },
+  "homepage": "https://github.com/mspix/WBA2SS15SpixGorskiPlaumann"
+}

@@ -1,11 +1,56 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var jsonParser = bodyParser.json();
+var ejs = require('ejs');
 var redis = require('redis');
+var fs = require('fs');
+var http = require('http');
 
 var db = redis.createClient();
 var app = express();
 
-app.use(bodyParser.json());
+// Log mit Pfad und Zeitangabe (Dienstanbieter)
+// app.use(function (req, res, next) {
+	// console.log('Time: %d ' + ' Request-Pfad: ' + req.path, Date.now());
+	// next();
+// });
+
+app.get('/test', jsonParser, function(req, res){
+	
+	fs.readFile('./users.ejs', {encoding: 'utf-8}, function(err, filestring){
+		if(err){
+			throw err;
+		}
+		else {
+			
+			var options = {
+				host: 'localhost',
+				port: 1337,
+				path: '/users',
+				method: 'GET',
+				headers: {
+					accept: 'application/json'
+				}
+			}
+			
+			var externalRequest = http.request(options, function(externalRespone) {
+				console.log('Connected');
+				externalResponse.on('data', function(chunk) {
+					
+					var userdata = JSON.parse(chunk);
+					
+					var html = ejs.render(filestring, userdata);
+					res.setHeader('content-type', 'text/html');
+					res.writeHead(200);
+					res.write(html);
+					res.end();
+				});
+			});
+			
+			externalRequest.end();
+		}
+	});
+});
 
 
 app.post('/users', function(req, res){
@@ -97,4 +142,6 @@ app.get('/', function(req, res){
 });
 
 
-app.listen(1338);
+app.listen(1338, function(){
+	console.log("Server listens on Port 1338");
+});
