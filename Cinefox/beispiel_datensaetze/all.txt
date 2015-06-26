@@ -1,0 +1,140 @@
+{
+  "kinoID" : 1,
+  "bezeichnung" : "Cinedom",
+  "straße" : "im MediaPark",
+  "gebaeudeNr" : "1",
+  "ort" : "Köln",
+  "plz" : "50670",
+  "oeffnungszeiten" : "Täglich von 10:30 - 23:30 Uhr",
+  "reservierungsHotline" : "0221 - 95195555",
+  "reservierungsService" : true,
+  "spielplan" : 1,
+  "preise" : "",
+  "kinotag" : ["Mo", "Di", "Mi"],
+  "website" : "http://www.cinedom.de",
+  "parkplaetze" : true,
+  "bewertung" : 8
+}
+
+{
+  "kinoID" : 2,
+  "bezeichnung" : "Metropolis",
+  "straße" : "Ebertplatz",
+  "gebaeudeNr" : "19",
+  "ort" : "Köln",
+  "plz" : "50668",
+  "oeffnungszeiten" : "Täglich von 10:30 - 23:30 Uhr",
+  "reservierungsHotline" : "0221 - 722436",
+  "reservierungsService" : true,
+  "spielplan" : 2,
+  "preise" : "",
+  "kinotag" : ["Mo", "Di", "Mi"],
+  "website" : "http://metropolis-koeln.de",
+  "parkplaetze" : false,
+  "bewertung" : 8
+}
+
+{
+  "kinoID" : 3,
+  "bezeichnung" : "Burg Theater Kino",
+  "straße" : "Kaiserstr.",
+  "gebaeudeNr" : "16",
+  "ort" : "Gummersbach",
+  "plz" : "51643",
+  "oeffnungszeiten" : "",
+  "reservierungsHotline" : "02261 - 22460",
+  "reservierungsService" : true,
+  "spielplan" : 1,
+  "preise" : "",
+  "kinotag" : "",
+  "website" : "http://burgtheater-gummersbach.kino-zeit.de/",
+  "parkplaetze" : false,
+  "bewertung" : 8
+}
+
+{
+	"spielplanID" : 1,
+	"kinoID" : 1,
+	"filmID" : 1,
+	"kalenderwoche" : 24,
+	"mo" : ["09-00", "10-00", "11-00"],
+	"di" : ["17-00", "22-00"],
+	"mi" : ["17-00", "22-00"],
+	"do" : ["17-00", "22-00"],
+	"fr" : ["17-00", "22-00"],
+	"sa" : ["17-00", "22-00"],
+	"so" : ["17-00", "22-00"],
+	"in3D"   : false,
+	"ueberlaenge" : false
+}
+
+{
+	"spielplanID" : 2,
+	"kinoID" : 3,
+	"filmID" : 3,
+	"kalenderwoche" : 24,
+	"mo" : ["09-00", "10-00", "11-00"],
+	"di" : ["17-00", "22-00"],
+	"mi" : ["17-00", "22-00"],
+	"do" : ["17-00", "22-00"],
+	"fr" : ["17-00", "22-00"],
+	"sa" : ["17-00", "22-00"],
+	"so" : ["17-00", "22-00"],
+	"in3D"   : false,
+	"ueberlaenge" : false
+}
+
+{
+	"spielplanID" : 3,
+	"kinoID" : 3,
+	"filmID" : 2,
+	"kalenderwoche" : 24,
+	"mo" : ["09-00", "10-00", "11-00"],
+	"di" : ["17-00", "22-00"],
+	"mi" : ["17-00", "22-00"],
+	"do" : ["17-00", "22-00"],
+	"fr" : ["17-00", "22-00"],
+	"sa" : ["17-00", "22-00"],
+	"so" : ["17-00", "22-00"],
+	"in3D"   : false,
+	"ueberlaenge" : false
+}
+
+{
+	"filmID" : 1,
+    "deTitel" : "Avengers: Age of Ultron",
+    "orTitel" : "Avengers: Age of Ultron",
+    "erscheinungstermin" : "2015-05-01",
+    "genre" : "Action",
+    "thumbnail" : "",
+    "kurzbeschreibung" : "",
+    "regie" : "Joss Whedon",
+    "dauer" : 141,
+    "ot" : false
+}
+
+{
+	"filmID" : 2,
+    "deTitel" : "Birdman oder (Die unverhoffte Macht der Ahnungslosigkeit)",
+    "orTitel" : "Birdman or (The Unexpected Virtue of Ignorance)",
+    "erscheinungstermin" : "2014-01-29",
+    "genre" : "Drama",
+    "thumbnail" : "",
+    "kurzbeschreibung" : "",
+    "regie" : "Alejandro González Iñárritu",
+    "dauer" : 119,
+    "ot" : false
+}
+
+{
+	"filmID" : 3,
+	"deTitel" : "The Imitation Game - Ein streng geheimes Leben",
+	"orTitel" : "The Imitation Game",
+	"erscheinungstermin" : "2015-01-22",
+	"genre" : "Drama",
+	"thumbnail" : "",
+	"kurzbeschreibung" : "",
+	"regie" : "Morten Tyldum",
+	"dauer" : 113,
+	"ot" : false
+}
