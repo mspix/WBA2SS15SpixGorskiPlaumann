@@ -9,15 +9,11 @@ var http = require('http');
 var db = redis.createClient();
 var app = express();
 
-// Log mit Pfad und Zeitangabe (Dienstanbieter)
-// app.use(function (req, res, next) {
-	// console.log('Time: %d ' + ' Request-Pfad: ' + req.path, Date.now());
-	// next();
-// });
+
 
 app.get('/test', jsonParser, function(req, res){
 	
-	fs.readFile('./users.ejs', {encoding: 'utf-8}, function(err, filestring){
+	fs.readFile('./users.ejs', {encoding: 'utf-8'}, function(err, filestring){
 		if(err){
 			throw err;
 		}
@@ -33,13 +29,17 @@ app.get('/test', jsonParser, function(req, res){
 				}
 			}
 			
-			var externalRequest = http.request(options, function(externalRespone) {
+			var externalRequest = http.request(options, function(externalResponse) {
 				console.log('Connected');
 				externalResponse.on('data', function(chunk) {
 					
 					var userdata = JSON.parse(chunk);
 					
-					var html = ejs.render(filestring, userdata);
+					var dataEdited = "{\"users\" : "+ JSON.stringify(userdata) + "}";
+					console.log(dataEdited);
+					console.log(userdata);
+					
+					var html = ejs.render(filestring, JSON.parse(dataEdited));
 					res.setHeader('content-type', 'text/html');
 					res.writeHead(200);
 					res.write(html);
@@ -128,7 +128,7 @@ app.get('/users', function(req, res){
 					users.push(JSON.parse(val));
 				});
 			
-				res.json(queryFilter(kinos, req.query));
+				res.json(queryFilter(users, req.query));
 			
 			});
 		});

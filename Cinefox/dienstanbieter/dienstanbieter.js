@@ -7,6 +7,11 @@ var app = express();
 
 app.use(bodyParser.json());
 
+// Log mit Pfad und Zeitangabe
+app.use(function (req, res, next) {
+	console.log('Time: %d ' + ' Request-Pfad: ' + req.path, Date.now());
+	next();
+});
 
 function queryFilter(dbArray, queryArray){
 
@@ -132,7 +137,7 @@ app.get('/users', function(req, res){
 					users.push(JSON.parse(val));
 				});
 			
-				res.json(queryFilter(kinos, req.query));
+				res.json(queryFilter(users, req.query));
 			
 			});
 		});

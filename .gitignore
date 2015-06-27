@@ -47,6 +47,8 @@ node_modules
 
 # Redis
 redis
+redis_dienstanbieter
+redis_dienstnutzer
 dump.rdb
 
 # Backup Files
