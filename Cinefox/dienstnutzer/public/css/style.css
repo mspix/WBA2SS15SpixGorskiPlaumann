@@ -1,0 +1,43 @@
+body {
+	
+	margin: auto auto;
+	padding: 0 0 0 0;
+	border: 0;
+	
+}
+
+h1 {
+	position: relative;
+	margin: 10px 20px;
+	font-size: 18px;
+
+}
+
+.userbar {
+	position: relative;
+	margin: 0 auto;
+	padding: 0 0 0 0;
+	height: 50px;
+	width: 100%;
+	background-color: red;
+	overflow: hidden;
+}
+
+.userbar p {
+
+	color: fff;
+	font-family: helvetica;
+	font-size: 30px;
+	margin: 6px auto 0 50px;
+	
+}
+
+
+
+.kategorie {
+
+	margin: 20px 0 0 20px;
+	position: relative;
+
+}
+

@@ -7,6 +7,11 @@ var app = express();
 
 app.use(bodyParser.json());
 
+// Log mit Pfad und Zeitangabe
+app.use(function (req, res, next) {
+	console.log('Time: %d ' + ' Request-Pfad: ' + req.path, Date.now());
+	next();
+});
 
 function queryFilter(dbArray, queryArray){
 
@@ -28,7 +33,7 @@ function queryFilter(dbArray, queryArray){
 							if(queryProp == dbElementProp && Array.isArray(queryArray[queryProp]) && Array.isArray(dbElement[dbElementProp])){
 								for (var i=0; i < dbElement[dbElementProp].length; i++){
 								
-									if( queryArray[queryProp][0] == dbElement[dbElementProp][i]){
+									if( JSON.stringify(queryArray[queryProp][0]).toLowerCase() == JSON.stringify(dbElement[dbElementProp][i]).toLowerCase()){
 										propCounter++;
 										break;
 									}
@@ -36,7 +41,7 @@ function queryFilter(dbArray, queryArray){
 							continue;
 							}
 							
-							if( dbElement[dbElementProp] == queryArray[queryProp] ){
+							if( JSON.stringify(dbElement[dbElementProp]).toLowerCase() == JSON.stringify(queryArray[queryProp]).toLowerCase() ){
 								propCounter++;
 							}
 					
@@ -132,7 +137,7 @@ app.get('/users', function(req, res){
 					users.push(JSON.parse(val));
 				});
 			
-				res.json(queryFilter(kinos, req.query));
+				res.json(queryFilter(users, req.query));
 			
 			});
 		});
@@ -218,7 +223,8 @@ app.get('/kinos', function(req, res){
 		rep.forEach(function(val){
 			kinos.push(JSON.parse(val));
 		});
-		
+		console.log(req.query);
+		console.log(queryFilter(kinos, req.query));
 		res.json(queryFilter(kinos, req.query));
 		
     });
@@ -308,7 +314,7 @@ app.get('/filme', function(req, res){
 });
 
 
-app.post('/spielplaene', function(req, res){
+app.post('kinos/spielplaene', function(req, res){
   var newSpielplan = req.body;
 
   db.incr('spielplanID:spielplaene', function(err, rep){
@@ -324,7 +330,7 @@ app.post('/spielplaene', function(req, res){
 });
 
 
-app.get('/spielplaene/:spielplanID', function(req, res){
+app.get('kinos/spielplaene/:spielplanID', function(req, res){
   db.get('spielplan:'+req.params.spielplanID, function(err, rep){
 
     if(rep){
@@ -338,7 +344,7 @@ app.get('/spielplaene/:spielplanID', function(req, res){
 });
 
 
-app.put('/spielplaene/:spielplanID', function(req, res){
+app.put('kinos/spielplaene/:spielplanID', function(req, res){
   db.exists('spielplan:'+req.params.spielplanID, function(err, rep){
     if (rep == 1){
       var updatedSpielplan = req.body;
@@ -354,7 +360,7 @@ app.put('/spielplaene/:spielplanID', function(req, res){
 });
 
 
-app.delete('/spielplaene/:spielplanID', function(req, res){
+app.delete('kinos/spielplaene/:spielplanID', function(req, res){
   db.del('spielplan:'+req.params.spielplanID, function(err, rep){
     if (rep == 1){
       res.status(200).type('text').send('OK - Spielplan gelöscht');
@@ -366,7 +372,7 @@ app.delete('/spielplaene/:spielplanID', function(req, res){
 });
 
 
-app.get('/spielplaene', function(req, res){
+app.get('kinos/spielplaene', function(req, res){
   db.keys('spielplan:*', function(err, rep){
 
     var spielplaene = [];
