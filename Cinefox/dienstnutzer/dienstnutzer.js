@@ -9,7 +9,7 @@ var http = require('http');
 var db = redis.createClient();
 var app = express();
 
-
+app.use(express.static(__dirname + '/public'));
 
 app.get('/test', jsonParser, function(req, res){
 	
@@ -137,8 +137,104 @@ app.get('/users', function(req, res){
 });
 
 
+
+app.get('/kinos', jsonParser, function(req, res){
+	
+	fs.readFile('./templates/index.ejs', {encoding: 'utf-8'}, function(err, filestring){
+		if(err){
+			throw err;
+		}
+		else {
+			
+		
+			var reqQueryArray = req.query;
+			
+			var queryString = "";
+			
+			if(reqQueryArray !== undefined){
+				for(var prop in reqQueryArray){
+					var i = 0;
+					if(queryString == ""){
+						queryString += "?";
+					}
+					if(reqQueryArray[prop] == ""){
+						continue;
+					}
+					if(prop == "submit"){
+						break;
+					}
+					if(queryString != "?" && reqQueryArray[prop] != ""){
+						queryString += "&";
+					}
+					queryString += prop + "=" + reqQueryArray[prop];
+					++i;
+					// if(reqQueryArray[prop] != "" && Object.keys(reqQueryArray)[i+1] != "submit"){
+						// console.log("next: " + Object.keys(reqQueryArray)[i+1]);
+						// queryString += "&";
+					// }
+					
+				}
+			}
+			
+			console.log(queryString);
+			
+			var path = "/kinos"+queryString;
+			
+			console.log(path);
+			
+			var options = {
+				host: 'localhost',
+				port: 1337,
+				path: path,
+				method: 'GET',
+				headers: {
+					accept: 'application/json'
+				}
+			}
+			
+			var externalRequest = http.request(options, function(externalResponse) {
+				console.log('Connected');
+				externalResponse.on('data', function(chunk) {
+					
+					var userdata = JSON.parse(chunk);
+					
+					var dataEdited = "{\"kinos\" : "+ JSON.stringify(userdata) + "}";
+					// console.log(dataEdited);
+					// console.log(userdata);
+					
+					var html = ejs.render(filestring, JSON.parse(dataEdited));
+					res.setHeader('content-type', 'text/html');
+					res.writeHead(200);
+					res.write(html);
+					res.end();
+				});
+			});
+			
+			externalRequest.end();
+		}
+	});
+});
+
+
 app.get('/', function(req, res){
-  res.send('Welcome to Cinefox!');
+		// fs.readFile('./index.html', {encoding: 'utf-8'}, function(err, filestring){
+	    // if(err){
+			// throw err;
+		// }
+		// else {
+					
+					// var html = filestring;
+					// res.setHeader('content-type', 'text/html');
+					// res.writeHead(200);
+					// res.write(html);
+					// res.end();
+					// console.log(html);
+                    // res.send(html);
+
+		// }
+		// });
+
+
 });
 
 
