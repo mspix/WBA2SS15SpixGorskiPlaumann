@@ -16,43 +16,56 @@ app.use(function (req, res, next) {
 function queryFilter(dbArray, queryArray){
 
 	if(queryArray !== undefined){
-			
+
 			var counter = 0;
 			for (prop in queryArray) {
 				counter++;
 			}
-		
+
 			var queryResult = [];
-							
+
 				dbArray.forEach(function(dbElement) {
 					var propCounter = 0;
 					for (var queryProp in queryArray) {
 
 						for (var dbElementProp in dbElement) {
-							// Checking if Array in Array
-							if(queryProp == dbElementProp && Array.isArray(queryArray[queryProp]) && Array.isArray(dbElement[dbElementProp])){
-								for (var i=0; i < dbElement[dbElementProp].length; i++){
-								
-									if( JSON.stringify(queryArray[queryProp][0]).toLowerCase() == JSON.stringify(dbElement[dbElementProp][i]).toLowerCase()){
-										propCounter++;
-										break;
-									}
-								}
-							continue;
-							}
-							
-							if( JSON.stringify(dbElement[dbElementProp]).toLowerCase() == JSON.stringify(queryArray[queryProp]).toLowerCase() ){
-								propCounter++;
-							}
-					
+
+
+
+
+													// Checking if Array in Array
+													if(queryProp == dbElementProp && Array.isArray(queryArray[queryProp]) && Array.isArray(dbElement[dbElementProp])){
+														for (var i=0; i < dbElement[dbElementProp].length; i++){
+
+															if( JSON.stringify(queryArray[queryProp][0]).toLowerCase() == JSON.stringify(dbElement[dbElementProp][i]).toLowerCase()){
+																propCounter++;
+																break;
+															}
+														}
+													continue;
+													}
+
+
+
+													if(!isNaN(queryArray[queryProp])){
+															if(dbElement[dbElementProp] == queryArray[queryProp]){
+																propCounter++
+															}
+													}
+												
+
+													if( JSON.stringify(dbElement[dbElementProp]).toLowerCase() == JSON.stringify(queryArray[queryProp]).toLowerCase() ){
+														propCounter++;
+													}
+
 						}
 					}
 					if( propCounter == counter ){
 						queryResult.push(dbElement);
 					}
 				});
-	
-			return queryResult;	
+
+			return queryResult;
 	}
 	else {
 		return dbArray;
@@ -130,18 +143,18 @@ app.get('/users', function(req, res){
 			  res.json(users);
 			  return;
 			}
-			
+
 			db.mget(rep, function(err, rep){
 
 				rep.forEach(function(val){
 					users.push(JSON.parse(val));
 				});
-			
+
 				res.json(queryFilter(users, req.query));
-			
+
 			});
 		});
-		
+
 
 });
 
@@ -226,7 +239,7 @@ app.get('/kinos', function(req, res){
 		console.log(req.query);
 		console.log(queryFilter(kinos, req.query));
 		res.json(queryFilter(kinos, req.query));
-		
+
     });
   });
 });
@@ -308,7 +321,7 @@ app.get('/filme', function(req, res){
       });
 
 	  	res.json(queryFilter(filme, req.query));
-    
+
 	});
   });
 });
