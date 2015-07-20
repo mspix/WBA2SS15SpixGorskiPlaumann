@@ -153,7 +153,7 @@ app.get('/kinos', jsonParser, function(req, res){
 			
 			if(reqQueryArray !== undefined){
 				for(var prop in reqQueryArray){
-					var i = 0;
+					// var i = 0;
 					if(queryString == ""){
 						queryString += "?";
 					}
@@ -166,8 +166,20 @@ app.get('/kinos', jsonParser, function(req, res){
 					if(queryString != "?" && reqQueryArray[prop] != ""){
 						queryString += "&";
 					}
-					queryString += prop + "=" + reqQueryArray[prop];
-					++i;
+
+					queryString += prop; 
+
+					if(Array.isArray(reqQueryArray[prop])){
+						queryString += "[]";
+					}
+
+					queryString += "=";
+
+					if(Array.isArray(reqQueryArray[prop])){
+						reqQueryArray[prop];
+					}
+					
+					// ++i;
 					// if(reqQueryArray[prop] != "" && Object.keys(reqQueryArray)[i+1] != "submit"){
 						// console.log("next: " + Object.keys(reqQueryArray)[i+1]);
 						// queryString += "&";
