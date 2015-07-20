@@ -31,8 +31,12 @@ function queryFilter(dbArray, queryArray){
 						for (var dbElementProp in dbElement) {
 							// Checking if Array in Array
 							if(queryProp == dbElementProp && Array.isArray(queryArray[queryProp]) && Array.isArray(dbElement[dbElementProp])){
+							
 								for (var i=0; i < dbElement[dbElementProp].length; i++){
-								
+									// if(Number.isInteger(queryArray[queryProp][0])){
+										// queryArray[queryProp][0] = parseInt(queryArray[queryProp][0]);
+									// }
+									
 									if( JSON.stringify(queryArray[queryProp][0]).toLowerCase() == JSON.stringify(dbElement[dbElementProp][i]).toLowerCase()){
 										propCounter++;
 										break;
@@ -40,9 +44,16 @@ function queryFilter(dbArray, queryArray){
 								}
 							continue;
 							}
+							if( !isNaN( queryArray[queryProp]) ){
 							
-							if( JSON.stringify(dbElement[dbElementProp]).toLowerCase() == JSON.stringify(queryArray[queryProp]).toLowerCase() ){
-								propCounter++;
+								if( parseInt(dbElement[dbElementProp]) == queryArray[queryProp] ){
+									propCounter++;
+								}
+							} else {
+							
+								if( JSON.stringify(dbElement[dbElementProp]).toLowerCase() == JSON.stringify(queryArray[queryProp]).toLowerCase() ){
+									propCounter++;
+								}
 							}
 					
 						}
@@ -223,8 +234,7 @@ app.get('/kinos', function(req, res){
 		rep.forEach(function(val){
 			kinos.push(JSON.parse(val));
 		});
-		console.log(req.query);
-		console.log(queryFilter(kinos, req.query));
+		
 		res.json(queryFilter(kinos, req.query));
 		
     });

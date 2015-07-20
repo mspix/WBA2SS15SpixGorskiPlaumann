@@ -205,11 +205,18 @@ app.get('/kinos', jsonParser, function(req, res){
 					var html = ejs.render(filestring, JSON.parse(dataEdited));
 					res.setHeader('content-type', 'text/html');
 					res.writeHead(200);
+
 					res.write(html);
+
 					res.end();
 				});
 			});
-			
+					// if(req.query !== undefined){
+						// externalRequest.append('Link', JSON.stringify(req.query));
+						// console.log("drin");
+						// console.log(externalRequest.get('Link'));
+					// }
+							
 			externalRequest.end();
 		}
 	});
