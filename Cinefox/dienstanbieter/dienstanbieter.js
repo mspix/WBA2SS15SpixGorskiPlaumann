@@ -31,19 +31,41 @@ function queryFilter(dbArray, queryArray){
 						for (var dbElementProp in dbElement) {
 
 							// Checking if Array in Array
-							if(queryProp == dbElementProp && Array.isArray(queryArray[queryProp]) && Array.isArray(dbElement[dbElementProp])){
-							
-								for (var i=0; i < dbElement[dbElementProp].length; i++){
-									// if(Number.isInteger(queryArray[queryProp][0])){
-										// queryArray[queryProp][0] = parseInt(queryArray[queryProp][0]);
-									// }
-									
-									if( JSON.stringify(queryArray[queryProp][0]).toLowerCase() == JSON.stringify(dbElement[dbElementProp][i]).toLowerCase()){
-										propCounter++;
-										break;
+							if(queryProp == dbElementProp && Array.isArray(dbElement[dbElementProp])){
+								console.log("In Array");
+								console.log(Array.isArray(queryArray[queryProp]) ? "true" : "false");
+								console.log(queryArray);
+								// var querySubPropCounter = 0;
+								// for (var tmpProp in queryArray[queryProp]){
+									// querySubPropCounter++;								
+								// }
+								
+								if ( !Array.isArray(queryArray[queryProp])){	// Checking if value of queryProp is a string
+									queryArray[queryProp] = queryArray[queryProp].split(","); // => make an array
+								}	
+								
+								var subPropCounter = 0;
+
+								for (var dbElementSubProp in dbElement[dbElementProp]){
+								
+									for (var querySubProp in queryArray[queryProp]){
+											
+										if( JSON.stringify(queryArray[queryProp][querySubProp]).toLowerCase() == JSON.stringify(dbElement[dbElementProp][dbElementSubProp]).toLowerCase()){
+												
+												subPropCounter++;
+												
+											
+										}
 									}
+									
+					
 								}
-							continue;
+								
+								if( subPropCounter == queryArray[queryProp].length ){
+									propCounter++;
+								}
+								
+							continue; // Skip the rest
 							}
 							if( !isNaN( queryArray[queryProp]) ){
 							
@@ -71,7 +93,33 @@ function queryFilter(dbArray, queryArray){
 	}
 }
 
+app.get('/explorer', function(req, res){
 
+		var explorerQuery = req.query.Query;
+		
+		var 
+
+		db.keys('user:*', function(err, rep){
+
+
+			if(rep.length == 0){
+			  res.json(users);
+			  return;
+			}
+
+			db.mget(rep, function(err, rep){
+
+				rep.forEach(function(val){
+					users.push(JSON.parse(val));
+				});
+
+				res.json(queryFilter(users, req.query));
+
+			});
+		});
+
+
+});
 
 
 app.post('/users', function(req, res){
