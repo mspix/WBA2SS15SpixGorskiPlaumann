@@ -11,6 +11,35 @@ var app = express();
 
 app.use(express.static(__dirname + '/public'));
 
+function queryBuilder(reqQueryArray){
+
+		var queryString = "";
+
+		if(reqQueryArray !== undefined){
+		
+			for(var prop in reqQueryArray){
+				// var i = 0;
+				if(queryString == ""){
+					queryString += "?";
+				}
+				if(reqQueryArray[prop] == ""){
+					continue;
+				}
+				if(prop == "submit"){
+					break;
+				}
+				if(queryString != "?" && reqQueryArray[prop] != ""){
+					queryString += "&";
+				}
+				queryString += prop + "=" + reqQueryArray[prop];
+					
+			}
+		}
+		console.log(queryString);
+		return queryString;
+}
+
+
 app.get('/test', jsonParser, function(req, res){
 	
 	fs.readFile('./users.ejs', {encoding: 'utf-8'}, function(err, filestring){
@@ -136,53 +165,45 @@ app.get('/users', function(req, res){
 
 });
 
-
-
-app.get('/kinos', jsonParser, function(req, res){
+app.get('/consumer', jsonParser, function(req, res){
 	
-	fs.readFile('./templates/index.ejs', {encoding: 'utf-8'}, function(err, filestring){
+	fs.readFile('./templates/consumer.ejs', {encoding: 'utf-8'}, function(err, filestring){
 		if(err){
 			throw err;
 		}
 		else {
 		
-			var reqQueryArray = req.query;
-			console.log(reqQueryArray);
-			console.log(Array.isArray(reqQueryArray[4]) ? "true" : "false");			
-			
-			var queryString = "";
-			
-			if(reqQueryArray !== undefined){
-				for(var prop in reqQueryArray){
-					// var i = 0;
-					if(queryString == ""){
-						queryString += "?";
-					}
-					if(reqQueryArray[prop] == ""){
-						continue;
-					}
-					if(prop == "submit"){
-						break;
-					}
-					if(queryString != "?" && reqQueryArray[prop] != ""){
-						queryString += "&";
-					}
-
-					queryString += prop + "=" + reqQueryArray[prop];
-					
-					
-					// ++i;
-					// if(reqQueryArray[prop] != "" && Object.keys(reqQueryArray)[i+1] != "submit"){
-						// console.log("next: " + Object.keys(reqQueryArray)[i+1]);
-						// queryString += "&";
-					// }
-					
+			var options = {
+				host: 'localhost',
+				port: 1337,
+				path: '/consumer',
+				method: 'GET',
+				headers: {
+					accept: 'application/json'
 				}
 			}
 			
-			console.log(queryString);
-			
-			var path = "/kinos"+queryString;
+
+					
+			var html = ejs.render(filestring);
+			res.setHeader('content-type', 'text/html');
+			res.writeHead(200);
+			res.write(html);
+			res.end();
+
+		}
+	});
+});
+
+app.get('/kinos', jsonParser, function(req, res){
+	
+	fs.readFile('./templates/consumer.ejs', {encoding: 'utf-8'}, function(err, filestring){
+		if(err){
+			throw err;
+		}
+		else {
+		
+			var path = "/kinos"+queryBuilder(req.query);
 			
 			console.log(path);
 			
@@ -215,11 +236,6 @@ app.get('/kinos', jsonParser, function(req, res){
 					res.end();
 				});
 			});
-					// if(req.query !== undefined){
-						// externalRequest.append('Link', JSON.stringify(req.query));
-						// console.log("drin");
-						// console.log(externalRequest.get('Link'));
-					// }
 							
 			externalRequest.end();
 		}
@@ -228,23 +244,6 @@ app.get('/kinos', jsonParser, function(req, res){
 
 
 app.get('/', function(req, res){
-		// fs.readFile('./index.html', {encoding: 'utf-8'}, function(err, filestring){
-	    // if(err){
-			// throw err;
-		// }
-		// else {
-					
-					// var html = filestring;
-					// res.setHeader('content-type', 'text/html');
-					// res.writeHead(200);
-					// res.write(html);
-					// res.end();
-					// console.log(html);
-                    // res.send(html);
-
-		// }
-		// });
-
 
 });
 

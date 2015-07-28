@@ -32,7 +32,53 @@ h1 {
 	
 }
 
+.button {
+     
+    /*Step 2: Basic Button Styles*/
+    display: block;
+    height: 40px;
+    width: 200px;
+    background: #f00;
+    border: 1px solid #f00;
+     
+    /*Step 3: Text Styles*/
+    color: rgba(0, 0, 0, 0.55);
+    text-align: center;
+    font: bold 1.2em "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+     
+    /*Step 4: Fancy CSS3 Styles*/
+	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#febbbb+0,fe9090+45,ff5c5c+100;Red+3D+%231 */
+	background: #febbbb; /* Old browsers */
+	background: -moz-linear-gradient(top,  #febbbb 0%, #fe9090 45%, #ff5c5c 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#febbbb), color-stop(45%,#fe9090), color-stop(100%,#ff5c5c)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #febbbb 0%,#fe9090 45%,#ff5c5c 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #febbbb 0%,#fe9090 45%,#ff5c5c 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #febbbb 0%,#fe9090 45%,#ff5c5c 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #febbbb 0%,#fe9090 45%,#ff5c5c 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#febbbb', endColorstr='#ff5c5c',GradientType=0 ); /* IE6-9 */
 
+     
+    -webkit-border-radius: 10px;
+    -khtml-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+     
+    -webkit-box-shadow: 0 2px 0 #1b383b;
+    -moz-box-shadow: 0 2px 0 #1b383b;
+    box-shadow: 0 2px 0 #1b383b;
+     
+    text-shadow: 0 2px 2px rgba(255, 255, 255, 0.2);
+     
+}
+ 
+/*Step 3: Link Styling*/
+a.button {
+    text-decoration: none;
+}
+
+.startmenue {
+	margin: 100px 50%;
+}
 
 .kategorie {
 
