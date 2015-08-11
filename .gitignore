@@ -49,7 +49,7 @@ node_modules
 redis
 redis_dienstanbieter
 redis_dienstnutzer
-dump.rdb
+
 
 # Backup Files
 backup
