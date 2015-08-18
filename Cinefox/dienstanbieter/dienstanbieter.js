@@ -93,33 +93,33 @@ function queryFilter(dbArray, queryArray){
 	}
 }
 
-app.get('/explorer', function(req, res){
+// app.get('/explorer', function(req, res){
 
-		var explorerQuery = req.query.Query;
+		// var explorerQuery = req.query.Query;
 		
-		var 
+		// var 
 
-		db.keys('user:*', function(err, rep){
-
-
-			if(rep.length == 0){
-			  res.json(users);
-			  return;
-			}
-
-			db.mget(rep, function(err, rep){
-
-				rep.forEach(function(val){
-					users.push(JSON.parse(val));
-				});
-
-				res.json(queryFilter(users, req.query));
-
-			});
-		});
+		// db.keys('user:*', function(err, rep){
 
 
-});
+			// if(rep.length == 0){
+			  // res.json(users);
+			  // return;
+			// }
+
+			// db.mget(rep, function(err, rep){
+
+				// rep.forEach(function(val){
+					// users.push(JSON.parse(val));
+				// });
+
+				// res.json(queryFilter(users, req.query));
+
+			// });
+		// });
+
+
+// });
 
 
 app.post('/users', function(req, res){

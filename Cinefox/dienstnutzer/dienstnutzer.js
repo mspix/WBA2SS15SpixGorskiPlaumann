@@ -197,12 +197,51 @@ app.get('/consumer', jsonParser, function(req, res){
 
 app.get('/kinos', jsonParser, function(req, res){
 	
-	fs.readFile('./templates/consumer.ejs', {encoding: 'utf-8'}, function(err, filestring){
-		if(err){
-			throw err;
-		}
-		else {
+	// fs.readFile('./templates/consumer.ejs', {encoding: 'utf-8'}, function(err, filestring){
+		// if(err){
+			// throw err;
+		// }
+		// else {
 		
+			// var path = "/kinos"+queryBuilder(req.query);
+			
+			// console.log(path);
+			
+			// var options = {
+				// host: 'localhost',
+				// port: 1337,
+				// path: path,
+				// method: 'GET',
+				// headers: {
+					// accept: 'application/json'
+				// }
+			// }
+			
+			// var externalRequest = http.request(options, function(externalResponse) {
+				// console.log('Connected');
+				// externalResponse.on('data', function(chunk) {
+					
+					// var userdata = JSON.parse(chunk);
+					
+					// var dataEdited = "{\"kinos\" : "+ JSON.stringify(userdata) + "}";
+					// // console.log(dataEdited);
+					// // console.log(userdata);
+					
+					// var html = ejs.render(filestring, JSON.parse(dataEdited));
+					// res.setHeader('content-type', 'text/html');
+					// res.writeHead(200);
+
+					// res.write(html);
+
+					// res.end();
+				// });
+			// });
+							
+			// externalRequest.end();
+		// }
+		
+	// });
+	
 			var path = "/kinos"+queryBuilder(req.query);
 			
 			console.log(path);
@@ -223,23 +262,24 @@ app.get('/kinos', jsonParser, function(req, res){
 					
 					var userdata = JSON.parse(chunk);
 					
-					var dataEdited = "{\"kinos\" : "+ JSON.stringify(userdata) + "}";
+					// var dataEdited = "{\"kinos\" : "+ JSON.stringify(userdata) + "}";
+					
+					var dataEdited = JSON.stringify(userdata);
+					
 					// console.log(dataEdited);
 					// console.log(userdata);
-					
-					var html = ejs.render(filestring, JSON.parse(dataEdited));
-					res.setHeader('content-type', 'text/html');
+
+					res.setHeader('content-type', 'application/json');
 					res.writeHead(200);
 
-					res.write(html);
+					res.write(dataEdited);
 
 					res.end();
 				});
 			});
 							
-			externalRequest.end();
-		}
-	});
+			externalRequest.end();	
+	
 });
 
 
