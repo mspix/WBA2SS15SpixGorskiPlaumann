@@ -208,15 +208,15 @@ app.get('/customer', function(req, res){
 // 	});
 // });
 //
-app.get('/kinos', jsonParser, function(req, res){
+// app.get('/kinos', jsonParser, function(req, res){
 //
-// 	fs.readFile('./templates/consumer.ejs', {encoding: 'utf-8'}, function(err, filestring){
+// 	fs.readFile('.//customer', {encoding: 'utf-8'}, function(err, filestring){
 // 		if(err){
 // 			throw err;
 // 		}
 // 		else {
 //
-			var path = "/kinos"+queryBuilder(req.query);
+			// var path = "/kinos"+queryBuilder(req.query);
 //
 // 			console.log(path);
 //
