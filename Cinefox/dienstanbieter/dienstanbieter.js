@@ -37,48 +37,48 @@ function queryFilter(dbArray, queryArray){
 								console.log(queryArray);
 								// var querySubPropCounter = 0;
 								// for (var tmpProp in queryArray[queryProp]){
-									// querySubPropCounter++;								
+									// querySubPropCounter++;
 								// }
-								
+
 								if ( !Array.isArray(queryArray[queryProp])){	// Checking if value of queryProp is a string
 									queryArray[queryProp] = queryArray[queryProp].split(","); // => make an array
-								}	
-								
+								}
+
 								var subPropCounter = 0;
 
 								for (var dbElementSubProp in dbElement[dbElementProp]){
-								
+
 									for (var querySubProp in queryArray[queryProp]){
-											
+
 										if( JSON.stringify(queryArray[queryProp][querySubProp]).toLowerCase() == JSON.stringify(dbElement[dbElementProp][dbElementSubProp]).toLowerCase()){
-												
+
 												subPropCounter++;
-												
-											
+
+
 										}
 									}
-									
-					
+
+
 								}
-								
+
 								if( subPropCounter == queryArray[queryProp].length ){
 									propCounter++;
 								}
-								
+
 							continue; // Skip the rest
 							}
 							if( !isNaN( queryArray[queryProp]) ){
-							
+
 								if( parseInt(dbElement[dbElementProp]) == queryArray[queryProp] ){
 									propCounter++;
 								}
 							} else {
-							
+
 								if( JSON.stringify(dbElement[dbElementProp]).toLowerCase() == JSON.stringify(queryArray[queryProp]).toLowerCase() ){
 									propCounter++;
 								}
 							}
-					
+
 						}
 					}
 					if( propCounter == counter ){
@@ -101,7 +101,6 @@ function queryFilter(dbArray, queryArray){
 
 		// db.keys('user:*', function(err, rep){
 
-
 			// if(rep.length == 0){
 			  // res.json(users);
 			  // return;
@@ -117,8 +116,6 @@ function queryFilter(dbArray, queryArray){
 
 			// });
 		// });
-
-
 // });
 
 
@@ -283,7 +280,7 @@ app.get('/kinos', function(req, res){
 		rep.forEach(function(val){
 			kinos.push(JSON.parse(val));
 		});
-		
+
 		res.json(queryFilter(kinos, req.query));
 
     });
@@ -452,5 +449,6 @@ app.get('kinos/spielplaene', function(req, res){
   });
 });
 
-
-app.listen(1337);
+app.listen(1337, function(){
+	console.log("Dienstanbieter listens on Port 1337");
+});
