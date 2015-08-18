@@ -96,11 +96,10 @@ function queryFilter(dbArray, queryArray){
 // app.get('/explorer', function(req, res){
 
 		// var explorerQuery = req.query.Query;
-
-		// var
+		
+		// var 
 
 		// db.keys('user:*', function(err, rep){
-
 
 			// if(rep.length == 0){
 			  // res.json(users);
@@ -117,8 +116,6 @@ function queryFilter(dbArray, queryArray){
 
 			// });
 		// });
-
-
 // });
 
 
