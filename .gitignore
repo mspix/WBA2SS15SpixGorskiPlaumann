@@ -56,3 +56,4 @@ backup
 
 # REST Client Files
 rest_client_requests
+*.stackdump
