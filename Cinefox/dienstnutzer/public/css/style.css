@@ -1,9 +1,9 @@
 body {
-	
+
 	margin: auto auto;
 	padding: 0 0 0 0;
 	border: 0;
-	
+
 }
 
 h1 {
@@ -29,23 +29,23 @@ h1 {
 	font-family: helvetica;
 	font-size: 30px;
 	margin: 6px auto 0 50px;
-	
+
 }
 
 .button {
-     
+
     /*Step 2: Basic Button Styles*/
     display: block;
     height: 40px;
     width: 200px;
     background: #f00;
     border: 1px solid #f00;
-     
+
     /*Step 3: Text Styles*/
     color: rgba(0, 0, 0, 0.55);
     text-align: center;
     font: bold 1.2em "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
-     
+
     /*Step 4: Fancy CSS3 Styles*/
 	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#febbbb+0,fe9090+45,ff5c5c+100;Red+3D+%231 */
 	background: #febbbb; /* Old browsers */
@@ -57,20 +57,20 @@ h1 {
 	background: linear-gradient(to bottom,  #febbbb 0%,#fe9090 45%,#ff5c5c 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#febbbb', endColorstr='#ff5c5c',GradientType=0 ); /* IE6-9 */
 
-     
+
     -webkit-border-radius: 10px;
     -khtml-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;
-     
+
     -webkit-box-shadow: 0 2px 0 #1b383b;
     -moz-box-shadow: 0 2px 0 #1b383b;
     box-shadow: 0 2px 0 #1b383b;
-     
+
     text-shadow: 0 2px 2px rgba(255, 255, 255, 0.2);
-     
+
 }
- 
+
 /*Step 3: Link Styling*/
 a.button {
     text-decoration: none;
@@ -87,3 +87,15 @@ a.button {
 
 }
 
+
+/* ajax load*/
+
+.load {
+	background: url('../images/1.gif') no-repeat center center;
+	width: 15px;
+	height: 15px;
+	display: block;
+}
+.load.none {
+	display:none;
+}

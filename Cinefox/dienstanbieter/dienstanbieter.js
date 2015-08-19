@@ -96,8 +96,7 @@ function queryFilter(dbArray, queryArray){
 // app.get('/explorer', function(req, res){
 
 		// var explorerQuery = req.query.Query;
-		
-		// var 
+
 
 		// db.keys('user:*', function(err, rep){
 
