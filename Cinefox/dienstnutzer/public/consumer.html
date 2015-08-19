@@ -12,6 +12,7 @@
 						
 				$( '.cineSearch' ).on( 'submit', function( event ) {
 					event.preventDefault();
+					$( '.cineResults' ).empty();
 					console.log( $( this ).serialize() );
 					
 					var $cineResults = $('.cineResults'); 	// div mit der Klasse cineResults selektiert
@@ -23,7 +24,7 @@
 						contentType: 'application/json',
 						success: function(cineResults) {
 							console.log($('.cineSearch').serialize());
-							$( 'cineResult' ).remove();
+							// $( '.cineResult' ).remove();
 							$.each(cineResults, function(i, cineResult) {
 							$cineResults.append('<li class="cineResult">'+cineResult.bezeichnung+'</li>');
 						});

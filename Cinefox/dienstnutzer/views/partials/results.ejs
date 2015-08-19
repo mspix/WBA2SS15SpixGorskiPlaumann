@@ -1,8 +1,15 @@
-<p><%= results-tag %></p>
-<ul>
-    <% results.forEach(function(result) { %>
-        <li><%= result.bezeichnung %></li>
-        <% }); 
 
-        %>
-</ul>
+
+	<% var kinos = {"kinos" : [{"bezeichnung" : ""}]}; %>
+		<%
+			if(kinos[0] !== undefined){ %>
+				<% var cache = ''; %>
+				<ul>
+					<% kinos.forEach(function(kino) { %>
+						<li><%= kino.bezeichnung %></li>
+					<% }); 
+
+					%>
+				</ul<%
+			}
+		%>

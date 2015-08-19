@@ -210,7 +210,7 @@ app.get('/customer', function(req, res){
 
 app.get('/kinos', jsonParser, function(req, res){
 	
-	// fs.readFile('./templates/consumer.ejs', {encoding: 'utf-8'}, function(err, filestring){
+	// fs.readFile('./views/partials/results.ejs', {encoding: 'utf-8'}, function(err, filestring){
 		// if(err){
 			// throw err;
 		// }
@@ -240,11 +240,11 @@ app.get('/kinos', jsonParser, function(req, res){
 					// // console.log(dataEdited);
 					// // console.log(userdata);
 					
-					// var html = ejs.render(filestring, JSON.parse(dataEdited));
+					// // var html = ejs.render(filestring, JSON.parse(dataEdited));
 					// res.setHeader('content-type', 'text/html');
 					// res.writeHead(200);
 
-					// res.write(html);
+					// res.write(dataEdited);
 
 					// res.end();
 				// });
