@@ -2,11 +2,52 @@
 <html lang="en">
 <head>
     <% include ../partials/head %>
+    <script>
+      $( document ).ready(function() {
+        console.log( "ready!" );
+
+
+
+        $( '.cineSearch' ).on( 'submit', function( event ) {
+          event.preventDefault();
+          $('.cineResults').empty();
+          console.log( $( this ).serialize() );
+
+          var $cineResults = $('.cineResults'); 	// div mit der Klasse cineResults selektiert
+
+          $.ajax({
+            url: '/kinos',
+            method: 'GET',
+            data: $('.cineSearch').serialize(),
+            contentType: 'application/json',
+            success: function(cineResults) {
+              console.log($('.cineSearch').serialize());
+
+              $.each(cineResults, function(i, cineResult) {
+                $cineResults.append('<li class="cineResult">'+cineResult.bezeichnung+'</li>');
+            });
+            }
+          })/*.done(function (response) {
+            console.log($('.cineSearch').serialize());
+            $.each(response, function(i, cineResult) {
+              $cineResults.append('<li>Result' + i+1 + '</li>');
+            });
+
+          })*/.fail(function () {
+            console.log('Error!');
+            alert('Error!');
+          });
+
+
+        });
+      });
+    </script>
 </head>
 <body class="container">
 
     <header>
         <% include ../partials/header %>
+
     </header>
 
     <main>
@@ -16,8 +57,8 @@
 
       <%include ../partials/customer-form %>
 
+    <ul class="cineResults"></ul>
 
-    
 
     </main>
 

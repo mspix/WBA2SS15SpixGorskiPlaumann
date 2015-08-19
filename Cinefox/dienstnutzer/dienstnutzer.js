@@ -209,17 +209,17 @@ app.get('/customer', function(req, res){
 // });
 
 app.get('/kinos', jsonParser, function(req, res){
-	
+
 	// fs.readFile('./templates/consumer.ejs', {encoding: 'utf-8'}, function(err, filestring){
 		// if(err){
 			// throw err;
 		// }
 		// else {
-		
+
 			// var path = "/kinos"+queryBuilder(req.query);
-			
+
 			// console.log(path);
-			
+
 			// var options = {
 				// host: 'localhost',
 				// port: 1337,
@@ -229,17 +229,17 @@ app.get('/kinos', jsonParser, function(req, res){
 					// accept: 'application/json'
 				// }
 			// }
-			
+
 			// var externalRequest = http.request(options, function(externalResponse) {
 				// console.log('Connected');
 				// externalResponse.on('data', function(chunk) {
-					
+
 					// var userdata = JSON.parse(chunk);
-					
+
 					// var dataEdited = "{\"kinos\" : "+ JSON.stringify(userdata) + "}";
 					// // console.log(dataEdited);
 					// // console.log(userdata);
-					
+
 					// var html = ejs.render(filestring, JSON.parse(dataEdited));
 					// res.setHeader('content-type', 'text/html');
 					// res.writeHead(200);
@@ -249,16 +249,16 @@ app.get('/kinos', jsonParser, function(req, res){
 					// res.end();
 				// });
 			// });
-							
+
 			// externalRequest.end();
 		// }
-		
+
 	// });
-	
+			console.log(req.query);
 			var path = "/kinos"+queryBuilder(req.query);
-			
+
 			console.log(path);
-			
+
 			var options = {
 				host: 'localhost',
 				port: 1337,
@@ -268,31 +268,30 @@ app.get('/kinos', jsonParser, function(req, res){
 					accept: 'application/json'
 				}
 			}
-			
+
 			var externalRequest = http.request(options, function(externalResponse) {
 				console.log('Connected');
 				externalResponse.on('data', function(chunk) {
-					
+
 					var userdata = JSON.parse(chunk);
-					
+
 					// var dataEdited = "{\"kinos\" : "+ JSON.stringify(userdata) + "}";
-					
+
 					var dataEdited = JSON.stringify(userdata);
-					
-					// console.log(dataEdited);
-					// console.log(userdata);
+
+
 
 					res.setHeader('content-type', 'application/json');
 					res.writeHead(200);
 
-					res.write(dataEdited);
-
+					 res.write(dataEdited);
+					 console.log(dataEdited);
 					res.end();
 				});
 			});
-							
-			externalRequest.end();	
-	
+
+			externalRequest.end();
+
 });
 
 

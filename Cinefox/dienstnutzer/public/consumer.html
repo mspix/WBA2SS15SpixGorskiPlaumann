@@ -1,21 +1,24 @@
 <html>
 	<head>
 		<title>Cinefox</title>
-		<link href="./css/normalize.css" type="text/css" rel="stylesheet">		
+		<link href="./css/normalize.css" type="text/css" rel="stylesheet">
 		<link href="./css/style.css" type="text/css" rel="stylesheet">
 		<meta charset="utf-8"/>
-		
+
 		<script src="http://code.jquery.com/jquery-1.9.0.js"></script>
 		<script>
 			$( document ).ready(function() {
 				console.log( "ready!" );
-						
+
+
+
 				$( '.cineSearch' ).on( 'submit', function( event ) {
 					event.preventDefault();
+					$('.cineResults').empty();
 					console.log( $( this ).serialize() );
-					
+
 					var $cineResults = $('.cineResults'); 	// div mit der Klasse cineResults selektiert
-					
+
 					$.ajax({
 						url: '/kinos',
 						method: 'GET',
@@ -23,9 +26,9 @@
 						contentType: 'application/json',
 						success: function(cineResults) {
 							console.log($('.cineSearch').serialize());
-							$( 'cineResult' ).remove();
+
 							$.each(cineResults, function(i, cineResult) {
-							$cineResults.append('<li class="cineResult">'+cineResult.bezeichnung+'</li>');
+								$cineResults.append('<li class="cineResult">'+cineResult.bezeichnung+'</li>');
 						});
 						}
 					})/*.done(function (response) {
@@ -33,71 +36,72 @@
 						$.each(response, function(i, cineResult) {
 							$cineResults.append('<li>Result' + i+1 + '</li>');
 						});
-						
+
 					})*/.fail(function () {
 						console.log('Error!');
-						alert('Error!');	
+						alert('Error!');
 					});
-				
-					
-				});
 
+
+				});
 			});
 		</script>
-		
+
 	</head>
 	<body>
 		<div class="userbar">
 			<p>Cinefox</p>
 		</div>
 
-		
+
 		<h2>Finden von Kinos, Filmen und Spielzeiten</h2>
-		
+
 		<div class="kategorie">
 			<h3>Kinos - Erweiterte Suche</h3>
-			
+
 			<div class="subCategory">
-				
+
 				<form class="cineSearch">
 					<label for="kino">Kino:</label>
 				    <input type="text" id="bezeichnung" name="bezeichnung"/></br>
-					
+
 					<label for="ort">Ort:</label>
 					<input type="text" id="kinoOrt" name="ort"/></br>
-					
+
 					<label for="plz">PLZ:</label>
 					<input type="text" id="plz" name="plz"/></br>
-					
+
 					<label for="bewertung">Bewertung:</label>
 					<input type="text" id="bewertung" name="bewertung"/></br>
-					
+
+				
+
 					<label for="kinotag">Kinotag:</label>
-					<input type="checkbox" name="kinotag" value="mo">Montag 
+					<input type="checkbox" name="kinotag" value="mo">Montag
 					<input type="checkbox" name="kinotag" value="di">Dienstag
 					<input type="checkbox" name="kinotag" value="mi">Mittwoch
 					<input type="checkbox" name="kinotag" value="do">Donnerstag
 					<input type="checkbox" name="kinotag" value="fr">Freitag
 					<input type="checkbox" name="kinotag" value="sa">Samstag
-					<input type="checkbox" name="kinotag" value="so">Sonntag<br>	
-					
-					
+					<input type="checkbox" name="kinotag" value="so">Sonntag<br>
+
+
 				    <input type="submit" value="Submit" name="submit"/>
 				</form>
-				
+
 				<ul class="cineResults"></ul>
-				
+
 			</div>
 		</div>
 		<div class="kategorie">
 		</div>
 		<div class="kategorie">
-		</div>		
+		</div>
 
 		<p><tt id="results"></tt></p>
- 
+
 		<script>
-		
+
 		  function showValues() {
 			var str = $( '.cineSearch' ).serialize();
 			$( "#results" ).text( str );
@@ -105,7 +109,7 @@
 		  $( "input[type='checkbox'], input[type='radio']" ).on( "click", showValues );
 		  $( "select" ).on( "change", showValues );
 		  showValues();
-		  
+
 		</script>
 
 	</body>
