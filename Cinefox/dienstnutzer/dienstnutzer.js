@@ -256,7 +256,7 @@ app.get('/kinos', jsonParser, function(req, res){
 		// }
 
 	// });
-			console.log(req.query);
+
 			var path = "/kinos"+queryBuilder(req.query);
 
 			console.log(path);
@@ -297,7 +297,80 @@ app.get('/kinos', jsonParser, function(req, res){
 });
 
 
+app.get('/filme', jsonParser, function(req, res){
 
+			var path = "/filme"+queryBuilder(req.query);
+
+			console.log(path);
+
+			var options = {
+				host: 'localhost',
+				port: 1337,
+				path: path,
+				method: 'GET',
+				headers: {
+					accept: 'application/json'
+				}
+			}
+
+			var externalRequest = http.request(options, function(externalResponse) {
+				console.log('Connected');
+				externalResponse.on('data', function(chunk) {
+
+					var userdata = JSON.parse(chunk);
+
+					var dataEdited = JSON.stringify(userdata);
+
+					res.setHeader('content-type', 'application/json');
+					res.writeHead(200);
+
+					 res.write(dataEdited);
+					 console.log(dataEdited);
+					res.end();
+				});
+			});
+
+			externalRequest.end();
+
+});
+
+
+app.get('/spielplaene', jsonParser, function(req, res){
+
+			var path = "/spielplaene"+queryBuilder(req.query);
+
+			console.log(path);
+
+			var options = {
+				host: 'localhost',
+				port: 1337,
+				path: path,
+				method: 'GET',
+				headers: {
+					accept: 'application/json'
+				}
+			}
+
+			var externalRequest = http.request(options, function(externalResponse) {
+				console.log('Connected');
+				externalResponse.on('data', function(chunk) {
+
+					var userdata = JSON.parse(chunk);
+
+					var dataEdited = JSON.stringify(userdata);
+
+					res.setHeader('content-type', 'application/json');
+					res.writeHead(200);
+
+					 res.write(dataEdited);
+					 console.log(dataEdited);
+					res.end();
+				});
+			});
+
+			externalRequest.end();
+
+});
 
 app.listen(1338, function(){
 	console.log("Dienstnutzer listens on Port 1338");

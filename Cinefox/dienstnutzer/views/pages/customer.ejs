@@ -3,44 +3,290 @@
 <head>
     <% include ../partials/head %>
     <script>
-      $( document ).ready(function() {
-        console.log( "ready!" );
+		$( document ).ready(function() {
+		console.log( "ready!" );
+		
+		var $cineResults = $('.cineResults'); 		// div mit der Klasse cineResults selektiert
+		var $movieResults = $('.movieResults'); 	// div mit der Klasse movieResults selektiert
+		var $timeResults = $('.timeResults'); 		// div mit der Klasse timeResults selektiert		
+		
+/*		var cineList = '';
+		var movieList = '';
+		var timeList = '';
+		
+		var priorityData = {							// Default
+								"searchPointer" : "",
+								"list" : ""
+							};	
+		
+		var priority = [];
+						
+		var searchPointer = '';
+		
+		var counter = 0;
+		
+		
+		function priorityCount(){
+			if(counter < 3){
+				counter++;
+			} else {
+				counter = 0;		
+			}
+		}
+		
+		function refreshPage(newList){ // vorher: newSearchPointer, newList
+			
+			// searchPointer:
+			// 0 == cineSearch
+			// 1 == movieSearch
+			// 2 == timeSearch
+			
+			console.log(cineList);
+			console.log(movieList);
+			console.log(timeList);
+			
+			priority[counter] = {	
+									"searchPointer" : newSearchPointer,			// benutzen!!! 
+									"list" : newList
+								};
+			
 
+			var listCache0 = priority[0].list;
+			
+			priorityCount();
+			
+			if(counter == 0){
+				return listCashe0;
+			}
+			
+			if(counter == 1){
+				
+				var listCache1 = [];		// Array für aktualisierte Ergebnisliste
+				
+				// schleife für alle elemente	
+				
+				priority[1].list.forEach(function(prio1ListPoint) {
+				
+					for( var prio0ListPoint in priority[0].list ) {
+					
+						if( prio0ListPoint.hasOwnProperty('kinoID') ){
+							if( prio1ListPoint.hasOwnProperty('kinoID') ){
+							
 
+								if( prio0ListPoint.kinoID == prio1ListPoint.kinoID ){
+								
+									listCache1.push(prioList1Point);
+									break;
+								}
+							}
+						} 
+						else if( prio0ListPoint.hasOwnProperty('filmID') ){
+							if( prio1ListPoint.hasOwnProperty('filmID') ){
+							
+
+								if( prio0ListPoint.filmID == prio1ListPoint.filmID ){
+								
+									listCache1.push(prioList1Point);
+									break;
+								}
+							}
+						}
+						else if( prio0ListPoint.hasOwnProperty('spielplanID') ){
+							if( prio1ListPoint.hasOwnProperty('spielplanID') ){		// Datensaetze aktualisieren!!! spielplan -> spielplanID
+							
+
+								if( prio0ListPoint.spielplanID == prio1ListPoint.spielplanID ){
+								
+									listCache1.push(prioList1Point);
+									break;
+								}
+							}
+						}
+						
+						return listCache1;
+						
+					}
+				});	
+			}
+			
+			if(counter == 2){
+						
+				var listCache2 = [];
+						
+				priority[2].list.forEach(function(prio2ListPoint) {
+							
+					for( var prio1ListPoint in priority[1].list ) {
+						if( prio1ListPoint.hasOwnProperty('kinoID') ){
+							if( prio2ListPoint.hasOwnProperty('kinoID') ){
+							
+
+								if( prio1ListPoint.kinoID == prio2ListPoint.kinoID ){
+								
+									listCache2.push(prioList2Point);
+									break;
+								}
+							}
+						} 
+						else if( prio1ListPoint.hasOwnProperty('filmID') ){
+							if( prio2ListPoint.hasOwnProperty('filmID') ){
+							
+
+								if( prio1ListPoint.filmID == prio2ListPoint.filmID ){
+								
+									listCache2.push(prioList2Point);
+									break;
+								}
+							}
+						}
+						else if( prio1ListPoint.hasOwnProperty('spielplanID') ){
+							if( prio2ListPoint.hasOwnProperty('spielplanID') ){		// Datensaetze aktualisieren!!! spielplan -> spielplanID
+							
+
+								if( prio1ListPoint.spielplanID == prio2ListPoint.spielplanID ){
+								
+									listCache2.push(prioList2Point);
+									break;
+								}
+							}
+						}
+						
+						return listCache2;
+						
+					}
+				});	
+			}
+			
+			
+			
+/*			$.each(cineList, function(i, cinePoint) {
+				$.each(movieList, function(i, moviePoint) {
+					$.each(timeList, function(i, timePoint) {
+						if(){
+							$cineResults.remove();
+						}
+					});
+				});
+				if(){
+					$cineResults.remove();
+				}
+				
+			});			
+			
+		};	*/
 
         $( '.cineSearch' ).on( 'submit', function( event ) {
-          event.preventDefault();
-          $('.cineResults').empty();
-          console.log( $( this ).serialize() );
+			event.preventDefault();
+			$('.cineResults').empty();
+			console.log( $( this ).serialize() );
 
-          var $cineResults = $('.cineResults'); 	// div mit der Klasse cineResults selektiert
+			$.ajax({
+				url: '/kinos',
+				method: 'GET',
+				data: $('.cineSearch').serialize(),
+				contentType: 'application/json',
+				success: function(cineResults) {
+					console.log($('.cineSearch').serialize());
+					
+					// cineResults = refreshPage(cineResults); // vorher: refreshPage(0, cineResults);
+					
+					$.each(cineResults, function(i, cineResult) {
+						$cineResults.append('<li class="cineResult cineResultID'+ i +'">'+	
+												'Kino: '				+cineResult.bezeichnung+
+												'</br>Kinotag: '		+cineResult.kinotag+
+												'</br>Reservierung: '	+cineResult.reservierungsHotline+
+												'</br>Preise: '			+cineResult.preise+
+												'</br>Bewertung: '		+cineResult.bewertung+
+											'</li>');
+					});
 
-          $.ajax({
-            url: '/kinos',
-            method: 'GET',
-            data: $('.cineSearch').serialize(),
-            contentType: 'application/json',
-            success: function(cineResults) {
-              console.log($('.cineSearch').serialize());
-
-              $.each(cineResults, function(i, cineResult) {
-                $cineResults.append('<li class="cineResult">'+cineResult.bezeichnung+'</li>');
-            });
-            }
-          })/*.done(function (response) {
-            console.log($('.cineSearch').serialize());
-            $.each(response, function(i, cineResult) {
-              $cineResults.append('<li>Result' + i+1 + '</li>');
+				}
+			})/*.done(function (response) {
+				console.log($('.cineSearch').serialize());
+				$.each(response, function(i, cineResult) {
+					$cineResults.append('<li>Result' + i+1 + '</li>');
             });
 
           })*/.fail(function () {
-            console.log('Error!');
-            alert('Error!');
+				console.log('Error!');
+				alert('Error!');
           });
 
 
         });
-      });
+      
+	  
+	  
+        $( '.movieSearch' ).on( 'submit', function( event ) {
+			event.preventDefault();
+			$('.movieResults').empty();
+			console.log( $( this ).serialize() );
+			
+			$.ajax({
+				url: '/filme',
+				method: 'GET',
+				data: $('.movieSearch').serialize(),
+				contentType: 'application/json',
+				success: function(movieResults) {
+					console.log($('.movieSearch').serialize());
+
+					// movieResults = refreshPage(movieResults);
+					
+					$.each(movieResults, function(i, movieResult) {
+						$movieResults.append('<li class="movieResult movieResultID'+ i +'">'+movieResult.deTitel+'</li>');
+					});
+					
+				}
+			})/*.done(function (response) {
+				console.log($('.movieSearch').serialize());
+				$.each(response, function(i, movieResult) {
+					$movieResults.append('<li>Result' + i+1 + '</li>');
+            });
+
+          })*/.fail(function () {
+				console.log('Error!');
+				alert('Error!');
+          });
+
+
+        });
+    
+
+
+        $( '.timeSearch' ).on( 'submit', function( event ) {
+			event.preventDefault();
+			$('.timeResults').empty();
+			console.log( $( this ).serialize() );
+
+			$.ajax({
+				url: '/spielplaene',
+				method: 'GET',
+				data: $('.timeSearch').serialize(),
+				contentType: 'application/json',
+				success: function(timeResults) {
+					console.log($('.timeSearch').serialize());
+					
+					// timeResults = refreshPage(timeResults);
+
+					$.each(timeResults, function(i, timeResult) {
+						$timeResults.append('<li class="timeResult timeResultID'+ i +'">'+timeResult.spielplanID+'</li>');
+					});
+									
+				}
+			})/*.done(function (response) {
+				console.log($('.timeSearch').serialize());
+				$.each(response, function(i, timeResult) {
+					$timeResults.append('<li>Result' + i+1 + '</li>');
+            });
+
+          })*/.fail(function () {
+				console.log('Error!');
+				alert('Error!');
+          });
+
+
+        });
+		
+	}); 
     </script>
 </head>
 <body class="container">
@@ -55,9 +301,17 @@
 		<%include ../partials/main-heading %>
 
 
-		<%include ../partials/customer-form %>
+		<%include ../partials/cine-form %>
 
 		<ul class="cineResults"></ul>
+		
+		<%include ../partials/movie-form %>
+		
+		<ul class="movieResults"></ul>
+
+		<%include ../partials/time-form %>
+		
+		<ul class="timeResults"></ul>		
 
     </main>
 

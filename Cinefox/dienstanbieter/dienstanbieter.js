@@ -14,7 +14,7 @@ app.use(function (req, res, next) {
 });
 
 function queryFilter(dbArray, queryArray){
-
+	console.log(queryArray);
 	if(queryArray !== undefined){
 
 			var counter = 0;
@@ -67,14 +67,20 @@ function queryFilter(dbArray, queryArray){
 
 							continue; // Skip the rest
 							}
-							if( !isNaN( queryArray[queryProp]) ){
+							if( !isNaN( queryArray[queryProp]) && queryProp == dbElementProp ){
+								console.log(queryArray[queryProp]);
 
 								if( parseInt(dbElement[dbElementProp]) == queryArray[queryProp] ){
 									propCounter++;
 								}
+							} else if ( ( queryArray[queryProp] ==  'true' || queryArray[queryProp] == 'false' ) && queryProp == dbElementProp ){
+								// console.log('dbElementProp:'+dbElementProp+' '+dbElement[dbElementProp]+' queryProp:'+queryProp+' '+queryArray[queryProp] + ' ' + typeof(queryArray[queryProp])); 
+								if( dbElement[dbElementProp] == JSON.parse(queryArray[queryProp]) ){
+									propCounter++;
+								}
 							} else {
 
-								if( JSON.stringify(dbElement[dbElementProp]).toLowerCase() == JSON.stringify(queryArray[queryProp]).toLowerCase() ){
+								if( queryProp == dbElementProp && JSON.stringify(dbElement[dbElementProp]).toLowerCase() == JSON.stringify(queryArray[queryProp]).toLowerCase() ){
 									propCounter++;
 								}
 							}
@@ -93,30 +99,13 @@ function queryFilter(dbArray, queryArray){
 	}
 }
 
-// app.get('/explorer', function(req, res){
-
-		// var explorerQuery = req.query.Query;
-
-
-		// db.keys('user:*', function(err, rep){
-
-			// if(rep.length == 0){
-			  // res.json(users);
-			  // return;
-			// }
-
-			// db.mget(rep, function(err, rep){
-
-				// rep.forEach(function(val){
-					// users.push(JSON.parse(val));
-				// });
-
-				// res.json(queryFilter(users, req.query));
-
-			// });
-		// });
-// });
-
+function stringToBoolean(string){
+	switch(string.toLowerCase()){
+		case "true": case "yes": case "1": return true;
+		case "false": case "no": case "0": case "": return false;
+		default: return Boolean(string);
+	}
+}
 
 app.post('/users', function(req, res){
   var newUser = req.body;
@@ -206,10 +195,11 @@ app.get('/', function(req, res){
   res.send('Welcome to Cinefox!');
 });
 
+
 app.post('/kinos', function(req, res){
   var newKino = req.body;
 
-  db.incr('kinoID:kinos', function(err, rep){
+  db.incr('id:kinos', function(err, rep){
 
     newKino.kinoID = rep;
 
@@ -290,7 +280,7 @@ app.get('/kinos', function(req, res){
 app.post('/filme', function(req, res){
   var newFilm = req.body;
 
-  db.incr('filmID:filme', function(err, rep){
+  db.incr('id:filme', function(err, rep){
 
     newFilm.filmID = rep;
 
@@ -369,10 +359,10 @@ app.get('/filme', function(req, res){
 });
 
 
-app.post('kinos/spielplaene', function(req, res){
+app.post('/spielplaene', function(req, res){
   var newSpielplan = req.body;
 
-  db.incr('spielplanID:spielplaene', function(err, rep){
+  db.incr('id:spielplaene', function(err, rep){
 
     newSpielplan.spielplanID = rep;
 
@@ -385,7 +375,7 @@ app.post('kinos/spielplaene', function(req, res){
 });
 
 
-app.get('kinos/spielplaene/:spielplanID', function(req, res){
+app.get('/spielplaene/:spielplanID', function(req, res){
   db.get('spielplan:'+req.params.spielplanID, function(err, rep){
 
     if(rep){
@@ -399,7 +389,7 @@ app.get('kinos/spielplaene/:spielplanID', function(req, res){
 });
 
 
-app.put('kinos/spielplaene/:spielplanID', function(req, res){
+app.put('/spielplaene/:spielplanID', function(req, res){
   db.exists('spielplan:'+req.params.spielplanID, function(err, rep){
     if (rep == 1){
       var updatedSpielplan = req.body;
@@ -415,7 +405,7 @@ app.put('kinos/spielplaene/:spielplanID', function(req, res){
 });
 
 
-app.delete('kinos/spielplaene/:spielplanID', function(req, res){
+app.delete('/spielplaene/:spielplanID', function(req, res){
   db.del('spielplan:'+req.params.spielplanID, function(err, rep){
     if (rep == 1){
       res.status(200).type('text').send('OK - Spielplan gelöscht');
@@ -427,7 +417,7 @@ app.delete('kinos/spielplaene/:spielplanID', function(req, res){
 });
 
 
-app.get('kinos/spielplaene', function(req, res){
+app.get('/spielplaene', function(req, res){
   db.keys('spielplan:*', function(err, rep){
 
     var spielplaene = [];
@@ -446,6 +436,17 @@ app.get('kinos/spielplaene', function(req, res){
 	  	res.json(queryFilter(spielplaene, req.query));
     });
   });
+});
+
+app.get('/fruit/:fruitName/kind/:fruitColor', function(req, res) {
+    var data = {
+        "fruit": {
+            "apple": req.params.fruitName,
+            "color": req.params.fruitColor
+        }
+    }; 
+
+    res.json(data);
 });
 
 app.listen(1337, function(){
