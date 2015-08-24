@@ -10,7 +10,7 @@
 		var $movieResults = $('.movieResults'); 	// div mit der Klasse movieResults selektiert
 		var $timeResults = $('.timeResults'); 		// div mit der Klasse timeResults selektiert		
 		
-/*		var cineList = '';
+		var cineList = '';
 		var movieList = '';
 		var timeList = '';
 		
@@ -29,132 +29,218 @@
 		function priorityCount(){
 			if(counter < 3){
 				counter++;
-			} else {
-				counter = 0;		
+				console.log("Counter: "+counter);
+				
+			} 
+			if(counter == 3){
+				counter = 1; // nicht 0, da die 1. Priorität beibehalten werden soll.	
+				console.log("Counter-Set: "+counter);
 			}
+			
 		}
 		
-		function refreshPage(newList){ // vorher: newSearchPointer, newList
+		function refreshPage(newSearchPointer, newList){ // vorher: newSearchPointer, newList
 			
 			// searchPointer:
 			// 0 == cineSearch
 			// 1 == movieSearch
 			// 2 == timeSearch
 			
-			console.log(cineList);
-			console.log(movieList);
-			console.log(timeList);
+			// console.log(cineList);
+			// console.log(movieList);
+			// console.log(timeList);
 			
 			priority[counter] = {	
-									"searchPointer" : newSearchPointer,			// benutzen!!! 
+									"searchPointer" : newSearchPointer,
 									"list" : newList
 								};
+								
+			// priority[counter] = newList;				
 			
 
 			var listCache0 = priority[0].list;
 			
-			priorityCount();
+			// console.log(listCache0);
 			
 			if(counter == 0){
-				return listCashe0;
+				priorityCount();
+				return listCache0;
 			}
 			
-			if(counter == 1){
+			if(counter > 0){
+				if(priority[counter-1].searchPointer == newSearchPointer){	// Bei wiederholter gleicher Suche soll der counter nicht hochzählen
+					counter = counter-1;
+				}
+				if(counter > 1 && priority[counter-2].searchPointer == newSearchPointer){
+					counter = counter-2;
+				}
+			}				
+			
+			if(counter == 1 && priority[1].searchPointer == newSearchPointer && priority[0].searchPointer != newSearchPointer){ 	// priority[0].searchPointer != newSearchPointer -> falls eine Veränderung in der selben Suche vorgenommen wird,
+																// sollen die Ergebnisse sich nicht anhand der vorherigen Ergebnisse updaten
+																// anders gesagt: wenn der neue searchPointer ein anderer ist als der erste, dann führe aus
+				
+				
 				
 				var listCache1 = [];		// Array für aktualisierte Ergebnisliste
 				
 				// schleife für alle elemente	
+				console.log(JSON.stringify(priority[1].list));
 				
-				priority[1].list.forEach(function(prio1ListPoint) {
+				for( var prio0ListPoint in priority[0].list ) {
 				
-					for( var prio0ListPoint in priority[0].list ) {
-					
-						if( prio0ListPoint.hasOwnProperty('kinoID') ){
-							if( prio1ListPoint.hasOwnProperty('kinoID') ){
-							
+					for( var prio1ListPoint in priority[1].list ) {
 
-								if( prio0ListPoint.kinoID == prio1ListPoint.kinoID ){
-								
-									listCache1.push(prioList1Point);
-									break;
+						console.log(priority[0].list[prio0ListPoint].hasOwnProperty('filmID')+" <-> "+priority[1].list[prio1ListPoint].hasOwnProperty('kinoID'));		
+						
+						if( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') ){
+							if( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') ){
+							
+								console.log(priority[0].list[prio0ListPoint].kinoID+" <-> "+priority[1].list[prio1ListPoint].kinoID);
+								if( priority[0].list[prio0ListPoint].kinoID == priority[1].list[prio1ListPoint].kinoID ){
+									console.log("kinoID");
+									listCache1.push(priority[1].list[prio1ListPoint]);
+									continue;
 								}
 							}
 						} 
-						else if( prio0ListPoint.hasOwnProperty('filmID') ){
-							if( prio1ListPoint.hasOwnProperty('filmID') ){
+						else if( priority[0].list[prio0ListPoint].hasOwnProperty('filmID') ){
+							if( priority[1].list[prio1ListPoint].hasOwnProperty('filmID') ){
 							
 
-								if( prio0ListPoint.filmID == prio1ListPoint.filmID ){
-								
-									listCache1.push(prioList1Point);
-									break;
+								if( priority[0].list[prio0ListPoint].filmID == priority[1].list[prio1ListPoint].filmID ){
+									console.log("filmID");								
+									listCache1.push(priority[1].list[prio1ListPoint]);
+									continue;
 								}
 							}
 						}
-						else if( prio0ListPoint.hasOwnProperty('spielplanID') ){
-							if( prio1ListPoint.hasOwnProperty('spielplanID') ){		// Datensaetze aktualisieren!!! spielplan -> spielplanID
+						else if( ( priority[0].list[prio0ListPoint].hasOwnProperty('filmID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')) ) || ( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('filmID')) ) ){
+							console.log("drin?");
+							// if( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') ){	// Keine filmID -> Kinodaten
+							
+								var filmID = priority[0].list[prio0ListPoint].filmID;
+								var kinoID = priority[1].list[prio1ListPoint].kinoID;
+								console.log("Before AJAX");
+							
+								$.ajax({
+									url: '/spielplaene',
+									method: 'GET',
+									data: '?kinoID='+kinoID+'&filmID='+filmID,
+									contentType: 'application/json',
+									success: function(spielplan) {
+
+										if(spielplan.length != 0){	// Kalenderwoche evtl. mit einbeziehen
+											listCache1.push(priority[1].list[prio1ListPoint]);
+											console.log("AJAX-Call: Success!");
+										}
+
+									}
+								}).fail(function () {
+									console.log('Error!');
+									alert('Error!');
+								});
+								continue;
+							// }
+						}
+						else if( priority[0].list[prio0ListPoint].hasOwnProperty('spielplanID') ){
+							if( priority[1].list[prio1ListPoint].hasOwnProperty('spielplanID') ){		// Datensaetze aktualisieren!!! spielplan -> spielplanID
 							
 
-								if( prio0ListPoint.spielplanID == prio1ListPoint.spielplanID ){
-								
-									listCache1.push(prioList1Point);
-									break;
+								if( priority[0].list[prio0ListPoint].spielplanID == priority[1].list[prio1ListPoint].spielplanID ){
+									console.log("spielplanID");								
+									listCache1.push(priority[1].list[prio1ListPoint]);
+									continue;
 								}
 							}
 						}
 						
-						return listCache1;
-						
-					}
-				});	
+					}				
+				}
+				priorityCount();	
+				return listCache1;	
 			}
 			
-			if(counter == 2){
-						
+			if(counter == 2 && priority[2].searchPointer == newSearchPointer && priority[0].searchPointer != newSearchPointer){
+				console.log("Counter == 2, Counter ist tatsächlich: "+counter);						
 				var listCache2 = [];
 						
-				priority[2].list.forEach(function(prio2ListPoint) {
-							
-					for( var prio1ListPoint in priority[1].list ) {
-						if( prio1ListPoint.hasOwnProperty('kinoID') ){
-							if( prio2ListPoint.hasOwnProperty('kinoID') ){
-							
+				for( var prio1ListPoint in priority[1].list ) {
+				
+					for( var prio2ListPoint in priority[2].list ) {
 
-								if( prio1ListPoint.kinoID == prio2ListPoint.kinoID ){
-								
-									listCache2.push(prioList2Point);
-									break;
+						console.log("KinoID: "+priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')+" <-> "+priority[2].list[prio2ListPoint].hasOwnProperty('kinoID'));		
+						console.log("FilmID: "+priority[1].list[prio1ListPoint].hasOwnProperty('filmID')+" <-> "+priority[2].list[prio2ListPoint].hasOwnProperty('filmID'));
+						
+						if( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') ){
+							if( priority[2].list[prio2ListPoint].hasOwnProperty('kinoID') ){
+							
+								console.log(priority[1].list[prio1ListPoint].kinoID+" <-> "+priority[2].list[prio2ListPoint].kinoID);
+								if( priority[1].list[prio1ListPoint].kinoID == priority[2].list[prio2ListPoint].kinoID ){
+									console.log("kinoID");
+									listCache2.push(priority[2].list[prio2ListPoint]);
+									continue;
 								}
 							}
 						} 
-						else if( prio1ListPoint.hasOwnProperty('filmID') ){
-							if( prio2ListPoint.hasOwnProperty('filmID') ){
+						else if( priority[1].list[prio1ListPoint].hasOwnProperty('filmID') ){
+							if( priority[2].list[prio2ListPoint].hasOwnProperty('filmID') ){
 							
 
-								if( prio1ListPoint.filmID == prio2ListPoint.filmID ){
-								
-									listCache2.push(prioList2Point);
-									break;
+								if( priority[1].list[prio1ListPoint].filmID == priority[2].list[prio2ListPoint].filmID ){
+									console.log("filmID");								
+									listCache2.push(priority[2].list[prio2ListPoint]);
+									continue;
 								}
 							}
 						}
-						else if( prio1ListPoint.hasOwnProperty('spielplanID') ){
-							if( prio2ListPoint.hasOwnProperty('spielplanID') ){		// Datensaetze aktualisieren!!! spielplan -> spielplanID
+						else if( priority[1].list[prio0ListPoint].hasOwnProperty('filmID') ){
+							if( priority[2].list[prio1ListPoint].hasOwnProperty('kinoID') ){	// Keine filmID -> Kinodaten
+							
+								var filmID = priority[1].list[prio0ListPoint].filmID;
+								var kinoID = priority[2].list[prio1ListPoint].kinoID;
+							
+							
+								$.ajax({
+									url: '/spielplaene',
+									method: 'GET',
+									data: '?kinoID='+kinoID+'&filmID='+filmID,
+									contentType: 'application/json',
+									success: function(spielplan) {
+
+										if(spielplan.length != 0){	// Kalenderwoche evtl. mit einbeziehen
+											listCache1.push(priority[2].list[prio1ListPoint]);
+											console.log("AJAX-Call: Success!");
+										}
+
+									}
+								}).fail(function () {
+									console.log('Error!');
+									alert('Error!');
+								});
+								continue;
+							}
+						}						
+						else if( priority[1].list[prio1ListPoint].hasOwnProperty('spielplanID') ){
+							if( priority[2].list[prio2ListPoint].hasOwnProperty('spielplanID') ){		// Datensaetze aktualisieren!!! spielplan -> spielplanID
 							
 
-								if( prio1ListPoint.spielplanID == prio2ListPoint.spielplanID ){
-								
-									listCache2.push(prioList2Point);
-									break;
+								if( priority[1].list[prio1ListPoint].spielplanID == priority[2].list[prio2ListPoint].spielplanID ){
+									console.log("spielplanID");								
+									listCache2.push(priority[2].list[prio2ListPoint]);
+									continue;
 								}
 							}
 						}
 						
-						return listCache2;
-						
-					}
-				});	
+					}				
+				}
+				priorityCount();	
+				return listCache2;	
 			}
+			console.log("end");
+			priorityCount();							
+			return newList; // Es gab keine Änderung
 			
 			
 			
@@ -170,9 +256,9 @@
 					$cineResults.remove();
 				}
 				
-			});			
+			});	*/		
 			
-		};	*/
+		};
 
         $( '.cineSearch' ).on( 'submit', function( event ) {
 			event.preventDefault();
@@ -187,7 +273,7 @@
 				success: function(cineResults) {
 					console.log($('.cineSearch').serialize());
 					
-					// cineResults = refreshPage(cineResults); // vorher: refreshPage(0, cineResults);
+					cineResults = refreshPage(0, cineResults); // vorher: refreshPage(0, cineResults);
 					
 					$.each(cineResults, function(i, cineResult) {
 						$cineResults.append('<li class="cineResult cineResultID'+ i +'">'+	
@@ -229,7 +315,7 @@
 				success: function(movieResults) {
 					console.log($('.movieSearch').serialize());
 
-					// movieResults = refreshPage(movieResults);
+					movieResults = refreshPage(1, movieResults);
 					
 					$.each(movieResults, function(i, movieResult) {
 						$movieResults.append('<li class="movieResult movieResultID'+ i +'">'+movieResult.deTitel+'</li>');
@@ -265,7 +351,7 @@
 				success: function(timeResults) {
 					console.log($('.timeSearch').serialize());
 					
-					// timeResults = refreshPage(timeResults);
+					timeResults = refreshPage(2, timeResults);
 
 					$.each(timeResults, function(i, timeResult) {
 						$timeResults.append('<li class="timeResult timeResultID'+ i +'">'+timeResult.spielplanID+'</li>');

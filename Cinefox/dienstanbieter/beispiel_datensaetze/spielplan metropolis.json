@@ -1,6 +1,6 @@
 {
 	"spielplanID" : 2,
-	"kinoID" : 3,
+	"kinoID" : 2,
 	"filmID" : 3,
 	"kalenderwoche" : 24,
 	"mo" : ["09-00", "10-00", "11-00"],
