@@ -8,7 +8,11 @@
 		
 		var $cineResults = $('.cineResults'); 		// div mit der Klasse cineResults selektiert
 		var $movieResults = $('.movieResults'); 	// div mit der Klasse movieResults selektiert
-		var $timeResults = $('.timeResults'); 		// div mit der Klasse timeResults selektiert			
+		var $timeResults = $('.timeResults');		// div mit der Klasse timeResults selektiert
+		
+		var $cineBox = $('.cineBox');
+		var $movieBox = $('.movieBox');
+		var $timeBox = $('.timeBox');		
 		
 		var priority = [];
 		
@@ -39,7 +43,7 @@
 			
 		}
 		
-		function refreshPage(newSearchPointer, newList){
+		function refreshPage(newSearchPointer, newList, newClass){
 			
 			// Overview - searchPointer:
 			// 0 == cineSearch
@@ -48,12 +52,18 @@
 			
 			priority[counter] = {	
 									"searchPointer" : newSearchPointer,
-									"list" : newList
+									"list" : newList,
+									"class" : newClass
 								};			
 			
 
 			if(priority[0].searchPointer == newSearchPointer){ // Für den Fall, dass die Liste von priority[0] geändert werden soll.
 				priority[0].list = newList;
+			}
+			
+			if(counter > 0 && priority[1].searchPointer == newSearchPointer){ // Für den Fall, dass die Liste von priority[1] geändert werden soll.
+				counter = 1;
+				priority[1].list = newList;
 			}
 			
 			var listCache0 = priority[0].list;
@@ -290,14 +300,94 @@
 				return priority[2].list;	
 			}
 			console.log("end");
-			priorityCount(newSearchPointer);							
+			priorityCount(newSearchPointer);						
 			return newList; // Es gab keine Änderung	
 			
 		};
+		
+		
+		function priorityVisualise(){
 
+			// Overview - classPointer:
+			// 0 == cineBox
+			// 1 == movieBox
+			// 2 == timeBox
+		
+			// var prioClass[0] = {
+							// "searchPointer" : priority[0].searchPointer,
+							// "classPointer" : "",
+						// }; 
+							
+			// var prio1 = {
+							// "searchPointer" : priority[1].searchPointer,
+							// "classPointer" : "",
+						// }; 
+			// var prio2 = {
+							// "searchPointer" : priority[2].searchPointer,
+							// "classPointer" : "",
+						// };
+						
+			// var prio = [];			
+		
+		
+			// if(priority[0].searchPointer == 0){
+				// prio0.classPointer = $cineBox;
+			// }
+			
+			if(priority[0].searchPointer == 0){
+				// priority[0].classPointer.removeClass(category cineBox prio0);
+				var $tmp = priority[0].classPointer;
+				console.log($tmp);
+				$tmp.addClass(prio0);
+			}
+			if(priority[0].searchPointer == 1){
+				priority[0].classPointer.addClass(prio0);
+			}			
+			if(priority[0].searchPointer == 2){
+				priority[0].classPointer.addClass(prio0);
+			}
+			if(priority[1].searchPointer == 0){
+				priority[1].classPointer.addClass(prio1);
+			}
+			if(priority[1].searchPointer == 1){
+				priority[1].classPointer.addClass(prio1);
+			}			
+			if(priority[1].searchPointer == 2){
+				priority[1].classPointer.addClass(prio1);
+			}
+			if(priority[2].searchPointer == 0){
+				priority[2].classPointer.addClass(prio2);
+			}
+			if(priority[2].searchPointer == 1){
+				priority[2].classPointer.addClass(prio2);
+			}			
+			if(priority[2].searchPointer == 2){
+				priority[2].classPointer.addClass(prio2);
+			}
+			
+			// for(var prioElement in priority){
+				// if
+			// }
+			
+			// if(prio0.searchPointer == 1 || prio1.searchPointer == 1 ){
+				// prio0.classPointer = $movieBox;
+			// }
+			// if(prio0.searchPointer == 2){
+				// prio0.classPointer = $timeBox;
+			// }
+			
+			// for(var pointerData in prioClass){
+				// prio[pointerData] = {
+							// "searchPointer" : priority[pointerData].searchPointer,
+							// "classPointer" : "",
+						// }; 
+			// }
+			
+		}
+		
 		
         $( '.cineSearch' ).on( 'submit', function( event ) {
-			event.preventDefault();
+			event.preventDefault();		
 			$('.cineResults').empty();
 			console.log( $( this ).serialize() );
 
@@ -309,7 +399,8 @@
 				success: function(cineResults) {
 					console.log($('.cineSearch').serialize());
 					
-					cineResults = refreshPage(0, cineResults);
+					cineResults = refreshPage(0, cineResults, $cineBox);
+					priorityVisualise();
 					
 					$.each(cineResults, function(i, cineResult) {
 						$cineResults.append('<li class="cineResult cineResultID'+ i +'">'+	
@@ -351,7 +442,8 @@
 				success: function(movieResults) {
 					console.log($('.movieSearch').serialize());
 
-					movieResults = refreshPage(1, movieResults);
+					movieResults = refreshPage(1, movieResults, $movieBox);
+					priorityVisualise();					
 					
 					$.each(movieResults, function(i, movieResult) {
 						$movieResults.append('<li class="movieResult movieResultID'+ i +'">'+movieResult.deTitel+'</li>');
@@ -387,7 +479,8 @@
 				success: function(timeResults) {
 					console.log($('.timeSearch').serialize());
 					
-					timeResults = refreshPage(2, timeResults);
+					timeResults = refreshPage(2, timeResults, $timeBox);
+					priorityVisualise();					
 
 					$.each(timeResults, function(i, timeResult) {
 						$timeResults.append('<li class="timeResult timeResultID'+ i +'">'+timeResult.spielplanID+'</li>');
@@ -422,19 +515,21 @@
 
 		<%include ../partials/main-heading %>
 
-
-		<%include ../partials/cine-form %>
-
-		<ul class="cineResults"></ul>
+		<div class="category cineBox">
+			<%include ../partials/cine-form %>
+			<ul class="cineResults"></ul>
+		</div>
 		
-		<%include ../partials/movie-form %>
+		<div class="category movieBox">
+			<%include ../partials/movie-form %>	
+			<ul class="movieResults"></ul>
+		</div>
 		
-		<ul class="movieResults"></ul>
-
-		<%include ../partials/time-form %>
-		
-		<ul class="timeResults"></ul>		
-
+		<div class="category movieBox">
+			<%include ../partials/time-form %>
+			<ul class="timeResults"></ul>		
+		</div>
+			
     </main>
 
     <footer>
