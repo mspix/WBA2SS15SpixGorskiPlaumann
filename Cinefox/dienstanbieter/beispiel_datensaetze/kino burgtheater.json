@@ -8,9 +8,9 @@
   "oeffnungszeiten" : "",
   "reservierungsHotline" : "02261 - 22460",
   "reservierungsService" : true,
-  "spielplanID" : 3,
+  "spielplaene" : [3, 6],
   "preise" : "",
-  "kinotag" : ,
+  "kinotag" : ["Di"],
   "website" : "http://burgtheater-gummersbach.kino-zeit.de/",
   "parkplaetze" : false,
   "bewertung" : 8

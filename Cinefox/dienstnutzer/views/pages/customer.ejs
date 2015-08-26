@@ -8,25 +8,25 @@
 		
 		var $cineResults = $('.cineResults'); 		// div mit der Klasse cineResults selektiert
 		var $movieResults = $('.movieResults'); 	// div mit der Klasse movieResults selektiert
-		var $timeResults = $('.timeResults'); 		// div mit der Klasse timeResults selektiert		
-		
-		var cineList = '';
-		var movieList = '';
-		var timeList = '';
-		
-		var priorityData = {							// Default
-								"searchPointer" : "",
-								"list" : ""
-							};	
+		var $timeResults = $('.timeResults'); 		// div mit der Klasse timeResults selektiert			
 		
 		var priority = [];
-						
-		var searchPointer = '';
 		
 		var counter = 0;
 		
-		
-		function priorityCount(){
+		function priorityCount(newSearchPointer){
+			// if(priority[counter].searchPointer == newSearchPointer){
+				// return;
+			// }
+			if(priority[0].searchPointer == newSearchPointer){
+				counter = 0;
+				// return counter;
+			}
+			if(counter == 2){
+				if( (priority[1].searchPointer == newSearchPointer) || (priority[2].searchPointer == newSearchPointer) ){	// Bei wiederholter gleicher Suche soll der counter nicht hochzählen
+					return;
+				}
+			}
 			if(counter < 3){
 				counter++;
 				console.log("Counter: "+counter);
@@ -39,100 +39,114 @@
 			
 		}
 		
-		function refreshPage(newSearchPointer, newList){ // vorher: newSearchPointer, newList
+		function refreshPage(newSearchPointer, newList){
 			
-			// searchPointer:
+			// Overview - searchPointer:
 			// 0 == cineSearch
 			// 1 == movieSearch
 			// 2 == timeSearch
 			
-			// console.log(cineList);
-			// console.log(movieList);
-			// console.log(timeList);
-			
 			priority[counter] = {	
 									"searchPointer" : newSearchPointer,
 									"list" : newList
-								};
-								
-			// priority[counter] = newList;				
+								};			
 			
 
+			if(priority[0].searchPointer == newSearchPointer){ // Für den Fall, dass die Liste von priority[0] geändert werden soll.
+				priority[0].list = newList;
+			}
+			
 			var listCache0 = priority[0].list;
 			
 			// console.log(listCache0);
 			
 			if(counter == 0){
-				priorityCount();
+				priorityCount(newSearchPointer);
 				return listCache0;
 			}
 			
-			if(counter > 0){
-				if(priority[counter-1].searchPointer == newSearchPointer){	// Bei wiederholter gleicher Suche soll der counter nicht hochzählen
-					counter = counter-1;
-				}
-				if(counter > 1 && priority[counter-2].searchPointer == newSearchPointer){
-					counter = counter-2;
-				}
-			}				
+			// if(counter > 0){
+				// if(priority[counter-1].searchPointer == newSearchPointer){	// Bei wiederholter gleicher Suche soll der counter nicht hochzählen
+					// counter = counter-1;
+				// }
+				// // if(counter > 1 && priority[counter-2].searchPointer == newSearchPointer){
+					// // counter = counter-2;
+				// // }
+			// }				
 			
-			if(counter == 1 && priority[1].searchPointer == newSearchPointer && priority[0].searchPointer != newSearchPointer){ 	// priority[0].searchPointer != newSearchPointer -> falls eine Veränderung in der selben Suche vorgenommen wird,
-																// sollen die Ergebnisse sich nicht anhand der vorherigen Ergebnisse updaten
-																// anders gesagt: wenn der neue searchPointer ein anderer ist als der erste, dann führe aus
+			if( counter == 1 && priority[1].searchPointer == newSearchPointer && priority[0].searchPointer != newSearchPointer ){ 
+				// priority[0].searchPointer != newSearchPointer -> falls eine Veränderung in der selben Suche vorgenommen wird,
+				// sollen die Ergebnisse sich nicht anhand der vorherigen Ergebnisse updaten
+				// anders gesagt: wenn der neue searchPointer ein anderer ist als der erste, dann führe aus
 				
 				
 				
 				var listCache1 = [];		// Array für aktualisierte Ergebnisliste
 				
 				// schleife für alle elemente	
-				console.log(JSON.stringify(priority[1].list));
+				// console.log(JSON.stringify(priority[1].list));
 				
 				for( var prio0ListPoint in priority[0].list ) {
 				
 					for( var prio1ListPoint in priority[1].list ) {
 
-						console.log(priority[0].list[prio0ListPoint].hasOwnProperty('filmID')+" <-> "+priority[1].list[prio1ListPoint].hasOwnProperty('kinoID'));		
+						// console.log(priority[0].list[prio0ListPoint].hasOwnProperty('filmID')+" <-> "+priority[1].list[prio1ListPoint].hasOwnProperty('kinoID'));		
 						
-						if( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') ){
-							if( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') ){
+						// console.log((priority[0].list[prio0ListPoint].hasOwnProperty('filmID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('filmID')) ) || ( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')) ));
+						
+						// if( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') && priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')){
 							
-								console.log(priority[0].list[prio0ListPoint].kinoID+" <-> "+priority[1].list[prio1ListPoint].kinoID);
-								if( priority[0].list[prio0ListPoint].kinoID == priority[1].list[prio1ListPoint].kinoID ){
-									console.log("kinoID");
-									listCache1.push(priority[1].list[prio1ListPoint]);
-									continue;
-								}
-							}
-						} 
-						else if( priority[0].list[prio0ListPoint].hasOwnProperty('filmID') ){
-							if( priority[1].list[prio1ListPoint].hasOwnProperty('filmID') ){
-							
+							// console.log(priority[0].list[prio0ListPoint].kinoID+" <-> "+priority[1].list[prio1ListPoint].kinoID);
+							// if( priority[0].list[prio0ListPoint].kinoID == priority[1].list[prio1ListPoint].kinoID ){
+								// console.log("kinoID");
+								// listCache1.push(priority[1].list[prio1ListPoint]);
+							// }
+							// continue;
 
-								if( priority[0].list[prio0ListPoint].filmID == priority[1].list[prio1ListPoint].filmID ){
-									console.log("filmID");								
-									listCache1.push(priority[1].list[prio1ListPoint]);
-									continue;
-								}
+						// } 
+						if( priority[0].list[prio0ListPoint].hasOwnProperty('filmID') && priority[1].list[prio1ListPoint].hasOwnProperty('filmID') ){
+					
+							if( priority[0].list[prio0ListPoint].filmID == priority[1].list[prio1ListPoint].filmID ){
+								console.log("filmID");								
+								listCache1.push(priority[1].list[prio1ListPoint]);
 							}
+							continue;
+							
 						}
-						else if( ( priority[0].list[prio0ListPoint].hasOwnProperty('filmID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')) ) || ( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('filmID')) ) ){
-							console.log("drin?");
-							// if( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') ){	// Keine filmID -> Kinodaten
+						else if( ( priority[0].list[prio0ListPoint].hasOwnProperty('filmID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('filmID')) ) || ( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')) ) ){	// Keine filmID -> Kinodaten
 							
-								var filmID = priority[0].list[prio0ListPoint].filmID;
-								var kinoID = priority[1].list[prio1ListPoint].kinoID;
-								console.log("Before AJAX");
+							var filmID = "";
+							var kinoID = "";
 							
-								$.ajax({
+							if(priority[0].list[prio0ListPoint].hasOwnProperty('filmID')){
+								filmID = JSON.stringify(priority[0].list[prio0ListPoint].filmID);
+								kinoID = JSON.stringify(priority[1].list[prio1ListPoint].kinoID);
+							}
+							if(priority[0].list[prio0ListPoint].hasOwnProperty('kinoID')){
+								kinoID = JSON.stringify(priority[0].list[prio0ListPoint].kinoID);
+								filmID = JSON.stringify(priority[1].list[prio1ListPoint].filmID);
+							}
+							
+							console.log("Before AJAX");
+							
+							console.log("filmID: "+filmID);
+							console.log("kinoID: "+kinoID);
+							
+							(function(){
+							// NOTE:  This function must return the value 
+							//        from calling the $.ajax() method.
+								return $.ajax({
 									url: '/spielplaene',
 									method: 'GET',
-									data: '?kinoID='+kinoID+'&filmID='+filmID,
+									async: false,
+									data: 'kinoID='+kinoID+'&filmID='+filmID,
 									contentType: 'application/json',
 									success: function(spielplan) {
 
 										if(spielplan.length != 0){	// Kalenderwoche evtl. mit einbeziehen
 											listCache1.push(priority[1].list[prio1ListPoint]);
-											console.log("AJAX-Call: Success!");
+											console.log("AJAX-Call: Success! - prio0ListPoint: "+prio0ListPoint+" prio1ListPoint: "+prio0ListPoint);
+											console.log(listCache1);
 										}
 
 									}
@@ -140,28 +154,52 @@
 									console.log('Error!');
 									alert('Error!');
 								});
-								continue;
-							// }
-						}
-						else if( priority[0].list[prio0ListPoint].hasOwnProperty('spielplanID') ){
-							if( priority[1].list[prio1ListPoint].hasOwnProperty('spielplanID') ){		// Datensaetze aktualisieren!!! spielplan -> spielplanID
-							
+							})();
+								
+							console.log("AJAX?");
+							console.log(listCache1);
+							continue;
 
-								if( priority[0].list[prio0ListPoint].spielplanID == priority[1].list[prio1ListPoint].spielplanID ){
-									console.log("spielplanID");								
-									listCache1.push(priority[1].list[prio1ListPoint]);
-									continue;
+						}
+						else if( (priority[0].list[prio0ListPoint].hasOwnProperty('spielplanID') && priority[1].list[prio1ListPoint].hasOwnProperty('spielplaene')) || (priority[0].list[prio0ListPoint].hasOwnProperty('spielplaene') && priority[1].list[prio1ListPoint].hasOwnProperty('spielplanID'))){
+
+							console.log("############ DRIN1 ############");
+						
+							var spielplanID = "";
+							var spielplaene = [];
+	
+							if(priority[0].list[prio0ListPoint].hasOwnProperty('spielplanID')){
+								spielplanID = JSON.stringify(priority[0].list[prio0ListPoint].spielplanID);
+								spielplaene = JSON.stringify(priority[1].list[prio1ListPoint].spielplaene);
+							}
+							if(priority[0].list[prio0ListPoint].hasOwnProperty('spielplaene')){
+								spielplaene = JSON.stringify(priority[0].list[prio0ListPoint].spielplaene);
+								spielplanID = JSON.stringify(priority[1].list[prio1ListPoint].spielplanID);
+							}
+	
+							console.log(spielplaene);
+	
+							for( var spielplan in spielplaene ){
+								if(spielplanID == spielplaene[spielplan]){
+									console.log("spielplanID:"+spielplanID+"\nspielplan:"+spielplan);							
+									listCache1.push(priority[1].list[prio1ListPoint]);									
+									break;
 								}
 							}
+
+							console.log("Pushed times prio0ListPoint: "+prio0ListPoint);
+							console.log("Pushed times prio1ListPoint: "+prio1ListPoint);								
+						
 						}
 						
 					}				
 				}
-				priorityCount();	
-				return listCache1;	
+				priorityCount(newSearchPointer);
+				priority[1].list = listCache1;	//Priority[2] soll sich an die aktualisierte Liste orientieren
+				return priority[1].list;	
 			}
-			
-			if(counter == 2 && priority[2].searchPointer == newSearchPointer && priority[0].searchPointer != newSearchPointer){
+			// Wenn der Counter 2 ist, dann an den listCache1 orientieren und nicht an die newList
+			if( counter == 2 && priority[2].searchPointer == newSearchPointer && priority[0].searchPointer != newSearchPointer ){
 				console.log("Counter == 2, Counter ist tatsächlich: "+counter);						
 				var listCache2 = [];
 						
@@ -172,94 +210,92 @@
 						console.log("KinoID: "+priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')+" <-> "+priority[2].list[prio2ListPoint].hasOwnProperty('kinoID'));		
 						console.log("FilmID: "+priority[1].list[prio1ListPoint].hasOwnProperty('filmID')+" <-> "+priority[2].list[prio2ListPoint].hasOwnProperty('filmID'));
 						
-						if( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') ){
-							if( priority[2].list[prio2ListPoint].hasOwnProperty('kinoID') ){
+						// if( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') && priority[2].list[prio2ListPoint].hasOwnProperty('kinoID')){
 							
-								console.log(priority[1].list[prio1ListPoint].kinoID+" <-> "+priority[2].list[prio2ListPoint].kinoID);
-								if( priority[1].list[prio1ListPoint].kinoID == priority[2].list[prio2ListPoint].kinoID ){
-									console.log("kinoID");
-									listCache2.push(priority[2].list[prio2ListPoint]);
-									continue;
-								}
-							}
-						} 
-						else if( priority[1].list[prio1ListPoint].hasOwnProperty('filmID') ){
-							if( priority[2].list[prio2ListPoint].hasOwnProperty('filmID') ){
-							
+							// console.log(priority[1].list[prio1ListPoint].kinoID+" <-> "+priority[2].list[prio2ListPoint].kinoID);
+							// if( priority[1].list[prio1ListPoint].kinoID == priority[2].list[prio2ListPoint].kinoID ){
+								// console.log("kinoID");
+								// listCache2.push(priority[2].list[prio2ListPoint]);
+							// }
+							// continue;							
 
-								if( priority[1].list[prio1ListPoint].filmID == priority[2].list[prio2ListPoint].filmID ){
-									console.log("filmID");								
-									listCache2.push(priority[2].list[prio2ListPoint]);
-									continue;
-								}
+						// } 
+						if( priority[1].list[prio1ListPoint].hasOwnProperty('filmID') && priority[2].list[prio2ListPoint].hasOwnProperty('filmID') ){
+					
+							if( priority[1].list[prio1ListPoint].filmID == priority[2].list[prio2ListPoint].filmID ){
+								console.log("filmID");								
+								listCache2.push(priority[2].list[prio2ListPoint]);
 							}
+							continue;
+							
 						}
-						else if( priority[1].list[prio0ListPoint].hasOwnProperty('filmID') ){
-							if( priority[2].list[prio1ListPoint].hasOwnProperty('kinoID') ){	// Keine filmID -> Kinodaten
+						else if( ( priority[1].list[prio1ListPoint].hasOwnProperty('filmID') && !(priority[2].list[prio2ListPoint].hasOwnProperty('filmID')) ) || ( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') && !(priority[2].list[prio2ListPoint].hasOwnProperty('kinoID')) ) ){	// Keine filmID -> Kinodaten
 							
-								var filmID = priority[1].list[prio0ListPoint].filmID;
-								var kinoID = priority[2].list[prio1ListPoint].kinoID;
+							var filmID = JSON.stringify(priority[1].list[prio1ListPoint].filmID);
+							var kinoID = JSON.stringify(priority[2].list[prio2ListPoint].kinoID);
+							console.log("Before AJAX");
 							
-							
-								$.ajax({
-									url: '/spielplaene',
-									method: 'GET',
-									data: '?kinoID='+kinoID+'&filmID='+filmID,
-									contentType: 'application/json',
-									success: function(spielplan) {
+							$.ajax({
+								url: '/spielplaene',
+								method: 'GET',
+								async: false,								
+								data: 'kinoID='+kinoID+'&filmID='+filmID,
+								contentType: 'application/json',
+								success: function(spielplan) {
 
-										if(spielplan.length != 0){	// Kalenderwoche evtl. mit einbeziehen
-											listCache1.push(priority[2].list[prio1ListPoint]);
-											console.log("AJAX-Call: Success!");
-										}
-
+									if(spielplan.length != 0){	// Kalenderwoche evtl. mit einbeziehen
+										listCache2.push(priority[2].list[prio2ListPoint]);
+										console.log("AJAX-Call: Success!");
 									}
-								}).fail(function () {
-									console.log('Error!');
-									alert('Error!');
-								});
-								continue;
-							}
-						}						
-						else if( priority[1].list[prio1ListPoint].hasOwnProperty('spielplanID') ){
-							if( priority[2].list[prio2ListPoint].hasOwnProperty('spielplanID') ){		// Datensaetze aktualisieren!!! spielplan -> spielplanID
-							
 
-								if( priority[1].list[prio1ListPoint].spielplanID == priority[2].list[prio2ListPoint].spielplanID ){
-									console.log("spielplanID");								
-									listCache2.push(priority[2].list[prio2ListPoint]);
-									continue;
+								}
+							}).fail(function () {
+								console.log('Error!');
+								alert('Error!');
+							});
+							console.log("AJAX?");
+							continue;
+
+						}
+						else if( (priority[1].list[prio1ListPoint].hasOwnProperty('spielplanID') && priority[2].list[prio2ListPoint].hasOwnProperty('spielplaene')) || (priority[1].list[prio1ListPoint].hasOwnProperty('spielplaene') && priority[2].list[prio2ListPoint].hasOwnProperty('spielplanID'))){
+
+							console.log("############ DRIN2 ############");
+						
+							var spielplanID = "";
+							var spielplaene = [];
+	
+							if(priority[1].list[prio1ListPoint].hasOwnProperty('spielplanID')){
+								spielplanID = JSON.stringify(priority[1].list[prio1ListPoint].spielplanID);
+								spielplaene = JSON.stringify(priority[2].list[prio2ListPoint].spielplaene);
+							}
+							if(priority[1].list[pri10ListPoint].hasOwnProperty('spielplaene')){
+								spielplaene = JSON.stringify(priority[1].list[prio1ListPoint].spielplaene);
+								spielplaeID = JSON.stringify(priority[2].list[prio2ListPoint].spielplanID);
+							}
+	
+							for( var spielplan in spielplaene ){
+								if(spielplanID == spielplaene[spielplan]){
+									console.log("spielplanID:"+spielplanID+"\nspielplan:"+spielplan);							
+									listCache2.push(priority[2].list[prio2ListPoint]);									
+									break;
 								}
 							}
+						
 						}
 						
 					}				
 				}
-				priorityCount();	
-				return listCache2;	
+				priorityCount(newSearchPointer);
+				priority[2].list = listCache2;
+				return priority[2].list;	
 			}
 			console.log("end");
-			priorityCount();							
-			return newList; // Es gab keine Änderung
-			
-			
-			
-/*			$.each(cineList, function(i, cinePoint) {
-				$.each(movieList, function(i, moviePoint) {
-					$.each(timeList, function(i, timePoint) {
-						if(){
-							$cineResults.remove();
-						}
-					});
-				});
-				if(){
-					$cineResults.remove();
-				}
-				
-			});	*/		
+			priorityCount(newSearchPointer);							
+			return newList; // Es gab keine Änderung	
 			
 		};
 
+		
         $( '.cineSearch' ).on( 'submit', function( event ) {
 			event.preventDefault();
 			$('.cineResults').empty();
@@ -273,7 +309,7 @@
 				success: function(cineResults) {
 					console.log($('.cineSearch').serialize());
 					
-					cineResults = refreshPage(0, cineResults); // vorher: refreshPage(0, cineResults);
+					cineResults = refreshPage(0, cineResults);
 					
 					$.each(cineResults, function(i, cineResult) {
 						$cineResults.append('<li class="cineResult cineResultID'+ i +'">'+	
