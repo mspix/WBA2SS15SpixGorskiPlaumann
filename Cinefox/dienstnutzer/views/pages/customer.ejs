@@ -27,6 +27,8 @@
 		
 		var counter = 0;
 		
+		var resetPrio12 = false;	// Wenn true -> PriorityVisualise entfernt die Klassen prio 1 und 2
+		
 		function priorityCount(newSearchPointer){
 			// if(priority[counter].searchPointer == newSearchPointer){
 				// return;
@@ -68,12 +70,15 @@
 
 			if(priority[0].searchPointer == newSearchPointer){ // Für den Fall, dass die Liste von priority[0] geändert werden soll.
 				priority[0].list = newList;
-				// return;
+				priority[1].searchPointer = "";
+				priority[2].searchPointer = "";
+				resetPrio12 = true;	// priorityVisualise soll die prio Klassen 1 und 2 reseten
 			}
 			
 			if(counter > 0 && priority[1].searchPointer == newSearchPointer){ // Für den Fall, dass die Liste von priority[1] geändert werden soll.
 				counter = 1;
 				priority[1].list = newList;
+				priority[2].searchPointer = "";
 			}
 			
 			var listCache0 = priority[0].list;
@@ -133,7 +138,7 @@
 							continue;
 							
 						}
-						else if( ( priority[0].list[prio0ListPoint].hasOwnProperty('filmID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('filmID')) ) || ( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')) ) ){	// Keine filmID -> Kinodaten
+						else if( ( priority[0].list[prio0ListPoint].hasOwnProperty('filmID') && !(priority[0].list[prio1ListPoint].hasOwnProperty('spielplanID')) && !(priority[1].list[prio1ListPoint].hasOwnProperty('filmID')) ) || ( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')) ) ){	// Keine filmID -> Kinodaten
 							
 							var filmID = "";
 							var kinoID = "";
@@ -198,12 +203,14 @@
 							}
 	
 							console.log(spielplaene);
-	
+									
 							for( var spielplan in spielplaene ){
 								if(spielplanID == spielplaene[spielplan]){
-									console.log("spielplanID:"+spielplanID+"\nspielplan:"+spielplan);							
-									listCache1.push(priority[1].list[prio1ListPoint]);									
-									break;
+									if($.inArray(priority[1].list[prio1ListPoint], listCache1) == -1){	// Bedingung - Keine doppelten Einträge (-1 == Eintrag nicht vorhanden)
+										console.log("spielplanID:"+spielplanID+"\nspielplan:"+spielplaene[spielplan]);							
+										listCache1.push(priority[1].list[prio1ListPoint]);
+										break;
+									}	
 								}
 							}
 
@@ -249,10 +256,20 @@
 							continue;
 							
 						}
-						else if( ( priority[1].list[prio1ListPoint].hasOwnProperty('filmID') && !(priority[2].list[prio2ListPoint].hasOwnProperty('filmID')) ) || ( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') && !(priority[2].list[prio2ListPoint].hasOwnProperty('kinoID')) ) ){	// Keine filmID -> Kinodaten
+						else if( ( priority[1].list[prio1ListPoint].hasOwnProperty('filmID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('spielplanID')) && !(priority[2].list[prio2ListPoint].hasOwnProperty('filmID')) ) || ( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') && !(priority[2].list[prio2ListPoint].hasOwnProperty('kinoID')) ) ){	// Keine filmID -> Kinodaten
 							
-							var filmID = JSON.stringify(priority[1].list[prio1ListPoint].filmID);
-							var kinoID = JSON.stringify(priority[2].list[prio2ListPoint].kinoID);
+							var filmID = "";
+							var kinoID = "";
+							
+							if(priority[1].list[prio1ListPoint].hasOwnProperty('filmID')){
+								filmID = JSON.stringify(priority[1].list[prio1ListPoint].filmID);
+								kinoID = JSON.stringify(priority[2].list[prio2ListPoint].kinoID);
+							}
+							if(priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')){
+								kinoID = JSON.stringify(priority[1].list[prio1ListPoint].kinoID);
+								filmID = JSON.stringify(priority[2].list[prio2ListPoint].filmID);
+							}
+							
 							console.log("Before AJAX");
 							
 							$.ajax({
@@ -321,23 +338,7 @@
 			// Overview - classPointer:
 			// 0 == cineBox
 			// 1 == movieBox
-			// 2 == timeBox
-		
-			// var prioClass[0] = {
-							// "searchPointer" : priority[0].searchPointer,
-							// "classPointer" : "",
-						// }; 
-							
-			// var prio1 = {
-							// "searchPointer" : priority[1].searchPointer,
-							// "classPointer" : "",
-						// }; 
-			// var prio2 = {
-							// "searchPointer" : priority[2].searchPointer,
-							// "classPointer" : "",
-						// };
-						
-			// var prio = [];			
+			// 2 == timeBox			
 
 			// $('div')
 				// .filter(function() {
@@ -350,9 +351,6 @@
 				// // console.log("YESSS!!!");
 			// // }
 		
-			// if(priority[0].searchPointer == 0){
-				// prio0.classPointer = $cineBox;
-			// }
 			console.log(typeof priority[0].searchPointer);			
 			console.log(typeof priority[0].classPointer);
 
@@ -360,15 +358,13 @@
 			console.log("priority[1].searchPointer: "+priority[1].searchPointer);			
 			console.log("priority[2].searchPointer: "+priority[2].searchPointer);
 			
-			if(typeof priority[0].searchPointer !== 'undefined' && priority[0].searchPointer == 0){
-				// priority[0].classPointer.removeClass(category cineBox prio0);
-				// var $tmp = priority[0].classPointer;
-				// console.log($tmp);
-				// $tmp.addClass(prio0);
-				// $(priority[0].classPointer).toggleClass( "prio0" );
-				// console.log(priority[0].classPointer);
-				// console.log("prio0 searchPointer: 0");
+			if(priority[0].searchPointer !== '' && priority[0].searchPointer == 0){
 				
+					for(var k = 0; k < 3; k++){
+						if( $('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
+							$('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+						}
+					}
 					if( $('div').filter($( "[class$='prio0']" )).length ){
 						console.log("YESSS!!!");
 						$('div').filter($( "[class$='prio0']" )).removeClass("prio0");							
@@ -385,7 +381,12 @@
 					console.log(priority[0].classPointer);
 				
 			}
-			if(typeof priority[0].searchPointer !== 'undefined' && priority[0].searchPointer == 1){
+			if(priority[0].searchPointer !== '' && priority[0].searchPointer == 1){
+					for(var k = 0; k < 3; k++){
+						if( $('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
+							$('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+						}
+					}
 					if( $('div').filter($( "[class$='prio0']" )).length ){
 						console.log("YESSS!!!");
 						$('div').filter($( "[class$='prio0']" )).removeClass("prio0");							
@@ -393,7 +394,12 @@
 					$(priority[0].classPointer).addClass( "prio0" );
 					console.log(priority[0].classPointer);	
 			}			
-			if(typeof priority[0].searchPointer !== 'undefined' && priority[0].searchPointer == 2){
+			if(priority[0].searchPointer !== '' && priority[0].searchPointer == 2){
+					for(var k = 0; k < 3; k++){
+						if( $('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
+							$('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+						}
+					}			
 					if( $('div').filter($( "[class$='prio0']" )).length ){
 						console.log("YESSS!!!");
 						$('div').filter($( "[class$='prio0']" )).removeClass("prio0");							
@@ -401,23 +407,13 @@
 					$(priority[0].classPointer).addClass( "prio0" );
 					console.log(priority[0].classPointer);
 			}
-			if(typeof priority[1].searchPointer !== 'undefined'){
-				if(priority[1].searchPointer == 0){
+			if(priority[1].searchPointer !== '' && priority[1].searchPointer == 0){
 
-					if( $('div').filter($( "[class$='prio1']" )).length ){
-						console.log("YESSS!!!");
-						// $(priority[i].classPointer).removeClass( "prio"+i );
-						$('div').filter($( "[class$='prio1']" )).removeClass("prio1");
-						// $('div.category').removeClass("prio1");								
-					}
-					$(priority[1].classPointer).addClass( "prio1" );
-					console.log(priority[1].classPointer);					
-				
-				}		
-			}
-			if(typeof priority[1].searchPointer !== 'undefined'){
-				if(priority[1].searchPointer == 1){
-
+					for(var k = 0; k < 3; k++){
+						if( $('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
+							$('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+						}
+					}	
 					if( $('div').filter($( "[class$='prio1']" )).length ){
 						console.log("YESSS!!!");
 						$('div').filter($( "[class$='prio1']" )).removeClass("prio1");								
@@ -425,21 +421,59 @@
 					$(priority[1].classPointer).addClass( "prio1" );
 					console.log(priority[1].classPointer);					
 				
-				}
+			}
+			if(priority[1].searchPointer !== '' && priority[1].searchPointer == 1){
+
+					for(var k = 0; k < 3; k++){
+						if( $('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
+							$('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+						}
+					}			
+					if( $('div').filter($( "[class$='prio1']" )).length ){
+						console.log("YESSS!!!");
+						$('div').filter($( "[class$='prio1']" )).removeClass("prio1");								
+					}
+					$(priority[1].classPointer).addClass( "prio1" );
+					console.log(priority[1].classPointer);					
+				
 			}			
-			if(typeof priority[1].searchPointer !== 'undefined'){
-				if(priority[1].searchPointer == 2){
+			if(priority[1].searchPointer !== '' && priority[1].searchPointer == 2){
+
+					for(var k = 0; k < 3; k++){
+						if( $('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
+							$('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+						}
+					}			
 					if( $('div').filter($( "[class$='prio1']" )).length ){
 						console.log("YESSS!!!");
 						$('div').filter($( "[class$='prio1']" )).removeClass("prio1");							
 					}
 					$(priority[1].classPointer).addClass( "prio1" );
 					console.log(priority[1].classPointer);					
-				}
-			}
-			if(typeof priority[2].searchPointer !== 'undefined'){
-				if(priority[2].searchPointer == 0){
 
+			}
+			if(priority[2].searchPointer !== '' && priority[2].searchPointer == 0){
+
+					for(var k = 0; k < 3; k++){
+						if( $('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
+							$('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+						}
+					}			
+					if( $('div').filter($( "[class$='prio2']" )).length ){
+						console.log("YESSS!!!");
+						$('div').filter($( "[class$='prio2']" )).removeClass("prio2");							
+					}
+					$(priority[2].classPointer).addClass( "prio2" );
+					console.log(priority[2].classPointer);					
+						
+			}
+			if(priority[2].searchPointer !== '' && priority[2].searchPointer == 1){
+
+					for(var k = 0; k < 3; k++){
+						if( $('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
+							$('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+						}
+					}			
 					if( $('div').filter($( "[class$='prio2']" )).length ){
 						console.log("YESSS!!!");
 						$('div').filter($( "[class$='prio2']" )).removeClass("prio2");							
@@ -447,23 +481,14 @@
 					$(priority[2].classPointer).addClass( "prio2" );
 					console.log(priority[2].classPointer);					
 				
-				}		
-			}
-			if(typeof priority[2].searchPointer !== 'undefined'){
-				if(priority[2].searchPointer == 1){
-
-					if( $('div').filter($( "[class$='prio2']" )).length ){
-						console.log("YESSS!!!");
-						$('div').filter($( "[class$='prio2']" )).removeClass("prio2");							
-					}
-					$(priority[2].classPointer).addClass( "prio2" );
-					console.log(priority[2].classPointer);					
-				
-				}
 			}			
-			if(typeof priority[2].searchPointer !== 'undefined'){
-				if(priority[2].searchPointer == 2){
-
+			if(priority[2].searchPointer !== '' && priority[2].searchPointer == 2){
+					
+					for(var k = 0; k < 3; k++){
+						if( $('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
+							$('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+						}
+					}
 					if( $('div').filter($( "[class$='prio2']" )).length ){
 						console.log("YESSS!!!");
 						$('div').filter($( "[class$='prio2']" )).removeClass("prio2");							
@@ -471,7 +496,6 @@
 					$(priority[2].classPointer).addClass( "prio2" );
 					console.log(priority[2].classPointer);					
 				
-				}
 			}
 			
 			// for(var i = 0; i < 3; i++){
@@ -494,9 +518,14 @@
 				// }
 			// }
 			
-			// for(var prioElement in priority){
-				// if
-			// }
+			if(resetPrio12 == true){				
+				for(var i = 1; i < 3; i++){
+					if( $('div').filter($( "[class$='prio"+i+"']" )).length ){
+						$('div').filter($( "[class$='prio"+i+"']" )).removeClass("prio"+i);
+					}
+				}			
+				resetPrio12 = false;
+			}
 			
 			// if(prio0.searchPointer == 1 || prio1.searchPointer == 1 ){
 				// prio0.classPointer = $movieBox;
