@@ -28,6 +28,7 @@
 		var counter = 0;
 		
 		var resetPrio12 = false;	// Wenn true -> PriorityVisualise entfernt die Klassen prio 1 und 2
+		var resetPrio2 = false;		// Wenn true -> PriorityVisualise entfernt die Klasse prio2
 		
 		function priorityCount(newSearchPointer){
 			// if(priority[counter].searchPointer == newSearchPointer){
@@ -79,6 +80,7 @@
 				counter = 1;
 				priority[1].list = newList;
 				priority[2].searchPointer = "";
+				resetPrio2 = true;	// priorityVisualise soll die Klasse prio2 reseten				
 			}
 			
 			var listCache0 = priority[0].list;
@@ -234,8 +236,8 @@
 				
 					for( var prio2ListPoint in priority[2].list ) {
 
-						console.log("KinoID: "+priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')+" <-> "+priority[2].list[prio2ListPoint].hasOwnProperty('kinoID'));		
-						console.log("FilmID: "+priority[1].list[prio1ListPoint].hasOwnProperty('filmID')+" <-> "+priority[2].list[prio2ListPoint].hasOwnProperty('filmID'));
+						// console.log("KinoID: "+priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')+" <-> "+priority[2].list[prio2ListPoint].hasOwnProperty('kinoID'));		
+						// console.log("FilmID: "+priority[1].list[prio1ListPoint].hasOwnProperty('filmID')+" <-> "+priority[2].list[prio2ListPoint].hasOwnProperty('filmID'));
 						
 						// if( priority[1].list[prio1ListPoint].hasOwnProperty('kinoID') && priority[2].list[prio2ListPoint].hasOwnProperty('kinoID')){
 							
@@ -305,16 +307,59 @@
 								spielplanID = JSON.stringify(priority[1].list[prio1ListPoint].spielplanID);
 								spielplaene = JSON.stringify(priority[2].list[prio2ListPoint].spielplaene);
 							}
-							if(priority[1].list[pri10ListPoint].hasOwnProperty('spielplaene')){
+							if(priority[1].list[prio1ListPoint].hasOwnProperty('spielplaene')){
 								spielplaene = JSON.stringify(priority[1].list[prio1ListPoint].spielplaene);
-								spielplaeID = JSON.stringify(priority[2].list[prio2ListPoint].spielplanID);
+								spielplanID = JSON.stringify(priority[2].list[prio2ListPoint].spielplanID);
 							}
-	
+
+							console.log(spielplaene);
+							console.log(spielplanID);
+								
 							for( var spielplan in spielplaene ){
 								if(spielplanID == spielplaene[spielplan]){
-									console.log("spielplanID:"+spielplanID+"\nspielplan:"+spielplan);							
-									listCache2.push(priority[2].list[prio2ListPoint]);									
-									break;
+									if($.inArray(priority[2].list[prio2ListPoint], listCache2) == -1){	// Bedingung - Keine doppelten Einträge (-1 == Eintrag nicht vorhanden)								
+										console.log("spielplanID:"+spielplanID+"\nspielplan:"+spielplan);							
+										listCache2.push(priority[2].list[prio2ListPoint]);
+										break;
+									}
+								}
+							}
+							
+							// Prüfung, ob nur Spielpläne gezeigt werden, die auch den Ergebnissen der Filmsuche zugehörig sind, bei folgender Suchreihenfolge:
+							// movieSearch -> cineSearch -> timeSearch
+							if(priority[2].list[prio2ListPoint].hasOwnProperty('spielplanID') && (listCache2.length > 0)){		// Wenn die cineSearch priority[1] hat und nun nach Spielplänen gesucht wird, kann die priority[0] nur bei der movieSearch liegen.			
+								var foundID = false;
+								// for( var spielplan in listCache2 ){
+									// for( var movie in priority[0].list ){
+										// if(priority[0].list[movie].filmID == listCache2[spielplan].filmID){
+											// console.log("In Korrektur: movie: "+priority[0].list[movie].filmID+"\nspielplan: "+listCache2[spielplan].filmID);
+											// foundID = true;
+											// // continue;
+										// }
+									// }
+									// console.log("foundID: "+foundID);
+									// if(!foundID) {
+										// var index = listCache2.indexOf(priority[2].list[prio2ListPoint]);
+										// if (index > -1) {
+											// listCache2.splice(index, 1);
+										// }
+										// console.log("Entfernter Spielplan: "+priority[2].list[prio2ListPoint].spieplanID);
+										// console.log("Pop!");
+										// foundID = false;
+									// }
+								// }
+								var index = listCache2.indexOf(priority[2].list[prio2ListPoint]);
+								console.log("Index: "+index);
+								if(index > -1) {
+									for( var movie in priority[0].list ){
+										if(priority[0].list[movie].filmID == listCache2[index].filmID){
+											foundID = true;
+											break;
+										}									
+									}
+									if(foundID == false){
+										listCache2.splice(index, 1);
+									}
 								}
 							}
 						
@@ -338,185 +383,27 @@
 			// Overview - classPointer:
 			// 0 == cineBox
 			// 1 == movieBox
-			// 2 == timeBox			
-
-			// $('div')
-				// .filter(function() {
-					// return this.className.match(/(^|\s)category\s.*\s\prio\d(\s|$)/);
-				// })
-				// .html("YESSS!")
-			// ;		
-
-			// // if($('div').filter(function() {		return this.className.match(/(^|\s)category\s.*\s\prio\d(\s|$)/);	}) ){
-				// // console.log("YESSS!!!");
-			// // }
-		
-			console.log(typeof priority[0].searchPointer);			
-			console.log(typeof priority[0].classPointer);
+			// 2 == timeBox				
 
 			console.log("priority[0].searchPointer: "+priority[0].searchPointer);
 			console.log("priority[1].searchPointer: "+priority[1].searchPointer);			
 			console.log("priority[2].searchPointer: "+priority[2].searchPointer);
 			
-			if(priority[0].searchPointer !== '' && priority[0].searchPointer == 0){
-				
-					for(var k = 0; k < 3; k++){
-						if( $('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
-							$('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+			for(var i = 0; i < 3; i++){
+				for(var j = 0; j < 3; j++){
+					if(priority[i].searchPointer !== '' && priority[i].searchPointer == j){				
+						for(var k = 0; k < 3; k++){
+							if( $('div'+priority[i].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
+								$('div'+priority[i].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
+							}
 						}
-					}
-					if( $('div').filter($( "[class$='prio0']" )).length ){
-						console.log("YESSS!!!");
-						$('div').filter($( "[class$='prio0']" )).removeClass("prio0");							
-					}
-					// if( $('div').filter($( "[class$='prio1']" )).length ){
-						// console.log("YESSS2!!!");
-						// $('div').filter($( "[class$='prio1']" )).removeClass("prio1");							
-					// }
-					// if( $('div').filter($( "[class$='prio2']" )).length ){
-						// console.log("YESSS3!!!");
-						// $('div').filter($( "[class$='prio2']" )).removeClass("prio2");							
-					// }					
-					$(priority[0].classPointer).addClass( "prio0" );
-					console.log(priority[0].classPointer);
-				
-			}
-			if(priority[0].searchPointer !== '' && priority[0].searchPointer == 1){
-					for(var k = 0; k < 3; k++){
-						if( $('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
-							$('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
-						}
-					}
-					if( $('div').filter($( "[class$='prio0']" )).length ){
-						console.log("YESSS!!!");
-						$('div').filter($( "[class$='prio0']" )).removeClass("prio0");							
-					}
-					$(priority[0].classPointer).addClass( "prio0" );
-					console.log(priority[0].classPointer);	
-			}			
-			if(priority[0].searchPointer !== '' && priority[0].searchPointer == 2){
-					for(var k = 0; k < 3; k++){
-						if( $('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
-							$('div'+priority[0].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
-						}
-					}			
-					if( $('div').filter($( "[class$='prio0']" )).length ){
-						console.log("YESSS!!!");
-						$('div').filter($( "[class$='prio0']" )).removeClass("prio0");							
-					}
-					$(priority[0].classPointer).addClass( "prio0" );
-					console.log(priority[0].classPointer);
-			}
-			if(priority[1].searchPointer !== '' && priority[1].searchPointer == 0){
-
-					for(var k = 0; k < 3; k++){
-						if( $('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
-							$('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
-						}
+						if( $('div').filter($( "[class$='prio"+i+"']" )).length ){	// Überprüfen, ob jeweilige Klasse bereits geadded wurde.
+							$('div').filter($( "[class$='prio"+i+"']" )).removeClass("prio"+i);							
+						}					
+						$(priority[i].classPointer).addClass( "prio"+i );
 					}	
-					if( $('div').filter($( "[class$='prio1']" )).length ){
-						console.log("YESSS!!!");
-						$('div').filter($( "[class$='prio1']" )).removeClass("prio1");								
-					}
-					$(priority[1].classPointer).addClass( "prio1" );
-					console.log(priority[1].classPointer);					
-				
+				}
 			}
-			if(priority[1].searchPointer !== '' && priority[1].searchPointer == 1){
-
-					for(var k = 0; k < 3; k++){
-						if( $('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
-							$('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
-						}
-					}			
-					if( $('div').filter($( "[class$='prio1']" )).length ){
-						console.log("YESSS!!!");
-						$('div').filter($( "[class$='prio1']" )).removeClass("prio1");								
-					}
-					$(priority[1].classPointer).addClass( "prio1" );
-					console.log(priority[1].classPointer);					
-				
-			}			
-			if(priority[1].searchPointer !== '' && priority[1].searchPointer == 2){
-
-					for(var k = 0; k < 3; k++){
-						if( $('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
-							$('div'+priority[1].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
-						}
-					}			
-					if( $('div').filter($( "[class$='prio1']" )).length ){
-						console.log("YESSS!!!");
-						$('div').filter($( "[class$='prio1']" )).removeClass("prio1");							
-					}
-					$(priority[1].classPointer).addClass( "prio1" );
-					console.log(priority[1].classPointer);					
-
-			}
-			if(priority[2].searchPointer !== '' && priority[2].searchPointer == 0){
-
-					for(var k = 0; k < 3; k++){
-						if( $('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
-							$('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
-						}
-					}			
-					if( $('div').filter($( "[class$='prio2']" )).length ){
-						console.log("YESSS!!!");
-						$('div').filter($( "[class$='prio2']" )).removeClass("prio2");							
-					}
-					$(priority[2].classPointer).addClass( "prio2" );
-					console.log(priority[2].classPointer);					
-						
-			}
-			if(priority[2].searchPointer !== '' && priority[2].searchPointer == 1){
-
-					for(var k = 0; k < 3; k++){
-						if( $('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
-							$('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
-						}
-					}			
-					if( $('div').filter($( "[class$='prio2']" )).length ){
-						console.log("YESSS!!!");
-						$('div').filter($( "[class$='prio2']" )).removeClass("prio2");							
-					}
-					$(priority[2].classPointer).addClass( "prio2" );
-					console.log(priority[2].classPointer);					
-				
-			}			
-			if(priority[2].searchPointer !== '' && priority[2].searchPointer == 2){
-					
-					for(var k = 0; k < 3; k++){
-						if( $('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).length ){
-							$('div'+priority[2].classPointer).filter($( "[class$='prio"+k+"']" )).removeClass("prio"+k);
-						}
-					}
-					if( $('div').filter($( "[class$='prio2']" )).length ){
-						console.log("YESSS!!!");
-						$('div').filter($( "[class$='prio2']" )).removeClass("prio2");							
-					}
-					$(priority[2].classPointer).addClass( "prio2" );
-					console.log(priority[2].classPointer);					
-				
-			}
-			
-			// for(var i = 0; i < 3; i++){
-				// for(var j = 0; j < 3; j++){
-					// if(typeof priority[i].searchPointer !== 'undefined'){
-						// if(priority[i].searchPointer == j){
-							// // if($('div'+priority[i].classPointer).filter(function() {		return this.className.match(/(^|\s)category\s.*\s\prio\d(\s|$)/);	}) ){
-							// if( $('div').filter($( "[class$='prio"+i+"']" )).length ){
-								// console.log("YESSS!!! - i: "+i);
-								// console.log($('div').filter($( "[class$='prio"+i+"']" )));
-								// // $(priority[i].classPointer).removeClass( "prio"+i );
-								// // $('div').filter($( "[class$='prio"+i+"']" )).removeClass("prio"+i);
-								// $('div.category').removeClass("prio"+i);								
-							// }
-							
-							// $(priority[i].classPointer).addClass( "prio"+i );
-							// console.log(priority[i].classPointer);
-						// }
-					// }
-				// }
-			// }
 			
 			if(resetPrio12 == true){				
 				for(var i = 1; i < 3; i++){
@@ -526,20 +413,12 @@
 				}			
 				resetPrio12 = false;
 			}
-			
-			// if(prio0.searchPointer == 1 || prio1.searchPointer == 1 ){
-				// prio0.classPointer = $movieBox;
-			// }
-			// if(prio0.searchPointer == 2){
-				// prio0.classPointer = $timeBox;
-			// }
-			
-			// for(var pointerData in prioClass){
-				// prio[pointerData] = {
-							// "searchPointer" : priority[pointerData].searchPointer,
-							// "classPointer" : "",
-						// }; 
-			// }
+			if(resetPrio2 == true){				
+					if( $('div').filter($( "[class$='prio2']" )).length ){
+						$('div').filter($( "[class$='prio2']" )).removeClass("prio2");
+					}						
+				resetPrio2 = false;
+			}			
 			
 		}
 		
@@ -672,21 +551,22 @@
     <main>
 
 		<%include ../partials/main-heading %>
-
-		<div class="category cineBox">
-			<%include ../partials/cine-form %>
-			<ul class="cineResults"></ul>
-		</div>
-		
-		<div class="category movieBox">
-			<%include ../partials/movie-form %>	
-			<ul class="movieResults"></ul>
-		</div>
-		
-		<div class="category timeBox">
-			<%include ../partials/time-form %>
-			<ul class="timeResults"></ul>		
-		</div>
+		<div class="categories">
+			<div class="category cineBox">
+				<%include ../partials/cine-form %>
+				<ul class="cineResults"></ul>
+			</div>
+			
+			<div class="category movieBox">
+				<%include ../partials/movie-form %>	
+				<ul class="movieResults"></ul>
+			</div>
+			
+			<div class="category timeBox">
+				<%include ../partials/time-form %>
+				<ul class="timeResults"></ul>		
+			</div>
+		</div>	
 			
     </main>
 
