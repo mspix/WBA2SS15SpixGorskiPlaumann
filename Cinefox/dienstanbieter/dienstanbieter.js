@@ -14,7 +14,7 @@ app.use(function (req, res, next) {
 });
 
 function queryFilter(dbArray, queryArray){
-
+	console.log(queryArray);
 	if(queryArray !== undefined){
 
 			var counter = 0;
@@ -31,32 +31,60 @@ function queryFilter(dbArray, queryArray){
 						for (var dbElementProp in dbElement) {
 
 							// Checking if Array in Array
-							if(queryProp == dbElementProp && Array.isArray(queryArray[queryProp]) && Array.isArray(dbElement[dbElementProp])){
-							
-								for (var i=0; i < dbElement[dbElementProp].length; i++){
-									// if(Number.isInteger(queryArray[queryProp][0])){
-										// queryArray[queryProp][0] = parseInt(queryArray[queryProp][0]);
-									// }
-									
-									if( JSON.stringify(queryArray[queryProp][0]).toLowerCase() == JSON.stringify(dbElement[dbElementProp][i]).toLowerCase()){
-										propCounter++;
-										break;
-									}
+							if(queryProp == dbElementProp && Array.isArray(dbElement[dbElementProp])){
+								console.log("In Array");
+								console.log(Array.isArray(queryArray[queryProp]) ? "true" : "false");
+								console.log(queryArray);
+								// var querySubPropCounter = 0;
+								// for (var tmpProp in queryArray[queryProp]){
+									// querySubPropCounter++;
+								// }
+
+								if ( !Array.isArray(queryArray[queryProp])){	// Checking if value of queryProp is a string
+									queryArray[queryProp] = queryArray[queryProp].split(","); // => make an array
 								}
-							continue;
+
+								var subPropCounter = 0;
+
+								for (var dbElementSubProp in dbElement[dbElementProp]){
+
+									for (var querySubProp in queryArray[queryProp]){
+
+										if( JSON.stringify(queryArray[queryProp][querySubProp]).toLowerCase() == JSON.stringify(dbElement[dbElementProp][dbElementSubProp]).toLowerCase()){
+
+												subPropCounter++;
+
+
+										}
+									}
+
+
+								}
+
+								if( subPropCounter == queryArray[queryProp].length ){
+									propCounter++;
+								}
+
+							continue; // Skip the rest
 							}
-							if( !isNaN( queryArray[queryProp]) ){
-							
+							if( !isNaN( queryArray[queryProp]) && queryProp == dbElementProp ){
+								console.log(queryArray[queryProp]);
+
 								if( parseInt(dbElement[dbElementProp]) == queryArray[queryProp] ){
 									propCounter++;
 								}
+							} else if ( ( queryArray[queryProp] ==  'true' || queryArray[queryProp] == 'false' ) && queryProp == dbElementProp ){
+								// console.log('dbElementProp:'+dbElementProp+' '+dbElement[dbElementProp]+' queryProp:'+queryProp+' '+queryArray[queryProp] + ' ' + typeof(queryArray[queryProp])); 
+								if( dbElement[dbElementProp] == JSON.parse(queryArray[queryProp]) ){
+									propCounter++;
+								}
 							} else {
-							
-								if( JSON.stringify(dbElement[dbElementProp]).toLowerCase() == JSON.stringify(queryArray[queryProp]).toLowerCase() ){
+
+								if( queryProp == dbElementProp && JSON.stringify(dbElement[dbElementProp]).toLowerCase() == JSON.stringify(queryArray[queryProp]).toLowerCase() ){
 									propCounter++;
 								}
 							}
-					
+
 						}
 					}
 					if( propCounter == counter ){
@@ -71,8 +99,13 @@ function queryFilter(dbArray, queryArray){
 	}
 }
 
-
-
+function stringToBoolean(string){
+	switch(string.toLowerCase()){
+		case "true": case "yes": case "1": return true;
+		case "false": case "no": case "0": case "": return false;
+		default: return Boolean(string);
+	}
+}
 
 app.post('/users', function(req, res){
   var newUser = req.body;
@@ -162,10 +195,11 @@ app.get('/', function(req, res){
   res.send('Welcome to Cinefox!');
 });
 
+
 app.post('/kinos', function(req, res){
   var newKino = req.body;
 
-  db.incr('kinoID:kinos', function(err, rep){
+  db.incr('id:kinos', function(err, rep){
 
     newKino.kinoID = rep;
 
@@ -235,7 +269,7 @@ app.get('/kinos', function(req, res){
 		rep.forEach(function(val){
 			kinos.push(JSON.parse(val));
 		});
-		
+
 		res.json(queryFilter(kinos, req.query));
 
     });
@@ -246,7 +280,7 @@ app.get('/kinos', function(req, res){
 app.post('/filme', function(req, res){
   var newFilm = req.body;
 
-  db.incr('filmID:filme', function(err, rep){
+  db.incr('id:filme', function(err, rep){
 
     newFilm.filmID = rep;
 
@@ -325,10 +359,10 @@ app.get('/filme', function(req, res){
 });
 
 
-app.post('kinos/spielplaene', function(req, res){
+app.post('/spielplaene', function(req, res){
   var newSpielplan = req.body;
 
-  db.incr('spielplanID:spielplaene', function(err, rep){
+  db.incr('id:spielplaene', function(err, rep){
 
     newSpielplan.spielplanID = rep;
 
@@ -341,7 +375,7 @@ app.post('kinos/spielplaene', function(req, res){
 });
 
 
-app.get('kinos/spielplaene/:spielplanID', function(req, res){
+app.get('/spielplaene/:spielplanID', function(req, res){
   db.get('spielplan:'+req.params.spielplanID, function(err, rep){
 
     if(rep){
@@ -355,7 +389,7 @@ app.get('kinos/spielplaene/:spielplanID', function(req, res){
 });
 
 
-app.put('kinos/spielplaene/:spielplanID', function(req, res){
+app.put('/spielplaene/:spielplanID', function(req, res){
   db.exists('spielplan:'+req.params.spielplanID, function(err, rep){
     if (rep == 1){
       var updatedSpielplan = req.body;
@@ -371,7 +405,7 @@ app.put('kinos/spielplaene/:spielplanID', function(req, res){
 });
 
 
-app.delete('kinos/spielplaene/:spielplanID', function(req, res){
+app.delete('/spielplaene/:spielplanID', function(req, res){
   db.del('spielplan:'+req.params.spielplanID, function(err, rep){
     if (rep == 1){
       res.status(200).type('text').send('OK - Spielplan gelöscht');
@@ -383,7 +417,7 @@ app.delete('kinos/spielplaene/:spielplanID', function(req, res){
 });
 
 
-app.get('kinos/spielplaene', function(req, res){
+app.get('/spielplaene', function(req, res){
   db.keys('spielplan:*', function(err, rep){
 
     var spielplaene = [];
@@ -404,5 +438,17 @@ app.get('kinos/spielplaene', function(req, res){
   });
 });
 
+app.get('/fruit/:fruitName/kind/:fruitColor', function(req, res) {
+    var data = {
+        "fruit": {
+            "apple": req.params.fruitName,
+            "color": req.params.fruitColor
+        }
+    }; 
 
-app.listen(1337);
+    res.json(data);
+});
+
+app.listen(1337, function(){
+	console.log("Dienstanbieter listens on Port 1337");
+});
