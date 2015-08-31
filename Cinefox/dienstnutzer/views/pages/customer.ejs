@@ -10,9 +10,9 @@
 		var $movieResults = $('.movieResults'); 	// div mit der Klasse movieResults selektiert
 		var $timeResults = $('.timeResults');		// div mit der Klasse timeResults selektiert
 		
-		var $cineBox = $('.cineBox');
-		var $movieBox = $('.movieBox');
-		var $timeBox = $('.timeBox');		
+		// var $cineBox = $('.cineBox');
+		// var $movieBox = $('.movieBox');
+		// var $timeBox = $('.timeBox');		
 		
 		var priority = [];
 		
@@ -26,6 +26,8 @@
 		}	
 		
 		var counter = 0;
+		
+		var activeDefineProposal = false;
 		
 		var resetPrio12 = false;	// Wenn true -> PriorityVisualise entfernt die Klassen prio 1 und 2
 		var resetPrio2 = false;		// Wenn true -> PriorityVisualise entfernt die Klasse prio2
@@ -55,7 +57,7 @@
 			
 		}
 		
-		function refreshPage(newSearchPointer, newList, newClass){
+		function refreshPage(newSearchPointer, newList, newClass){	// Vielleicht besser in updateResults umbenennen?
 			
 			// Overview - searchPointer:
 			// 0 == cineSearch
@@ -369,6 +371,8 @@
 				}
 				priorityCount(newSearchPointer);
 				priority[2].list = listCache2;
+				activeDefineProposal = true;
+				defineProposal();
 				return priority[2].list;	
 			}
 			console.log("end");
@@ -408,6 +412,7 @@
 			if(resetPrio12 == true){				
 				for(var i = 1; i < 3; i++){
 					if( $('div').filter($( "[class$='prio"+i+"']" )).length ){
+						$('div').filter($( "[class$='prio"+i+"']" )).children("[class$='Results']").empty(); // Entferne auch die Suchergebnisse der prio 1 und 2 untergeordneten Listen
 						$('div').filter($( "[class$='prio"+i+"']" )).removeClass("prio"+i);
 					}
 				}			
@@ -415,6 +420,7 @@
 			}
 			if(resetPrio2 == true){				
 					if( $('div').filter($( "[class$='prio2']" )).length ){
+						$('div').filter($( "[class$='prio2']" )).children("[class$='Results']").empty();					
 						$('div').filter($( "[class$='prio2']" )).removeClass("prio2");
 					}						
 				resetPrio2 = false;
@@ -440,7 +446,7 @@
 					priorityVisualise();
 					
 					$.each(cineResults, function(i, cineResult) {
-						$cineResults.append('<li class="cineResult cineResultID'+ i +'">'+	
+						$cineResults.append('<li class="cineResult cine-resultID-'+ i +'">'+	
 												'Kino: '				+cineResult.bezeichnung+
 												'</br>Kinotag: '		+cineResult.kinotag+
 												'</br>Reservierung: '	+cineResult.reservierungsHotline+
@@ -483,7 +489,7 @@
 					priorityVisualise();					
 					
 					$.each(movieResults, function(i, movieResult) {
-						$movieResults.append('<li class="movieResult movieResultID'+ i +'">'+movieResult.deTitel+'</li>');
+						$movieResults.append('<li class="movieResult movie-resultID-'+ i +'">'+movieResult.deTitel+'</li>');
 					});
 					
 				}
@@ -520,7 +526,7 @@
 					priorityVisualise();					
 
 					$.each(timeResults, function(i, timeResult) {
-						$timeResults.append('<li class="timeResult timeResultID'+ i +'">'+timeResult.spielplanID+'</li>');
+						$timeResults.append('<li class="timeResult time-resultID-'+ i +'">'+timeResult.spielplanID+'</li>');
 					});
 									
 				}
@@ -538,6 +544,31 @@
 
         });
 		
+		function defineProposal(){
+			if(activeDefineProposal == true){
+				$(".defineProposal").css("display", "inline-block");
+			}
+		}
+		
+		$( ".searchReset" ).click(function() {
+			counter = 0;
+			for(var i = 0; i < 3; i++){
+				priority[i] =	{	
+									"searchPointer" : "",
+									"list" : "",
+									"classPointer" : ""
+								};
+			}
+			$('.cineResults').empty();
+			$('.movieResults').empty();			
+			$('.timeResults').empty();			
+			for(var i = 0; i < 3; i++){
+				if( $('div').filter($( "[class$='prio"+i+"']" )).length ){
+					$('div').filter($( "[class$='prio"+i+"']" )).removeClass("prio"+i);
+				}
+			}				
+		});
+		
 	}); 
     </script>
 </head>
@@ -551,6 +582,12 @@
     <main>
 
 		<%include ../partials/main-heading %>
+		
+		<div class="defineProposal">
+			<div class="defineProposalContent"></div>
+			<p>Define Proposal</p>
+		</div>
+		
 		<div class="categories">
 			<div class="category cineBox">
 				<%include ../partials/cine-form %>
@@ -566,7 +603,9 @@
 				<%include ../partials/time-form %>
 				<ul class="timeResults"></ul>		
 			</div>
-		</div>	
+		</div>
+		<div class="searchReset">Reset search</div>
+		
 			
     </main>
 
