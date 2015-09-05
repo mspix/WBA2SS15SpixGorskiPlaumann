@@ -50,7 +50,13 @@ app.get('/customer', function(req, res){
 	res.render('pages/customer');
 });
 
+app.get('/login', function(req, res){
+	res.render('pages/loginCinema');
+});
 
+app.get('/cinemaoperator', function(req, res){
+	res.render('pages/cinemaoperator');
+});
 
 
 // app.get('/test', jsonParser, function(req, res){
@@ -209,7 +215,7 @@ app.get('/customer', function(req, res){
 // });
 
 app.get('/kinos', jsonParser, function(req, res){
-	
+
 	// fs.readFile('./views/partials/results.ejs', {encoding: 'utf-8'}, function(err, filestring){
 
 		// if(err){
@@ -331,6 +337,44 @@ app.get('/filme', jsonParser, function(req, res){
 			});
 
 			externalRequest.end();
+
+});
+
+app.post('/filme', jsonParser, function(req, res){
+	// var formData = req.body;
+	console.log(JSON.stringify(req.body)+'!!!');
+
+
+	var options = {
+		host: 'localhost',
+		port: 1337,
+		path: '/filme',
+		method: 'POST',
+		headers: {
+        		'Content-Type': 'application/json'
+    		}
+	}
+
+	var externalRequest = http.request(options, function(externalResponse){
+		externalResponse.setEncoding('utf8');
+   		externalResponse.on('data', function (chunk) {
+       		console.log("body: " + chunk);
+   		});
+	});
+
+	externalRequest.write(JSON.stringify(req.body));
+	externalRequest.end();
+
+	// res.on('data', function(chunk){
+	// 		console.log(data);
+	// 	}).on('end', function(){
+        //     		console.log('end of stream');
+        // 	});
+
+
+});
+
+app.delete('/filme/:filmID', jsonParser, function(req, res){
 
 });
 
