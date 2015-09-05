@@ -16,6 +16,26 @@
 		
 		var priority = [];
 		
+		var proposal = {
+						"kinoID" : "",
+						"filmID" : "",
+						"spielplanID" : "",
+						"day" : [],
+						"time" : ""
+						};
+		
+		// Die mit pickResult() ausgewählten Elemente
+		var proposalPrio0listPoint = "";
+		var proposalPrio1listPoint = "";
+		var proposalPrio2listPoint = "";
+		
+		var timeSet = false;
+
+		// Nachdem ein mit pickResult() ausgewähltes Element an priority[x].list übergeben wurde, 
+		// soll der vorherige Inhalt von priority[x].list nicht verloren gehen. 
+		// Der Inhalt wird noch gebraucht, um eine Auswahländerung des Users möglich zu machen.
+		var tmpCache = "";	
+		
 		// Schleife zum initialisieren der Arrayfelder ( Benötigt für die Funktion priorityVisualise )
 		for(var i = 0; i < 3; i++){
 			priority[i] =	{	
@@ -70,7 +90,9 @@
 			if(priority[0].searchPointer == newSearchPointer){ // Für den Fall, dass die Liste von priority[0] geändert werden soll.
 				priority[0].list = newList;
 				priority[1].searchPointer = "";
+				priority[1].classPointer = "";
 				priority[2].searchPointer = "";
+				priority[2].classPointer = "";
 				resetPrio12 = true;	// priorityVisualise soll die prio Klassen 1 und 2 reseten
 			}
 			
@@ -94,10 +116,14 @@
 				// anders gesagt: wenn der neue searchPointer ein anderer ist als der erste, dann führe aus
 				
 				
-				
 				var listCache1 = [];		// Array für aktualisierte Ergebnisliste
 				
-				// schleife für alle elemente	
+				if(	proposalPrio0listPoint != ""){
+					tmpCache = priority[0].list;
+					priority[0].list = [proposalPrio0listPoint];
+					console.log("proposalPrio0listPoint: "+JSON.stringify(proposalPrio0listPoint));
+					console.log("Counter 1 und priority[0].list: "+JSON.stringify(priority[0].list));
+				}
 	
 				for( var prio0ListPoint in priority[0].list ) {
 				
@@ -112,7 +138,7 @@
 							continue;
 							
 						}
-						else if( ( priority[0].list[prio0ListPoint].hasOwnProperty('filmID') && !(priority[0].list[prio1ListPoint].hasOwnProperty('spielplanID')) && !(priority[1].list[prio1ListPoint].hasOwnProperty('filmID')) ) || ( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')) ) ){	// Keine filmID -> Kinodaten
+						else if( ( priority[0].list[prio0ListPoint].hasOwnProperty('filmID') && !(priority[0].list[prio0ListPoint].hasOwnProperty('spielplanID')) && !(priority[1].list[prio1ListPoint].hasOwnProperty('filmID')) ) || ( priority[0].list[prio0ListPoint].hasOwnProperty('kinoID') && !(priority[1].list[prio1ListPoint].hasOwnProperty('kinoID')) ) ){	// Keine filmID -> Kinodaten
 							
 							var filmID = "";
 							var kinoID = "";
@@ -129,23 +155,23 @@
 							console.log("Before AJAX");
 							
 							$.ajax({
-									url: '/spielplaene',
-									method: 'GET',
-									async: false,
-									data: 'kinoID='+kinoID+'&filmID='+filmID,
-									contentType: 'application/json',
-									success: function(spielplan) {
+								url: '/spielplaene',
+								method: 'GET',
+								async: false,
+								data: 'kinoID='+kinoID+'&filmID='+filmID,
+								contentType: 'application/json',
+								success: function(spielplan) {
 
-										if(spielplan.length != 0){	// Kalenderwoche evtl. mit einbeziehen
-											listCache1.push(priority[1].list[prio1ListPoint]);
-											console.log("AJAX-Call: Success! - prio0ListPoint: "+prio0ListPoint+" prio1ListPoint: "+prio0ListPoint);
-										}
-
+									if(spielplan.length != 0){	// Aktuelle Kalenderwoche evtl. mit einbeziehen
+										listCache1.push(priority[1].list[prio1ListPoint]);
+										console.log("AJAX-Call: Success! - prio0ListPoint: "+prio0ListPoint+" prio1ListPoint: "+prio0ListPoint);
 									}
-								}).fail(function () {
-									console.log('Error!');
-									alert('Error!');
-								});
+
+								}
+							}).fail(function () {
+								console.log('Error!');
+								alert('Error!');
+							});
 								
 							continue;
 
@@ -178,6 +204,7 @@
 						
 					}				
 				}
+				priority[0].list = tmpCache;
 				priorityCount(newSearchPointer);
 				priority[1].list = listCache1;	//Priority[2] soll sich an die aktualisierte Liste orientieren
 				return priority[1].list;	
@@ -186,6 +213,13 @@
 			if( counter == 2 && priority[2].searchPointer == newSearchPointer && priority[0].searchPointer != newSearchPointer ){
 					
 				var listCache2 = [];
+				
+				if(	proposalPrio1listPoint != ""){
+					tmpCache = priority[1].list;
+					priority[1].list = [proposalPrio1listPoint];
+					console.log("proposalPrio1listPoint: "+JSON.stringify(proposalPrio1listPoint));
+					console.log("Counter 2 und priority[1].list: "+JSON.stringify(priority[1].list));
+				}				
 						
 				for( var prio1ListPoint in priority[1].list ) {
 				
@@ -285,10 +319,9 @@
 						
 					}				
 				}
+				priority[1].list = tmpCache;
 				priorityCount(newSearchPointer);
 				priority[2].list = listCache2;
-				activeDefineProposal = true;
-				defineProposal();
 				return priority[2].list;	
 			}
 			console.log("End");
@@ -305,9 +338,14 @@
 			// 1 == movieBox
 			// 2 == timeBox				
 
-			console.log("priority[0].searchPointer: "+priority[0].searchPointer);
-			console.log("priority[1].searchPointer: "+priority[1].searchPointer);			
-			console.log("priority[2].searchPointer: "+priority[2].searchPointer);
+			// console.log("priority[0].searchPointer: "+priority[0].searchPointer);
+			// console.log("priority[0].classPointer: "+priority[0].classPointer);
+			// // console.log("priority[0].list: "+JSON.stringify(priority[0].list));
+			// console.log("priority[1].searchPointer: "+priority[1].searchPointer);
+			// console.log("priority[1].classPointer: "+priority[1].classPointer);	
+			// // console.log("priority[1].list: "+JSON.stringify(priority[1].list));
+			// console.log("priority[2].searchPointer: "+priority[2].searchPointer);
+			// console.log("priority[2].classPointer: "+priority[2].classPointer);			
 			
 			for(var i = 0; i < 3; i++){
 				for(var j = 0; j < 3; j++){
@@ -344,11 +382,1288 @@
 			
 		}
 		
+		function pickResult(){
+		
+			var pickedResult = false;
+			
+			if( $( 'div' ).filter($( "[class$='prio0']" )).length ){
+			
+				// console.log("prio0 is set?: "+ $( 'div' ).filter($( "[class$='prio0']" )).length );
+			
+				var classPointer = priority[0].classPointer.split(".");	// Bsp.: String == .category.cineBox wird gesplitted in [".","category","cineBox"]
+				
+				console.log(priority[0].classPointer);
+				console.log(classPointer);
+				
+				var prio0Class = classPointer[2];	
+				
+				console.log("prio0Class: "+prio0Class);
+				
+				var stringComponent = prio0Class.slice(0, -3);	// Bsp.: Schneidet "Box" von "cineBox" ab - String: "cine"
+				
+				console.log(stringComponent);
+				
+				// $( "li" ).filter( $( "[class^='"+stringComponent+"']" ) ).addClass( "selectResult" ); // funktioniert auch			
+				
+				var element0ID = "";
+				var element1ID = "";
+				var element2ID = "";
+				
+				var kinoResponse = [];		
+				var filmResponse = [];	
+				var spielplanResponse = [];
+				var ajaxGetFilm = "";
+				var ajaxGetKino = "";				
+
+				$( "li[class^='"+stringComponent+"']" ).addClass( "selectResult" );				
+				
+				$( "li[class^='"+stringComponent+"']" ).click(function() {
+
+					console.log( $( this ).attr("class") );
+					
+					var element0Array = $( this ).attr("class").split(" ");
+					var element0 = element0Array[1];
+					var element0SplittedArray = element0.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+					
+					element0ID = element0SplittedArray[2];					
+					console.log("ElementID: "+element0ID);
+					
+					proposalPrio0listPoint = priority[0].list[element0ID];	// Speichern des Listen-Inhalts
+					
+					var element1Array = "";
+					var element1 = "";
+					var element1SplittedArray = "";
+					var element2Array = "";
+					var element2 = "";
+					var element2SplittedArray = "";						
+					
+					$( "li" ).removeClass("selectedResult");
+					$( "."+element0 ).addClass("selectedResult");
+					
+					$( "div.proposal0" ).remove();
+					$( "div.proposal1" ).remove();
+					$( "div.proposal2" ).remove();					
+
+					kinoResponse = [];		
+					filmResponse = [];	
+					spielplanResponse = [];
+					ajaxGetFilm = "";
+					ajaxGetKino = "";
+					
+					if( stringComponent == "cine" ){
+					
+						// priority[0].searchPointer = 0;
+						// priority[0].classPointer = ".category.cineBox";
+						// priority[0].list = priority[0].list[element0ID];
+					
+						proposal.kinoID = proposalPrio0listPoint.kinoID;										
+						$( "div.defineProposalContent" ).append('<div class="proposal0">'+
+																	'Kino: '+proposalPrio0listPoint.bezeichnung+
+																'</div>');
+						console.log('kinoID='+proposalPrio0listPoint.kinoID);										
+																
+						function getSpielplaeneKinoID(){
+							return $.ajax({
+										url: '/spielplaene',
+										method: 'GET',
+										async: false,
+										data: 'kinoID='+proposalPrio0listPoint.kinoID,
+										contentType: 'application/json',
+									}).done(function (response) {
+											console.log("spielplaene: "+response);
+											spielplanResponse = response;
+									}).fail(function () {
+										console.log('Error!');
+										alert('Error!');
+									});
+						};
+						
+						function getFilm(index) {
+							return $.ajax({
+										url: '/filme',
+										method: 'GET',
+										async: false,
+										data: 'filmID='+spielplanResponse[index].filmID,
+										contentType: 'application/json',
+									}).done(function (response) {
+										filmResponse.push(response[0]); // response ist ein array - wir wollen kein array in ein array übergeben, daher response[0]
+										console.log("filme: "+filmResponse);
+										console.log("Response: "+response);
+									}).fail(function () {
+										console.log('Error!');
+										alert('Error!');
+									});
+						};
+				
+						$.when( getSpielplaeneKinoID() ).done( function(){
+							// console.log(spielplanResponse[0].filmID);
+
+							for(var spielplan in spielplanResponse){
+						
+								console.log("test");
+								console.log(JSON.stringify(spielplanResponse[spielplan].filmID));
+							
+								ajaxGetFilm = getFilm(spielplan);	
+							}
+
+							$.when( ajaxGetFilm ).done( function(){
+								$timeResults.empty();
+								$movieResults.empty();
+								
+								$.each(spielplanResponse, function(i, spielplan) {
+									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectResult">'+spielplan.spielplanID+'</li>');
+								});	
+								$.each(filmResponse, function(i, film) {
+									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectResult">'+film.deTitel+'</li>');
+								});
+								
+								pointerView();
+
+								if( !($( 'div' ).filter($( "[class$='prio1']" )).length) || ($( 'div' ).filter( ".category.movieBox.prio1" ).length) ){
+									
+									if( $( 'div' ).filter($( "[class$='prio2']" )).length ){
+										$( "li[class^='time']" ).removeClass( "selectResult" );
+									}
+									
+									$( "li[class^='movie']" ).click(function() {
+									
+										$( "li[class^='time']" ).removeClass( "selectResult" );
+									
+										priority[1].searchPointer = 1;
+										priority[1].classPointer = ".category.movieBox";
+										priority[1].list = filmResponse;
+										priority[2].searchPointer = 2;
+										priority[2].classPointer = ".category.timeBox";
+										priority[2].list = spielplanResponse;
+										
+										$( 'div' ).filter($( "[class$='prio1']" )).removeClass( "prio1" );
+										$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+										$(priority[1].classPointer).addClass( "prio1" );
+										$(priority[2].classPointer).addClass( "prio2" );
+										
+										console.log( $( this ).attr("class") );
+					
+										element1Array = $( this ).attr("class").split(" ");
+										element1 = element1Array[1];
+										element1SplittedArray = element1.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+										
+										element1ID = element1SplittedArray[2];					
+										console.log("ElementID: "+element1ID);
+										
+										proposalPrio1listPoint = priority[1].list[element1ID];	// Speichern des Listen-Inhalts
+										proposalPrio2listPoint = priority[2].list[element1ID];
+										
+										$( "li[class^='movie']" ).removeClass("selectedResult");
+										$( "."+element1 ).addClass("selectedResult");
+										
+										proposal.filmID = proposalPrio1listPoint.filmID;
+										proposal.spielplanID = proposalPrio2listPoint.spielplanID;
+										
+										$( "div.proposal1" ).remove();
+										$( "div.proposal2" ).remove();
+										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
+																					'Film: '+proposalPrio1listPoint.deTitel+
+																				'</div>');
+										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																					'Spielplan: '+proposalPrio2listPoint.spielplanID+
+																				'</div>');
+																				
+										$timeResults.empty();
+										
+										$.each(spielplanResponse, function(i, spielplan) {
+											if(priority[1].list[element1ID].filmID == spielplan.filmID){
+												$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
+											}
+										});
+										
+										pointerView();
+										defineProposal();
+										
+									});
+								}
+								if( !($( 'div' ).filter($( "[class$='prio1']" )).length) || ($( 'div' ).filter( ".category.timeBox.prio1" ).length) ){
+
+									if( $( 'div' ).filter($( "[class$='prio2']" )).length ){
+										$( "li[class^='movie']" ).removeClass( "selectResult" );
+									}
+								
+									$( "li[class^='time']" ).click(function() {
+
+										$( "li[class^='movie']" ).removeClass( "selectResult" );
+									
+										priority[1].searchPointer = 2;
+										priority[1].classPointer = ".category.timeBox";
+										priority[1].list = spielplanResponse;
+										priority[2].searchPointer = 1;
+										priority[2].classPointer = ".category.movieBox";
+										priority[2].list = filmResponse;
+
+										$( 'div' ).filter($( "[class$='prio1']" )).removeClass( "prio1" );
+										$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+										$(priority[1].classPointer).addClass( "prio1" );
+										$(priority[2].classPointer).addClass( "prio2" );										
+										
+										$( 'div' ).filter($( "[class$='prio1']" )).removeClass( "prio1" );
+										$(priority[1].classPointer).addClass( "prio1" );
+										
+										console.log( $( this ).attr("class") );
+					
+										element1Array = $( this ).attr("class").split(" ");
+										element1 = element1Array[1];
+										element1SplittedArray = element1.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+										
+										element1ID = element1SplittedArray[2];					
+										console.log("ElementID: "+element1ID);
+										
+										proposalPrio1listPoint = priority[1].list[element1ID];	// Speichern des Listen-Inhalts
+										proposalPrio2listPoint = priority[2].list[element1ID];
+
+										$( "li[class^='time']" ).removeClass("selectedResult");
+										$( "."+element1 ).addClass("selectedResult");
+										
+										proposal.spielplanID = proposalPrio1listPoint.spielplanID;
+										proposal.filmID = proposalPrio2listPoint.filmID;
+										
+										$( "div.proposal1" ).remove();
+										$( "div.proposal2" ).remove();
+										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
+																					'Spielplan: '+proposalPrio1listPoint.spielplanID+
+																				'</div>');									
+										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																					'Film: '+proposalPrio2listPoint.deTitel+
+																				'</div>');
+																				
+										$movieResults.empty();
+										
+										$.each(filmResponse, function(i, film) {
+											if(priority[1].list[element1ID].filmID == film.filmID){
+												$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+film.deTitel+'</li>');
+											}
+										});
+
+										pointerView();										
+										defineProposal();	
+										
+									});
+								}									
+																	
+							});
+												
+						});
+																						
+					}
+					if( stringComponent == "movie" ){						
+					
+						// priority[0].searchPointer = 1;
+						// priority[0].classPointer = ".category.movieBox";
+						// priority[0].list = priority[0].list[element0ID];
+					
+						proposal.filmID = proposalPrio0listPoint.filmID;											
+						$( "div.defineProposalContent" ).append('<div class="proposal0">'+
+																	'Film: '+proposalPrio0listPoint.deTitel+
+																'</div>');
+																
+						function getSpielplaeneFilmID(){
+							return $.ajax({
+										url: '/spielplaene',
+										method: 'GET',
+										async: false,
+										data: 'filmID='+proposalPrio0listPoint.filmID,
+										contentType: 'application/json',
+									}).done(function (response) {
+											console.log("spielplaene: "+response);
+											spielplanResponse = response;
+									}).fail(function () {
+										console.log('Error!');
+										alert('Error!');
+									});
+						};
+						
+						function getKinos(i) {
+							return $.ajax({
+										url: '/kinos',
+										method: 'GET',
+										async: false,
+										data: 'kinoID='+spielplanResponse[i].kinoID,
+										contentType: 'application/json',
+									}).done(function (response) {
+										kinoResponse.push(response[0]); // response ist ein array - wir wollen kein array in ein array übergeben, daher response[0]
+										
+										var index = kinoResponse.indexOf(response[0]);
+										var foundID = false;
+										
+										console.log("Index: "+index);
+										
+										if(index > -1) {
+											for( var kino in kinoResponse ){
+												if(kinoResponse[kino].kinoID == response[0].kinoID){
+													foundID = true;
+													break;
+												}									
+											}
+											if(foundID == false){
+												kinoResponse.splice(index, 1);
+											}
+										}										
+									
+										console.log("kinos: "+kinoResponse);
+										console.log("Response: "+response);
+									}).fail(function () {
+										console.log('Error!');
+										alert('Error!');
+									});
+								};
+				
+						$.when( getSpielplaeneFilmID() ).done( function(){
+							// console.log(spielplanResponse[0].kinoID);
+
+							for(var spielplan in spielplanResponse){
+						
+								// console.log("test");
+								// console.log(JSON.stringify(spielplanResponse[spielplan].filmID));
+							
+								ajaxGetKino = getKinos(spielplan);
+							}
+
+							$.when( ajaxGetKino ).done( function(){
+								$timeResults.empty();
+								$cineResults.empty();
+								
+								$.each(spielplanResponse, function(i, spielplan) {
+									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectResult">'+spielplan.spielplanID+'</li>');
+								});	
+								$.each(kinoResponse, function(i, kino) {
+									$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectResult">'+kino.bezeichnung+'</li>');
+								});
+								
+								pointerView();
+
+								if( !($( 'div' ).filter($( "[class$='prio1']" )).length) || ($( 'div' ).filter( ".category.cineBox.prio1" ).length) ){
+
+									if( $( 'div' ).filter($( "[class$='prio2']" )).length ){
+										$( "li[class^='time']" ).removeClass( "selectResult" );
+									}
+								
+									$( "li[class^='cine']" ).click(function() {
+
+										$( "li[class^='time']" ).removeClass( "selectResult" );
+									
+										priority[1].searchPointer = 0;
+										priority[1].classPointer = ".category.cineBox";
+										priority[1].list = kinoResponse;
+										priority[2].searchPointer = 2;
+										priority[2].classPointer = ".category.timeBox";
+										priority[2].list = spielplanResponse;
+										
+										$( 'div' ).filter($( "[class$='prio1']" )).removeClass( "prio1" );
+										$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+										$(priority[1].classPointer).addClass( "prio1" );
+										$(priority[2].classPointer).addClass( "prio2" );
+										
+										console.log( $( this ).attr("class") );
+					
+										element1Array = $( this ).attr("class").split(" ");
+										element1 = element1Array[1];
+										element1SplittedArray = element1.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+										
+										element1ID = element1SplittedArray[2];					
+										console.log("ElementID: "+element1ID);
+										
+										proposalPrio1listPoint = priority[1].list[element1ID];	// Speichern des Listen-Inhalts
+										proposalPrio2listPoint = priority[2].list[element1ID];
+										
+										$( "li[class^='cine']" ).removeClass("selectedResult");
+										$( "."+element1 ).addClass("selectedResult");
+										
+										proposal.kinoID = proposalPrio1listPoint.kinoID;
+										proposal.spielplanID = proposalPrio2listPoint.spielplanID;
+										
+										$( "div.proposal1" ).remove();
+										$( "div.proposal2" ).remove();
+										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
+																					'Kino: '+proposalPrio1listPoint.bezeichnung+
+																				'</div>');
+										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																					'Spielplan: '+proposalPrio2listPoint.spielplanID+
+																				'</div>');
+																				
+										$timeResults.empty();
+										
+										$.each(spielplanResponse, function(i, spielplan) {
+											if(priority[1].list[element1ID].kinoID == spielplan.kinoID){
+												$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
+											}
+										});
+										
+										pointerView();
+										defineProposal();
+										
+									});
+								}
+								if( !($( 'div' ).filter($( "[class$='prio1']" )).length) || ($( 'div' ).filter( ".category.timeBox.prio1" ).length) ){
+
+									if( $( 'div' ).filter($( "[class$='prio2']" )).length ){
+										$( "li[class^='cine']" ).removeClass( "selectResult" );
+									}
+								
+									$( "li[class^='time']" ).click(function() {
+									
+										$( "li[class^='cine']" ).removeClass( "selectResult" );
+									
+										priority[1].searchPointer = 2;
+										priority[1].classPointer = ".category.timeBox";
+										priority[1].list = spielplanResponse;
+										priority[2].searchPointer = 0;
+										priority[2].classPointer = ".category.cineBox";
+										priority[2].list = kinoResponse;
+
+										$( 'div' ).filter($( "[class$='prio1']" )).removeClass( "prio1" );
+										$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+										$(priority[1].classPointer).addClass( "prio1" );
+										$(priority[2].classPointer).addClass( "prio2" );										
+										
+										console.log( $( this ).attr("class") );
+					
+										element1Array = $( this ).attr("class").split(" ");
+										element1 = element1Array[1];
+										element1SplittedArray = element1.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+										
+										element1ID = element1SplittedArray[2];					
+										console.log("ElementID: "+element1ID);
+										
+										proposalPrio1listPoint = priority[1].list[element1ID];	// Speichern des Listen-Inhalts
+										proposalPrio2listPoint = priority[2].list[element1ID];
+
+										$( "li[class^='time']" ).removeClass("selectedResult");
+										$( "."+element1 ).addClass("selectedResult");
+										
+										proposal.spielplanID = proposalPrio1listPoint.spielplanID;
+										proposal.kinoID = proposalPrio2listPoint.kinoID;
+										
+										$( "div.proposal1" ).remove();
+										$( "div.proposal2" ).remove();
+										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
+																					'Spielplan: '+proposalPrio1listPoint.spielplanID+
+																				'</div>');									
+										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																					'Kino: '+proposalPrio2listPoint.bezeichnung+
+																				'</div>');
+																				
+										$cineResults.empty();
+										
+										$.each(kinoResponse, function(i, kino) {
+											if(priority[1].list[element1ID].kinoID == kino.kinoID){
+												$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kino.bezeichnung+'</li>');
+											}
+										});
+
+										pointerView();
+										defineProposal();
+																				
+									});
+								}									
+																	
+							});
+												
+						});																
+					}
+					if( stringComponent == "time" ){
+					
+						// priority[0].searchPointer = 2;
+						// priority[0].classPointer = ".category.timeBox";
+						// priority[0].list = priority[0].list[element0ID];
+					
+						proposal.spielplanID = proposalPrio0listPoint.spielplanID;										
+						$( "div.defineProposalContent" ).append('<div class="proposal0">'+
+																	'Spielplan: '+proposalPrio0listPoint.spielplanID+
+																'</div>');
+
+						function getFilmeSpielplanID(){
+							return $.ajax({
+										url: '/filme',
+										method: 'GET',
+										async: false,
+										data: 'filmID='+proposalPrio0listPoint.filmID,
+										contentType: 'application/json',
+									}).done(function (response) {
+											console.log("spielplaene: "+response);
+											filmResponse = response;
+									}).fail(function () {
+										console.log('Error!');
+										alert('Error!');
+									});
+						};
+						
+						function getKinosSpielplanID() {
+							return $.ajax({
+										url: '/kinos',
+										method: 'GET',
+										async: false,
+										data: 'kinoID='+proposalPrio0listPoint.kinoID,
+										contentType: 'application/json',
+									}).done(function (response) {
+										kinoResponse.push(response[0]); // response ist ein array - wir wollen kein array in ein array übergeben, daher response[0]
+										
+										var index = kinoResponse.indexOf(response[0]);
+										var foundID = false;
+										
+										console.log("Index: "+index);
+										
+										if(index > -1) {
+											for( var kino in kinoResponse ){
+												if(kinoResponse[kino].kinoID == response[0].kinoID){
+													foundID = true;
+													break;
+												}									
+											}
+											if(foundID == false){
+												kinoResponse.splice(index, 1);
+											}
+										}										
+									
+										console.log("kinos: "+kinoResponse);
+										console.log("Response: "+response);
+									}).fail(function () {
+										console.log('Error!');
+										alert('Error!');
+									});
+								};
+				
+						$.when( getFilmeSpielplanID() ).done( function(){
+
+							// for(var spielplan in spielplanResponse){
+							
+								// ajaxGetKino = getKinoSpielplanID(spielplan);
+							// }
+
+							$.when( getKinosSpielplanID() ).done( function(){
+								$movieResults.empty();
+								$cineResults.empty();
+								
+								$.each(filmResponse, function(i, film) {
+									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectResult">'+film.deTitel+'</li>');
+								});	
+								$.each(kinoResponse, function(i, kino) {
+									$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectResult">'+kino.bezeichnung+'</li>');
+								});
+
+								if( !($( 'div' ).filter($( "[class$='prio1']" )).length) || ($( 'div' ).filter( ".category.cineBox.prio1" ).length) ){
+
+									if( $( 'div' ).filter($( "[class$='prio2']" )).length ){
+										$( "li[class^='movie']" ).removeClass( "selectResult" );
+									}
+								
+									$( "li[class^='cine']" ).click(function() {
+									
+										$( "li[class^='movie']" ).removeClass( "selectResult" );
+									
+										priority[1].searchPointer = 0;
+										priority[1].classPointer = ".category.cineBox";
+										priority[1].list = kinoResponse;
+										priority[2].searchPointer = 1;
+										priority[2].classPointer = ".category.movieBox";
+										priority[2].list = filmResponse;
+										
+										$( 'div' ).filter($( "[class$='prio1']" )).removeClass( "prio1" );
+										$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+										$(priority[1].classPointer).addClass( "prio1" );
+										$(priority[2].classPointer).addClass( "prio2" );
+										
+										console.log( $( this ).attr("class") );
+					
+										element1Array = $( this ).attr("class").split(" ");
+										element1 = element1Array[1];
+										element1SplittedArray = element1.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+										
+										element1ID = element1SplittedArray[2];					
+										console.log("ElementID: "+element1ID);
+										
+										proposalPrio1listPoint = priority[1].list[element1ID];	// Speichern des Listen-Inhalts
+										proposalPrio2listPoint = priority[2].list[element1ID];
+										
+										$( "li[class^='cine']" ).removeClass("selectedResult");
+										$( "."+element1 ).addClass("selectedResult");
+										
+										proposal.kinoID = proposalPrio1listPoint.kinoID;
+										proposal.filmID = proposalPrio2listPoint.filmID;
+										
+										$( "div.proposal1" ).remove();
+										$( "div.proposal2" ).remove();
+										
+										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
+																					'Kino: '+proposalPrio1listPoint.bezeichnung+
+																				'</div>');
+										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																					'Film: '+proposalPrio2listPoint.deTitel+
+																				'</div>');
+																				
+										$movieResults.empty();
+										
+										$.each(filmResponse, function(i, film) {
+											if(priority[0].list[element0ID].filmID == film.filmID){
+												$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+film.deTitel+'</li>');
+											}
+										});
+										
+										pointerView();
+										defineProposal();
+										
+									});
+								}
+								if( !($( 'div' ).filter($( "[class$='prio1']" )).length) || ($( 'div' ).filter( ".category.movieBox.prio1" ).length) ){
+
+									if( $( 'div' ).filter($( "[class$='prio2']" )).length ){
+										$( "li[class^='cine']" ).removeClass( "selectResult" );
+									}
+								
+									$( "li[class^='movie']" ).click(function() {
+									
+										$( "li[class^='cine']" ).removeClass( "selectResult" );
+									
+										priority[1].searchPointer = 1;
+										priority[1].classPointer = ".category.movieBox";
+										priority[1].list = filmResponse;
+										priority[2].searchPointer = 0;
+										priority[2].classPointer = ".category.cineBox";
+										priority[2].list = kinoResponse;
+
+										$( 'div' ).filter($( "[class$='prio1']" )).removeClass( "prio1" );
+										$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+										$(priority[1].classPointer).addClass( "prio1" );
+										$(priority[2].classPointer).addClass( "prio2" );										
+										
+										$( 'div' ).filter($( "[class$='prio1']" )).removeClass( "prio1" );
+										$(priority[1].classPointer).addClass( "prio1" );
+										
+										console.log( $( this ).attr("class") );
+					
+										element1Array = $( this ).attr("class").split(" ");
+										element1 = element1Array[1];
+										element1SplittedArray = element1.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+										
+										element1ID = element1SplittedArray[2];					
+										console.log("ElementID: "+element1ID);
+										
+										proposalPrio1listPoint = priority[1].list[element1ID];	// Speichern des Listen-Inhalts
+										proposalPrio2listPoint = priority[2].list[element1ID];
+
+										$( "li[class^='movie']" ).removeClass("selectedResult");
+										$( "."+element1 ).addClass("selectedResult");
+										
+										proposal.filmID = proposalPrio1listPoint.filmID;
+										proposal.kinoID = proposalPrio2listPoint.kinoID;
+										
+										$( "div.proposal1" ).remove();
+										$( "div.proposal2" ).remove();
+										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
+																					'Film: '+proposalPrio1listPoint.deTitel+
+																				'</div>');									
+										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																					'Kino: '+proposalPrio2listPoint.bezeichnung+
+																				'</div>');
+
+										$cineResults.empty();
+										
+										$.each(kinoResponse, function(i, kino) {
+											if(priority[0].list[element0ID].kinoID == kino.kinoID){
+												$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kino.bezeichnung+'</li>');
+											}
+										});
+
+										pointerView();
+										defineProposal();
+																				
+									});
+								}									
+																	
+							});
+												
+						});																
+																
+					}
+					
+					console.log(proposal);					
+															
+					// $( "li[class^='"+stringComponent+"']" ).removeClass( "selectResult" );
+					
+					$( "div.locked" ).remove();
+
+					defineProposal();					
+					
+				});
+				
+				if( !($( 'div' ).filter($( ".locked" )).length) ){	// Wenn keine Suche bereits gelocked ist, darf gelocked werden
+				
+					if( stringComponent == "cine" && counter == 1 && priority[1].searchPointer == "" && priority[2].searchPointer == "" ){						
+						$( "div.category.movieBox" ).append('<div class="locked"></div>');
+						$( "div.category.timeBox" ).append('<div class="locked"></div>');					
+					}
+					if( priority[1].searchPointer === 0 && counter == 2 && priority[0].searchPointer === 1 && priority[2].searchPointer == "" ){						
+						$( "div.category.timeBox" ).append('<div class="locked"></div>');					
+					}
+					if( priority[1].searchPointer === 0 && counter == 2 && priority[0].searchPointer === 2 && priority[2].searchPointer == "" ){						
+						$( "div.category.movieBox" ).append('<div class="locked"></div>');					
+					}
+					
+					if( stringComponent == "movie" && counter == 1 && priority[1].searchPointer == "" && priority[2].searchPointer == "" ){				
+						$( "div.category.cineBox" ).append('<div class="locked"></div>');
+						$( "div.category.timeBox" ).append('<div class="locked"></div>');					
+					}
+					if( priority[1].searchPointer === 1 && counter == 2 && priority[0].searchPointer === 0 && priority[2].searchPointer == "" ){						
+						$( "div.category.timeBox" ).append('<div class="locked"></div>');					
+					}
+					if( priority[1].searchPointer === 1 && counter == 2 && priority[0].searchPointer === 2 && priority[2].searchPointer == "" ){						
+						$( "div.category.cineBox" ).append('<div class="locked"></div>');					
+					}
+					
+					if( stringComponent == "time" && counter == 1 && priority[1].searchPointer == "" && priority[2].searchPointer == "" ){				
+						$( "div.category.cineBox" ).append('<div class="locked"></div>');
+						$( "div.category.movieBox" ).append('<div class="locked"></div>');					
+					}
+					if( priority[1].searchPointer === 2 && counter == 2 && priority[0].searchPointer === 1 && priority[2].searchPointer === "" ){						
+						$( "div.category.cineBox" ).append('<div class="locked"></div>');					
+					}
+					if( priority[1].searchPointer === 2 && counter == 2 && priority[0].searchPointer === 0 && priority[2].searchPointer == "" ){						
+						$( "div.category.movieBox" ).append('<div class="locked"></div>');					
+					}
+				}			
+
+				// Falls cineSearch priority[1] und ein Filter per Submit angewendet wird
+				if( priority[1].searchPointer === 0 ){
+
+					$( "li[class^='cine']" ).addClass("selectResult");
+				
+					$( "li[class^='cine']" ).click(function() {
+								
+						console.log( $( this ).attr("class") );
+	
+						element1Array = $( this ).attr("class").split(" ");
+						element1 = element1Array[1];
+						element1SplittedArray = element1.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+						
+						element1ID = element1SplittedArray[2];					
+						console.log("ElementID: "+element1ID);
+						
+						
+						
+						proposalPrio1listPoint = priority[1].list[element1ID];	// Speichern des Listen-Inhalts
+						
+						$( "li[class^='cine']" ).removeClass("selectedResult");
+						$( "."+element1 ).addClass("selectedResult");
+						
+						proposal.kinoID = proposalPrio1listPoint.kinoID;
+						
+						
+						$( "div.proposal1" ).remove();
+						$( "div.defineProposalContent" ).append('<div class="proposal1">'+
+																	'Kino: '+proposalPrio1listPoint.bezeichnung+
+																'</div>');
+						
+						$( "div.locked" ).remove();
+
+						// Falls priority[0] bei der movieSearch liegt -> priority[2] liegt bei timeSearch
+						if(priority[0].searchPointer === 1){
+						
+							priority[2].searchPointer = 2;
+							priority[2].classPointer = ".category.timeBox";
+						
+							$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+							$(priority[2].classPointer).addClass( "prio2" );
+						
+							$.ajax({
+								url: '/spielplaene',
+								method: 'GET',
+								async: false,
+								data: 'kinoID='+proposalPrio1listPoint.kinoID,
+								contentType: 'application/json',
+							}).done(function (response) {
+								console.log("spielplaene: "+response);
+								spielplanResponse = response;
+							}).fail(function () {
+								console.log('Error!');
+								alert('Error!');
+							});
+
+							priority[2].list = spielplanResponse;
+																
+							$timeResults.empty();
+							
+							$.each(spielplanResponse, function(i, spielplan) {
+								if(proposalPrio0listPoint.filmID == spielplan.filmID){
+									proposalPrio2listPoint = spielplanResponse[i];
+									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
+									
+								}
+							});
+							
+							proposal.spielplanID = proposalPrio2listPoint.spielplanID;
+							
+							$( "div.proposal2" ).remove();							
+							$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																		'Spielplan: '+proposalPrio2listPoint.spielplanID+
+																	'</div>');
+																	
+							defineProposal();
+							
+						}
+						// Falls priority[0] bei der timeSearch liegt -> priority[2] liegt bei movieSearch
+						if(priority[0].searchPointer === 2){
+						
+							priority[2].searchPointer = 1;
+							priority[2].classPointer = ".category.movieBox";
+						
+							$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+							$(priority[2].classPointer).addClass( "prio2" );
+						
+							$.ajax({
+								url: '/filme',
+								method: 'GET',
+								async: false,
+								data: 'filmID='+proposalPrio0listPoint.filmID,
+								contentType: 'application/json',
+							}).done(function (response) {
+								console.log("spielplaene: "+response);
+								filmResponse = response;
+							}).fail(function () {
+								console.log('Error!');
+								alert('Error!');
+							});
+
+							priority[2].list = filmResponse;
+																
+							$movieResults.empty();
+							
+							// $.each(spielplanResponse, function(i, spielplan) {
+								// if(proposalPrio0listPoint.filmID == spielplan.filmID){
+									proposalPrio2listPoint = filmResponse[0];
+									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+filmResponse[0].deTitel+'</li>');
+									
+								// }
+							// });
+							
+							proposal.filmID = proposalPrio2listPoint.filmID;
+							
+							$( "div.proposal2" ).remove();							
+							$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																		'Film: '+proposalPrio2listPoint.deTitel+
+																	'</div>');	
+
+							defineProposal();
+							
+						}						
+
+					});					
+				}
+				// Falls movieSearch priority[1] und ein Filter per Submit angewendet wird
+				if( priority[1].searchPointer === 1 ){
+				
+					$( "li[class^='movie']" ).addClass("selectResult");
+				
+					$( "li[class^='movie']" ).click(function() {									
+						
+						console.log( $( this ).attr("class") );
+	
+						element1Array = $( this ).attr("class").split(" ");
+						element1 = element1Array[1];
+						element1SplittedArray = element1.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+						
+						element1ID = element1SplittedArray[2];					
+						console.log("ElementID: "+element1ID);
+						
+						proposalPrio1listPoint = priority[1].list[element1ID];	// Speichern des Listen-Inhalts
+						
+						$( "li[class^='movie']" ).removeClass("selectedResult");
+						$( "."+element1 ).addClass("selectedResult");
+						
+						proposal.filmID = proposalPrio1listPoint.filmID;
+						
+						$( "div.proposal1" ).remove();
+						$( "div.defineProposalContent" ).append('<div class="proposal1">'+
+																	'Film: '+proposalPrio1listPoint.deTitel+
+																'</div>');
+																
+						$( "div.locked" ).remove();
+						
+						// Falls priority[0] bei der cineSearch liegt -> priority[2] liegt bei timeSearch
+						if(priority[0].searchPointer === 0){
+						
+							priority[2].searchPointer = 2;
+							priority[2].classPointer = ".category.timeBox";
+						
+							$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+							$(priority[2].classPointer).addClass( "prio2" );
+						
+							$.ajax({
+								url: '/spielplaene',
+								method: 'GET',
+								async: false,
+								data: 'filmID='+proposalPrio1listPoint.filmID,
+								contentType: 'application/json',
+							}).done(function (response) {
+								console.log("spielplaene: "+response);
+								spielplanResponse = response;
+							}).fail(function () {
+								console.log('Error!');
+								alert('Error!');
+							});
+
+							priority[2].list = spielplanResponse;
+																
+							$timeResults.empty();
+
+							$.each(spielplanResponse, function(i, spielplan) {
+								if(proposalPrio1listPoint.filmID == spielplan.filmID){
+									proposalPrio2listPoint = spielplanResponse[i];
+									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
+									
+								}
+							});
+							
+							proposal.spielplanID = proposalPrio2listPoint.spielplanID;
+							
+							$( "div.proposal2" ).remove();							
+							$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																		'Spielplan: '+proposalPrio2listPoint.spielplanID+
+																	'</div>');
+
+							defineProposal();
+																	
+						}
+						// Falls priority[0] bei der timeSearch liegt -> priority[2] liegt bei cineSearch
+						if(priority[0].searchPointer === 2){
+						
+							priority[2].searchPointer = 0;
+							priority[2].classPointer = ".category.cineBox";
+						
+							$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+							$(priority[2].classPointer).addClass( "prio2" );
+						
+							$.ajax({
+								url: '/kinos',
+								method: 'GET',
+								async: false,
+								data: 'kinoID='+proposalPrio0listPoint.kinoID,
+								contentType: 'application/json',
+							}).done(function (response) {
+								console.log("kinos: "+response);
+								kinoResponse = response;
+							}).fail(function () {
+								console.log('Error!');
+								alert('Error!');
+							});
+
+							priority[2].list = kinoResponse;
+																
+							$cineResults.empty();
+							
+							// $.each(spielplanResponse, function(i, spielplan) {
+								// if(proposalPrio0listPoint.filmID == spielplan.filmID){
+									proposalPrio2listPoint = kinoResponse[0];
+									$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kinoResponse[0].bezeichnung+'</li>');
+									
+								// }
+							// });
+							
+							proposal.kinoID = proposalPrio2listPoint.kinoID;
+							
+							$( "div.proposal2" ).remove();							
+							$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																		'Kino: '+proposalPrio2listPoint.bezeichnung+
+																	'</div>');							
+						}								
+																
+					});					
+				}
+				// Falls timeSearch priority[1] und ein Filter per Submit angewendet wird
+				if( priority[1].searchPointer === 2 ){
+					$( "li[class^='time']" ).addClass("selectResult");
+				
+					$( "li[class^='time']" ).click(function() {									
+						
+						console.log( $( this ).attr("class") );
+	
+						element1Array = $( this ).attr("class").split(" ");
+						element1 = element1Array[1];
+						element1SplittedArray = element1.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+						
+						element1ID = element1SplittedArray[2];					
+						console.log("ElementID: "+element1ID);
+						
+						proposalPrio1listPoint = priority[1].list[element1ID];	// Speichern des Listen-Inhalts
+						
+						$( "li[class^='time']" ).removeClass("selectedResult");
+						$( "."+element1 ).addClass("selectedResult");
+						
+						proposal.spielplanID = proposalPrio1listPoint.spielplanID;
+						
+						$( "div.proposal1" ).remove();
+						$( "div.defineProposalContent" ).append('<div class="proposal1">'+
+																	'Spielplan: '+proposalPrio1listPoint.spielplanID+
+																'</div>');
+						
+						$( "div.locked" ).remove();						
+																
+						// Falls priority[0] bei der cineSearch liegt -> priority[2] liegt bei movieSearch
+						if(priority[0].searchPointer === 0){
+						
+							priority[2].searchPointer = 1;
+							priority[2].classPointer = ".category.movieBox";
+						
+							$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+							$(priority[2].classPointer).addClass( "prio2" );
+						
+							$.ajax({
+								url: '/filme',
+								method: 'GET',
+								async: false,
+								data: 'filmID='+proposalPrio1listPoint.filmID,
+								contentType: 'application/json',
+							}).done(function (response) {
+								console.log("filme: "+response);
+								filmResponse = response;
+							}).fail(function () {
+								console.log('Error!');
+								alert('Error!');
+							});
+
+							priority[2].list = filmResponse;
+																
+							$movieResults.empty();
+
+							// $.each(spielplanResponse, function(i, spielplan) {
+								// if(proposalPrio1listPoint.filmID == spielplan.filmID){
+									proposalPrio2listPoint = filmResponse[0];
+									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+filmResponse[0].deTitel+'</li>');
+									
+								// }
+							// });
+							
+							proposal.filmID = proposalPrio2listPoint.filmID;
+							
+							$( "div.proposal2" ).remove();							
+							$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																		'Film: '+proposalPrio2listPoint.deTitel+
+																	'</div>');	
+
+							defineProposal();
+																	
+						}
+						// Falls priority[0] bei der movieSearch liegt -> priority[2] liegt bei cineSearch
+						if(priority[0].searchPointer === 1){
+						
+							priority[2].searchPointer = 0;
+							priority[2].classPointer = ".category.cineBox";
+						
+							$( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+							$(priority[2].classPointer).addClass( "prio2" );
+						
+							$.ajax({
+								url: '/kinos',
+								method: 'GET',
+								async: false,
+								data: 'kinoID='+proposalPrio1listPoint.kinoID,
+								contentType: 'application/json',
+							}).done(function (response) {
+								console.log("kinos: "+response);
+								kinoResponse = response;
+							}).fail(function () {
+								console.log('Error!');
+								alert('Error!');
+							});
+
+							priority[2].list = kinoResponse;
+																
+							$cineResults.empty();
+							
+							// $.each(spielplanResponse, function(i, spielplan) {
+								// if(proposalPrio0listPoint.filmID == spielplan.filmID){
+									proposalPrio2listPoint = kinoResponse[0];
+									$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kinoResponse[0].bezeichnung+'</li>');
+									
+								// }
+							// });
+							
+							proposal.kinoID = proposalPrio2listPoint.kinoID;
+							
+							$( "div.proposal2" ).remove();							
+							$( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																		'Kino: '+proposalPrio2listPoint.bezeichnung+
+																	'</div>');	
+
+							defineProposal();
+																	
+						}								
+																
+					});					
+				}
+				// // Falls cineSearch priority[2] und ein Filter per Submit angewendet wird
+				// if( priority[2].searchPointer === 0 ){
+				
+					// $( "li[class^='cine']" ).addClass("selectResult");
+
+					// $cineResults.empty();
+					
+					// if(proposalPrio0listPoint.hasOwnProperty("kinoID")){
+						// for(var listPoint in priority[2].list){
+							// if(priority[2].list === proposalPrio0listPoint.kinoID){
+								// proposalPrio2listPoint = priority[2].list[listPoint];
+								// $cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+proposalPrio2listPoint.Bezeichnung+'</li>');
+							// }
+						// }
+					// }
+					// if(proposalPrio1listPoint.hasOwnProperty("kinoID")){
+						// for(var listPoint in priority[2].list){
+							// if(priority[2].list === proposalPrio1listPoint.kinoID){
+								// proposalPrio2listPoint = priority[2].list[listPoint];
+								// $cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+proposalPrio2listPoint.Bezeichnung+'</li>');
+							// }
+						// }
+					// }					
+					// // $.each(spielplanResponse, function(i, spielplan) {
+						// // if(proposalPrio0listPoint.filmID == spielplan.filmID){
+							// // proposalPrio2listPoint = spielplanResponse[i];
+							// // $timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
+							
+						// // }
+					// // });
+					
+					// $( "li[class^='cine']" ).click(function() {
+								
+						// console.log( $( this ).attr("class") );
+	
+						// element2Array = $( this ).attr("class").split(" ");
+						// element2 = element2Array[1];
+						// element2SplittedArray = element2.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
+						
+						// element2ID = element2SplittedArray[2];					
+						// console.log("ElementID: "+element2ID);
+						
+						
+						// proposalPrio2listPoint = priority[2].list[element2ID];	// Speichern des Listen-Inhalts
+						
+						// $( "li[class^='cine']" ).removeClass("selectedResult");
+						// $( "."+element1 ).addClass("selectedResult");
+						
+						// proposal.kinoID = proposalPrio2listPoint.kinoID;
+						
+						
+						// $( "div.proposal2" ).remove();
+						// $( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																	// 'Kino: '+proposalPrio2listPoint.bezeichnung+
+																// '</div>');
+						
+						
+						// // // // // // // // Falls priority[1] bei der movieSearch liegt -> priority[2] liegt bei timeSearch
+						// // // // // // // if(priority[1].searchPointer === 1){
+						
+							// // // // // // // // priority[2].searchPointer = 2;
+							// // // // // // // // priority[2].classPointer = ".category.timeBox";
+						
+							// // // // // // // // $( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+							// // // // // // // // $(priority[2].classPointer).addClass( "prio2" );
+						
+							// // // // // // // // $.ajax({
+								// // // // // // // // url: '/spielplaene',
+								// // // // // // // // method: 'GET',
+								// // // // // // // // async: false,
+								// // // // // // // // data: 'kinoID='+proposalPrio1listPoint.kinoID,
+								// // // // // // // // contentType: 'application/json',
+							// // // // // // // // }).done(function (response) {
+								// // // // // // // // console.log("spielplaene: "+response);
+								// // // // // // // // spielplanResponse = response;
+							// // // // // // // // }).fail(function () {
+								// // // // // // // // console.log('Error!');
+								// // // // // // // // alert('Error!');
+							// // // // // // // // });
+
+							// // // // // // // priority[2].list = spielplanResponse;
+																
+							// // // // // // // // $timeResults.empty();
+							
+							// // // // // // // // $.each(spielplanResponse, function(i, spielplan) {
+								// // // // // // // // if(proposalPrio0listPoint.filmID == spielplan.filmID){
+									// // // // // // // // proposalPrio2listPoint = spielplanResponse[i];
+									// // // // // // // // $timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
+									
+								// // // // // // // // }
+							// // // // // // // // });
+							
+							// // // // // // // proposal.spielplanID = proposalPrio2listPoint.spielplanID;
+							
+							// // // // // // // $( "div.proposal2" ).remove();							
+							// // // // // // // $( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																		// // // // // // // 'Spielplan: '+proposalPrio2listPoint.spielplanID+
+																	// // // // // // // '</div>');							
+						// // // // // // // }
+						// // // // Falls priority[1] bei der timeSearch liegt -> priority[2] liegt bei movieSearch
+						// // // if(priority[1].searchPointer === 2){
+						
+							// // // priority[2].searchPointer = 1;
+							// // // priority[2].classPointer = ".category.movieBox";
+						
+							// // // $( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
+							// // // $(priority[2].classPointer).addClass( "prio2" );
+						
+							// // // $.ajax({
+								// // // url: '/filme',
+								// // // method: 'GET',
+								// // // async: false,
+								// // // data: 'filmID='+proposalPrio0listPoint.filmID,
+								// // // contentType: 'application/json',
+							// // // }).done(function (response) {
+								// // // console.log("spielplaene: "+response);
+								// // // filmResponse = response;
+							// // // }).fail(function () {
+								// // // console.log('Error!');
+								// // // alert('Error!');
+							// // // });
+
+							// // // priority[2].list = filmResponse;
+																
+							// // // $movieResults.empty();
+							
+							// // // // $.each(spielplanResponse, function(i, spielplan) {
+								// // // // if(proposalPrio0listPoint.filmID == spielplan.filmID){
+									// // // proposalPrio2listPoint = filmResponse[0];
+									// // // $movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+filmResponse[0].deTitel+'</li>');
+									
+								// // // // }
+							// // // // });
+							
+							// // // proposal.filmID = proposalPrio2listPoint.filmID;
+							
+							// // // $( "div.proposal2" ).remove();							
+							// // // $( "div.defineProposalContent" ).append('<div class="proposal2">'+
+																		// // // 'Film: '+proposalPrio2listPoint.deTitel+
+																	// // // '</div>');							
+						// // // }						
+
+					// });					
+				// }
+				
+			}
+			
+			
+			if(pickedResult == true){ // Bisher nicht gebraucht
+				$( "div.locked" ).remove();
+				pickedResult == false;
+			}
+			
+			
+			// if( $('div').filter($( "[class$='Box']" )).length ){
+				// $('div').filter($( "[class$='Box']" )).css({
+															  // "z-index" : "3",
+															  // "background-color": "rgba(125, 125, 125, 0.5)"
+															// });
+			// }
+		
+		}
+		
 		
         $( '.cineSearch' ).on( 'submit', function( event ) {
 			event.preventDefault();		
 			$('.cineResults').empty();
-			console.log( $( this ).serialize() );
+			// console.log( $( this ).serialize() );
 
 			$.ajax({
 				url: '/kinos',
@@ -356,7 +1671,7 @@
 				data: $('.cineSearch').serialize(),
 				contentType: 'application/json',
 				success: function(cineResults) {
-					console.log($('.cineSearch').serialize());
+					// console.log($('.cineSearch').serialize());
 					
 					cineResults = refreshPage(0, cineResults, ".category.cineBox");
 					priorityVisualise();
@@ -370,6 +1685,9 @@
 												'</br>Bewertung: '		+cineResult.bewertung+
 											'</li>');
 					});
+					
+					pickResult();
+					pointerView();
 
 				}
 			})/*.done(function (response) {
@@ -378,11 +1696,10 @@
 					$cineResults.append('<li>Result' + i+1 + '</li>');
             });
 
-          })*/.fail(function () {
+			})*/.fail(function () {
 				console.log('Error!');
 				alert('Error!');
-          });
-
+			});
 
         });
       
@@ -391,7 +1708,7 @@
         $( '.movieSearch' ).on( 'submit', function( event ) {
 			event.preventDefault();
 			$('.movieResults').empty();
-			console.log( $( this ).serialize() );
+			// console.log( $( this ).serialize() );
 			
 			$.ajax({
 				url: '/filme',
@@ -399,14 +1716,17 @@
 				data: $('.movieSearch').serialize(),
 				contentType: 'application/json',
 				success: function(movieResults) {
-					console.log($('.movieSearch').serialize());
-
+					// console.log($('.movieSearch').serialize());
+					console.log("movieResults: "+JSON.stringify(movieResults));
 					movieResults = refreshPage(1, movieResults, ".category.movieBox");
 					priorityVisualise();					
 					
 					$.each(movieResults, function(i, movieResult) {
 						$movieResults.append('<li class="movieResult movie-resultID-'+ i +'">'+movieResult.deTitel+'</li>');
 					});
+					
+					pickResult();
+					pointerView();
 					
 				}
 			})/*.done(function (response) {
@@ -436,7 +1756,7 @@
 				data: $('.timeSearch').serialize(),
 				contentType: 'application/json',
 				success: function(timeResults) {
-					console.log($('.timeSearch').serialize());
+					// console.log($('.timeSearch').serialize());
 					
 					timeResults = refreshPage(2, timeResults, ".category.timeBox");
 					priorityVisualise();					
@@ -444,6 +1764,9 @@
 					$.each(timeResults, function(i, timeResult) {
 						$timeResults.append('<li class="timeResult time-resultID-'+ i +'">'+timeResult.spielplanID+'</li>');
 					});
+					
+					pickResult();
+					pointerView();
 									
 				}
 			})/*.done(function (response) {
@@ -460,9 +1783,82 @@
 
         });
 		
+		
+		$( "input[class=showday]" ).on( "click", function() {
+			var buttonMsg = $( "input[class=showday]:checked" ).val() + " is checked!";
+			var newKey = "";
+			var newValue = "";
+			var valueMatch = false;
+			var button = this;
+			proposal.day = [];
+			
+			$( '.showTime' ).empty();
+			$( '.showTime' ).append('<label for="zeit">Zeit (hh-mm):</label></br>'+
+									'<input type="text" id="zeit"/></br>');
+		
+			console.log( buttonMsg );
+			console.log( this );
+			
+			console.log(button.name);
+			// newKey = this.name;
+			
+			$('#zeit').keyup(function () {
+				//$('.showTime').text($(this).val());
+				// $("#input-setzen").click(function(){
+					// $("#input1").val("Gesetzter Wert");
+				// });
+				
+				console.log($(this).val());
+				newValue = $(this).val();
+				
+				// $('span.glyphicon', '.timeInfo').remove();
+				valueMatch = ( newValue ).match(/(^|\s)(2[0-3]|1[0-9]|0[0-9])-([0-5][0-9])(\s|$)/); // match == true, sonst null
+
+				if(valueMatch){
+					console.log("BESTANDEN");
+					$('span.glyphicon').remove();
+					$('.timeInfo').remove();
+					// if( $('.glyphicon').length === "0" ){
+						$( '.showTime' ).append(' <span class="glyphicon glyphicon-ok" aria-hidden="true"></span><span class="timeInfo"> Format OK</span>');
+					// }
+					$( "input[class=showday]:checked" ).each( function(i, checkedInput){
+						this.value = newValue;
+						proposal.day.push(this.name);
+					});
+					proposal.time = newValue;
+					console.log(proposal);
+					timeSet = true;
+				}	
+				console.log("valueMatch: "+valueMatch);
+				if(valueMatch == null){
+					$('span.glyphicon').remove();
+					$('.timeInfo').remove();
+					proposal.day = [];
+					proposal.time = "";
+					timeSet = false;
+				}	
+				
+			});
+			
+		
+			if( !($( "input[class=showday]:checked" ).length) ){
+				$( '.showTime' ).empty();
+			}
+			
+		});		
+		
 		function defineProposal(){
-			if(activeDefineProposal == true){
-				$(".defineProposal").css("display", "inline-block");
+			// if(activeDefineProposal == true){
+				// $(".defineProposal").css("display", "inline-block");
+			// }
+			if( $('div').filter($( ".proposal0" )).length && $('div').filter($( ".proposal1" )).length && $('div').filter($( ".proposal2" )).length ){
+				$( ".submitProposal" ).css("display", "inline-block");
+				$( ".submitProposal" ).click(function() {
+				
+				});
+			}
+			else {
+				$(".submitProposal").css("display", "none");
 			}
 		}
 		
@@ -482,8 +1878,33 @@
 				if( $('div').filter($( "[class$='prio"+i+"']" )).length ){
 					$('div').filter($( "[class$='prio"+i+"']" )).removeClass("prio"+i);
 				}
-			}				
+			}
+			$( "div.locked" ).remove();
+			$( "div.proposal0" ).remove();
+			$( "div.proposal1" ).remove();
+			$( "div.proposal2" ).remove();
+			
+			// $( "li[class^='cine']" ).off('click');
+			// $( "li[class^='movie']" ).off('click');			
+			// $( "li[class^='time']" ).off('click');
+			
+			proposalPrio0listPoint = "";
+			proposalPrio1listPoint = "";
+			proposalPrio2listPoint = "";
+			
+			defineProposal();			
+			
 		});
+
+		function pointerView(){
+			console.log("PointerView - Counter: "+counter);
+			console.log("priority[0].searchPointer: "+priority[0].searchPointer);
+			console.log("priority[0].classPointer: "+priority[0].classPointer);
+			console.log("priority[1].searchPointer: "+priority[1].searchPointer);
+			console.log("priority[1].classPointer: "+priority[1].classPointer);	
+			console.log("priority[2].searchPointer: "+priority[2].searchPointer);
+			console.log("priority[2].classPointer: "+priority[2].classPointer);	
+		}
 		
 	}); 
     </script>
@@ -500,8 +1921,9 @@
 		<%include ../partials/main-heading %>
 		
 		<div class="defineProposal">
+			<h4>Erstelle einen Vorschlag</h4>
 			<div class="defineProposalContent"></div>
-			<p>Define Proposal</p>
+			<div class="submitProposal">Fertig mit Auswahl</div>
 		</div>
 		
 		<div class="categories">
@@ -520,7 +1942,7 @@
 				<ul class="timeResults"></ul>		
 			</div>
 		</div>
-		<div class="searchReset">Reset search</div>
+		<div class="searchReset"><strong>Reset search<strong></div>
 		
 			
     </main>

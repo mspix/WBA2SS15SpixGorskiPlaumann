@@ -16,14 +16,20 @@
 
 <style>
     body    { padding-top:50px; }
+	
+	h4 {
+		font-size: 1.5em;
+	}
 
 /* 	main { overflow: auto; } */
 	
-    .jumbotron  { background-color: #ff0000	}
+    .jumbotron  { background-color: #F00;	}
 
-    .jumbotron>.main-heading { color: #F8F8FF	}
+    .jumbotron>.main-heading { color: #F8F8FF;	}
 
-    .jumbotron>.underline { color: #F8F8FF	}
+    .jumbotron>.underline { color: #F8F8FF;	}
+	
+	/* .glyphicon-ok { color: #009728; } */
 	
 	.categories {
 	
@@ -32,7 +38,7 @@
 	}
 	  
 	.category {
-/* 		position: relative; */
+		position: relative;
 		order: 3;
 		margin: 10px 10px 10px 10px;
 		padding: 10px;
@@ -118,8 +124,8 @@
 	}
 	
 	.defineProposal	{
-		display: none;
-		background-Color: #D3C6C6;
+/* 		display: none; */
+		background-Color: #E9D3D3;
 		margin: 10px;
 		padding: 10px;
 		border-style: solid;
@@ -133,5 +139,49 @@
 	.defineProposal:hover {
 		background-Color: #E9D3D3;		
 	}
+	
+	.submitProposal {
+		display: none;
+		background-Color: #24AB47;
+		color: #002B0B;
+		margin: 10px;
+		padding: 10px;
+		border-style: solid;
+		border-width: 1px;
+		border-color: #007B21;
+		-webkit-border-radius: 8px;
+		-moz-border-radius: 8px;
+		border-radius: 8px;	
+	}
+	
+	.submitProposal:hover {	
+		background-Color: #77B687;			
+	}
+	
+	.selectResult {
+/* 		background-Color: #fff; */
+	}
+	
+	.selectResult:hover {
+		background-Color: #00c0fa;
+	}
+	
+	.selectedResult {
+		background-Color: #B5A0F7;
+	}
+	
+	.locked {
+ 		position: absolute;
+		height: 100%;
+		width: 100%;
+		top: 0;
+		left: 0;
+		z-index: 10;
+		background-Color: rgba(115, 115, 115, 0.7);
+		-webkit-border-radius: 6px;
+		-moz-border-radius: 6px;
+		border-radius: 6px;				
+	}
+	
 	
 </style>

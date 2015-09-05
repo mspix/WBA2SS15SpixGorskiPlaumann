@@ -2,6 +2,7 @@
     <div class="search">
 
       <form class="timeSearch">
+	  	  <h4>Zeit</h4>
           <label for="spielplanID">SpielplanID (nur zum Testen):</label></br>
           <input type="text" id="spielplanID" name="spielplanID"/></br>
 
@@ -13,18 +14,17 @@
 		  <input type="radio" id="in3D" name="in3D" value="true">Ja
 		  <input type="radio" id="in3D" name="in3D" value="false">Nein</br>
 
+         <label for="spieltag">Spieltag:</label></br>
+          <input class="showday" type="checkbox" name="mo" value="mo">Mo
+          <input class="showday" type="checkbox" name="di" value="di">Di
+          <input class="showday" type="checkbox" name="mi" value="mi">Mi
+          <input class="showday" type="checkbox" name="do" value="do">Do
+          <input class="showday" type="checkbox" name="fr" value="fr">Fr
+          <input class="showday" type="checkbox" name="sa" value="sa">Sa
+          <input class="showday" type="checkbox" name="so" value="so">So</br>
 
-
-
-          <label for="spieltag">Spieltag:</label></br>
-          <input type="checkbox" name="spieltag" value="mo">Mo
-          <input type="checkbox" name="spieltag" value="di">Di
-          <input type="checkbox" name="spieltag" value="mi">Mi
-          <input type="checkbox" name="spieltag" value="do">Do
-          <input type="checkbox" name="spieltag" value="fr">Fr
-          <input type="checkbox" name="spieltag" value="sa">Sa
-          <input type="checkbox" name="spieltag" value="so">So</br></br>
-
+		  <div class="showTime"></div></br>
+		  <div id="liveText"></div>
 
             <input type="submit" value="Submit" name="submit"/>
 
