@@ -1,0 +1,17 @@
+{
+  "kinoID" : 2,
+  "bezeichnung" : "Metropolis",
+  "straße" : "Ebertplatz",
+  "gebaeudeNr" : "19",
+  "ort" : "Köln",
+  "plz" : "50668",
+  "oeffnungszeiten" : "Täglich von 10:30 - 23:30 Uhr",
+  "reservierungsHotline" : "0221 - 722436",
+  "reservierungsService" : true,
+  "spielplaene" : [2, 5],
+  "preise" : "",
+  "kinotag" : ["Mo", "Di", "Mi"],
+  "website" : "http://metropolis-koeln.de",
+  "parkplaetze" : false,
+  "bewertung" : 8
+}

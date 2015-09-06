@@ -1,0 +1,241 @@
+<meta charset="UTF-8">
+<title>Cinefox - Your movieplaner</title>
+
+
+
+
+<!-- CSS (load bootstrap from a CDN) -->
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+<script src="http://code.jquery.com/jquery-1.9.0.js"></script>
+
+
+<style>
+    body    { padding-top:50px; }
+	
+	h4 {
+		font-size: 1.5em;
+	}
+	
+    .jumbotron { 
+		background-color: #F00;
+		padding-top: 5px;
+		padding-bottom: 5px;
+	}
+
+    .jumbotron>.main-heading { color: #F8F8FF;	}
+
+    .jumbotron>.underline { color: #F8F8FF;	}
+	
+	/* .glyphicon-ok { color: #009728; } */
+	
+	.categories {
+	
+		display: flex;
+		clear: both;
+	
+	}
+	  
+	.category {
+		position: relative;
+		order: 3;
+		margin: 10px 10px 10px 10px;
+		padding: 10px;
+		width: 300px;
+		-webkit-border-radius: 6px;
+		-moz-border-radius: 6px;
+		border-radius: 6px;			
+	}
+	  
+	.cineBox {
+
+	}
+
+	.movieBox {
+
+	}
+	  
+	.timeBox {
+
+	}	  
+	  
+	.prio0 {
+		order: 0;	
+		background-color: #FF6B6B;
+	}
+	.prio1 {
+		order: 1;	
+		background-color: #FF8F8F;	
+	}
+	.prio2 {
+		order: 2;	
+		background-color: #FFBABA;
+	}
+	
+	.cineResult, .movieResult, .timeResult {
+		background-color: #FFF3F3;
+		margin: 5px;
+		padding: 5px;
+		border-style: solid;
+		border-width: 2px;
+		border-color: #E92525;
+		-webkit-border-radius: 8px;
+		-moz-border-radius: 8px;
+		border-radius: 8px;
+	}
+	
+	.searchReset {
+		display: inline-block;
+		background-Color: #D3C6C6;
+		margin: 10px;
+		padding: 10px;
+		border-style: solid;
+		border-width: 2px;
+		border-color: #C3AEAE;
+		-webkit-border-radius: 8px;
+		-moz-border-radius: 8px;
+		border-radius: 8px;		
+	}
+	
+	.searchReset:hover {
+		background-Color: #E9D3D3;		
+	}
+	
+	.defineProposal	{
+		background-Color: #E9D3D3;
+		margin: 10px;
+		padding: 10px;
+		border-style: solid;
+		border-width: 2px;
+		border-color: #C3AEAE;
+		-webkit-border-radius: 8px;
+		-moz-border-radius: 8px;
+		border-radius: 8px;			
+	}
+	
+	.defineProposal:hover {
+		background-Color: #E9D3D3;		
+	}
+	
+	.defineProposalContent {
+		display: inline-block;
+		vertical-align: top;
+	}
+	
+	.proposal0, .proposal1, .proposal2 {
+		display: inline-block;
+		margin: 10px 20px 10px 20px;
+		vertical-align: top;
+		
+	}
+	
+	.proposalZeit, .proposalKino, .proposalFilm, .proposalSpielplan {
+		display: inline-block;
+		margin: 0 30px 10px 0px; 
+		vertical-align: top;
+	}
+	
+	.selectUser {
+		display: none;
+		vertical-align: top;
+	}
+	
+	.submitProposal {
+		display: inline-block;
+		background-Color: #24AB47;
+		color: #002B0B;
+		margin: 20px;
+		padding: 10px;
+		border-style: solid;
+		border-width: 1px;
+		border-color: #007B21;
+		-webkit-border-radius: 8px;
+		-moz-border-radius: 8px;
+		border-radius: 8px;	
+	}
+	
+	.submitProposal:hover {	
+		background-Color: #77B687;			
+	}
+	
+	.input[value~="Fertig"] {
+		margin-left: 10px;
+	}
+	
+	.selectResult {
+
+	}
+	
+	.selectResult:hover {
+		background-Color: #00c0fa;
+	}
+	
+	.selectedResult {
+		background-Color: #B5A0F7;
+	}
+	
+	.locked {
+ 		position: absolute;
+		height: 100%;
+		width: 100%;
+		top: 0;
+		left: 0;
+		z-index: 10;
+		background-Color: rgba(115, 115, 115, 0.7);
+		-webkit-border-radius: 6px;
+		-moz-border-radius: 6px;
+		border-radius: 6px;				
+	}
+	
+	.chooseRecipient {
+		display: inline-block;
+	}
+	
+	.shareButton {
+		display: inline-block;
+		background-Color: #24AB47;
+		color: #002B0B;
+		margin: 10px;
+		padding: 10px;
+		border-style: solid;
+		border-width: 1px;
+		border-color: #007B21;
+		-webkit-border-radius: 8px;
+		-moz-border-radius: 8px;
+		border-radius: 8px;	
+	}
+	
+	.shareButton:hover {	
+		background-Color: #77B687;			
+	}
+	
+	.chooseCharacter {
+		background-Color: #FF8F8F;
+		margin: 0 0 20px 0;
+		padding: 20px;
+		-webkit-border-radius: 6px;
+		-moz-border-radius: 6px;
+		border-radius: 6px;			
+	}
+	
+	.userArea {
+		background-Color: #FFBABA;
+		margin: 0 0 20px 0;
+		padding: 20px;
+		-webkit-border-radius: 6px;
+		-moz-border-radius: 6px;
+		border-radius: 6px;			
+	}
+	
+	label {
+		display: inline-block;
+		width: 90px;
+		margin: 0 0 4px 0;
+	}
+	
+	.noBreak {
+		width: auto;
+	}
+	
+	
+</style>

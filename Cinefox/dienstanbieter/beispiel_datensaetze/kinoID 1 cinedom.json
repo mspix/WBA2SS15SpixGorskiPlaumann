@@ -1,0 +1,17 @@
+{
+  "kinoID" : 1,
+  "bezeichnung" : "Cinedom",
+  "straße" : "im MediaPark",
+  "gebaeudeNr" : "1",
+  "ort" : "Köln",
+  "plz" : "50670",
+  "oeffnungszeiten" : "Täglich von 10:30 - 23:30 Uhr",
+  "reservierungsHotline" : "0221 - 95195555",
+  "reservierungsService" : true,
+  "spielplaene" : [1, 4],
+  "preise" : "",
+  "kinotag" : ["Mo", "Di", "Mi"],
+  "website" : "http://www.cinedom.de",
+  "parkplaetze" : true,
+  "bewertung" : 8
+}

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+    <script>
+        $(document).ready(function(){
+
+                var query = window.location.search.substring(1);
+                console.log(query);
+                var pairs = query.split('&');
+                console.log(pairs);
+                var ident = pairs[0].split('=');
+                console.log(ident);
+                var cinemaID = ident[1];
+                console.log(cinemaID);
+
+                var kino = "";
+                var filme = [];
+                var alleFilme = [];
+
+                var $cineTableBody = $('.cineTableBody');
+                var $filmTableBody = $('.filmTableBody');
+                var $datesTableBody = $('.datesTableBody');
+                var $info = $('.info');
+
+                $('.btn-hinzufuegen').prop("disabled", true);
+
+                var timeObject = {
+                                        "mo": [],
+                                        "di": [],
+                                        "mi": [],
+                                        "do": [],
+                                        "fr": [],
+                                        "sa": [],
+                                        "so": []
+                                };
+
+                var respondedFilmID = "";
+                var respondedFilm = "";
+
+
+
+                function getCurrentCinema(){
+                        return $.ajax({
+                                        url: '/kinos',
+                                        method: 'GET',
+                                        data: query,
+                                        contentType: 'application/json',
+                                        success: function(currentCinema) {
+                                                kino = currentCinema[0];
+                                                $info.append('<p>'+'Kino: '+currentCinema[0].bezeichnung+
+                                                                '</br>Kinotag: '        +currentCinema[0].kinotag+
+                                                                '</br>Reservierung: '	+currentCinema[0].reservierungsHotline+
+                                                                '</br>Preise: '		+currentCinema[0].preise+
+                                                                '</br>Bewertung: '	+currentCinema[0].bewertung+
+                                                                '</p>');
+
+                                                                $('input').filter('.timetableKinoID').each( function(n, elem){
+                                                                        $(this).val(cinemaID);
+
+                                                                });
+
+
+
+                                        }
+                                });
+                        }
+
+                        // function getCurrentCinema(){
+                        //         return $.ajax({
+                        //                         url: '/kinos/'+cinemaID,
+                        //                         method: 'GET',
+                        //                         // data: query,
+                        //                         contentType: 'application/json',
+                        //                         success: function(currentCinema) {
+                        //                                 kino = currentCinema[0];
+                        //                                 $info.append('<p>'+'Kino: '+currentCinema[0].bezeichnung+
+                        //                                                 '</br>Kinotag: '        +currentCinema[0].kinotag+
+                        //                                                 '</br>Reservierung: '	+currentCinema[0].reservierungsHotline+
+                        //                                                 '</br>Preise: '		+currentCinema[0].preise+
+                        //                                                 '</br>Bewertung: '	+currentCinema[0].bewertung+
+                        //                                                 '</p>');
+                        //
+                        //
+                        //
+                        //
+                        //                         }
+                        //                 });
+                        //         }
+
+
+
+                function getSpielplan(){
+                        return $.ajax({
+                                url: '/spielplaene',
+                                method: 'GET',
+                                data: query,
+                                contentType: 'application/json',
+                                success: function(dates){
+                                        // console.log(dates);
+                                        $.each(dates, function(i, date){
+                                                // console.log(date);
+                                                // console.log(date.filmID);
+                                                filme[i]=date.filmID;
+                                        });
+                                }
+                        });
+                }
+
+
+                function getAllFilms(){
+                        return $.ajax({
+                                url: '/filme',
+                                method: 'GET',
+                                contentType: 'application/json',
+                                success: function(allFilms){
+
+                                        $.each(allFilms, function(m, oneFilm){
+                                                $filmTableBody.append('<tr><td>'+oneFilm.deTitel+
+                                                                        '</td><td>'+oneFilm.erscheinungstermin+
+                                                                        '</td><td>'+oneFilm.genre+
+                                                                        '</td><td>'+oneFilm.filmID+
+                                                                        '</td></tr>');
+                                        })
+
+
+                                        $('.btn-remove').click(function(event){
+                                                event.preventDefault();
+                                                var buttonId = $(this).attr('id');
+                                                alert(buttonId);
+                                        });
+
+
+                                }
+                        });
+                }
+
+                function getFilmByIndexId(indexId){
+                        return $.ajax({
+                                url: '/filme',
+                                method: 'GET',
+                                data: 'filmID='+filme[indexId],
+                                contentType: 'application/json',
+                                success: function(tableElements){
+
+                                        $.each(tableElements, function(k, tableElement){
+                                                $cineTableBody.append('<tr><td>'+tableElement.deTitel+'</td><td>'+tableElement.erscheinungstermin+'</td><td>'+tableElement.genre+'</td></tr>');
+
+                                        })
+                                }
+                        });
+                }
+
+
+
+
+                // Quelle: https://gist.github.com/lfender6445/6707904
+                query_to_json = function() {
+                        var j, q;
+                        q = $('.moviePost').serialize().replace(/\?/, "").split("&");
+                        j = {};
+                        $.each(q, function(i, arr) {
+                                arr = arr.split('=');
+                                return j[arr[0]] = arr[1];
+                        });
+                        return j;
+                }
+
+
+
+
+                $.when(getCurrentCinema()).done(function(){
+                        getSpielplan();
+
+                });
+
+
+                $.when( getSpielplan() ).done( function(){
+                        $.each(filme, function(j, film){
+                                getFilmByIndexId(j);
+                        });
+                });
+
+                $.when(getFilmByIndexId()).done(function(){
+                        getAllFilms();
+                });
+
+                // $.when( getSpielplan() ).done( function(){
+                //         getAllFilms();
+                //
+                // });
+
+
+                // $.when(getAllFilms()).done(function(){
+                //         getFilmByIndexId();
+                // });
+
+                $('.moviePost').on('submit', function(event){
+                        event.preventDefault();
+                        var object = $('.moviePost').serialize();
+                        console.log(object);
+
+                        var film = {};
+                        var timetable1 = {};
+                        var timetable2 = {};
+
+                        $( 'input' ).filter( '.film' ).each( function(i, elem){
+
+                                elem[0] = this.name;
+                                elem[1] = this.value;
+                                film[elem[0]] = elem[1];
+                        });
+
+                        console.log(film);
+
+                        $( 'input:checked' ).filter( '.timetable' ).each( function(i, elem){
+
+                                elem[0] = this.name;
+                                elem[1] = this.value;
+                                timetable1[elem[0]] = elem[1];
+                        });
+
+                        $( 'input' ).filter( '.timetable' ).each( function(i, elem){
+
+                                elem[0] = this.name;
+                                elem[1] = this.value;
+                                timetable2[elem[0]] = elem[1];
+                        });
+
+
+                        // $('input').filter('.timetable').each(function(j, elem){
+                        //         var $element = this;
+                        //         console.log($( $element ).filter('input:checked').length);
+                        //         if( $( $element ).filter('input:checked').length ){
+                        //                 $( $element ).filter('input:checked').each( function(k, elem2){
+                        //                         elem[0] = this.name;
+                        //                         elem[1] = this.value;
+                        //                         timetable[elem[0]] = elem[1];
+                        //                         return;
+                        //                 });
+                        //         }
+                        //         console.log(this);
+                        //         elem[0] = this.name;
+                        //         elem[1] = this.value;
+                        //         timetable[elem[0]] = elem[1];
+                        // });
+
+                        console.log(timetable1);
+                        console.log(timetable2);
+
+                        var timetableobject = $.extend({},timetable2, timetable1);
+                        console.log(timetableobject);
+
+                        var stillNeedFilmId = $.extend({},timetableobject, timeObject);
+                        console.log(JSON.stringify(stillNeedFilmId));
+
+
+                        console.log(JSON.stringify(film));
+
+
+                        var finalDatePost = "";
+
+
+
+                        $.ajax({
+                                url: '/filme',
+                                method: 'POST',
+                                data: JSON.stringify(film),
+                                contentType: 'application/json',
+                                success: function(incomingMovie){
+
+
+
+                                        respondedFilm = JSON.stringify(incomingMovie);
+                                        respondedFilmID = incomingMovie.filmID;
+                                        console.log(respondedFilm+'----');
+                                        console.log(respondedFilmID+'+++++');
+                                        var filmIdElem = {};
+                                        filmIdElem['filmID'] = respondedFilmID;
+                                        console.log(JSON.stringify(filmIdElem));
+                                        finalDatePost =  $.extend({},stillNeedFilmId,filmIdElem );
+                                        console.log(JSON.stringify(finalDatePost));
+                                },
+                                complete:function(){
+                                        $.ajax({
+                                                url: '/spielplaene',
+                                                method: 'POST',
+                                                data: JSON.stringify(finalDatePost),
+                                                contentType: 'application/json',
+                                                success:function(spielplan){
+                                                        // location.reload(true);
+
+                                                        console.log(JSON.stringify(spielplan));
+                                                }
+                                        });
+                                }
+
+
+
+
+                        });
+
+
+                        // var recursiveDecoded = decodeURIComponent(object);
+                        // console.log(recursiveDecoded);
+
+                        // console.log(query_to_json()+'!!!!!!!!!!!!!!!!!!!!!!!!!!!! hier hinschauen');
+                        // console.log(JSON.stringify(query_to_json()));
+                        // var data = query_to_json();
+                        // console.log(data);
+                        // console.log(data.deTitel);
+
+
+                        // $.ajax({
+                        //         url: '/filme',
+                        //         method: 'POST',
+                        //         data: JSON.stringify(data),
+                        //         contentType: 'application/json',
+                        //         // contentType: 'application/x-www-form-urlencoded',
+                        //         // dataType: 'json',
+                        //         success: function(whateverHappens) {
+                        //                 console.log(whateverHappens);
+                        //         }
+                        //
+                        // })
+                });
+
+
+                $( "input[class=showday]" ).on( "click", function() {
+                        var buttonMsg = $( "input[class=showday]:checked" ).val() + " is checked!";
+                        var newKey = "";
+                        var newValue = "";
+                        var valueMatch = false;
+                        var button = this;
+
+
+
+                        // $( '.showTime' ).empty();
+                        // $( '.showTime' ).append('<label for="zeit">Zeit (hh-mm):</label></br>'+
+                        //                                                 '<input type="text" id="zeit"/></br>');
+
+                        console.log( buttonMsg );
+                        console.log( this );
+
+                        console.log(button.name);
+                        // newKey = this.name;
+
+                        $('#zeit').keyup(function () {
+                                //$('.showTime').text($(this).val());
+                                // $("#input-setzen").click(function(){
+                                        // $("#input1").val("Gesetzter Wert");
+                                // });
+
+
+                                console.log($(this).val());
+                                newValue = $(this).val();
+
+                                // $('span.glyphicon', '.timeInfo').remove();
+                                valueMatch = ( newValue ).match(/(^|\s)(2[0-3]|1[0-9]|0[0-9])-([0-5][0-9])(\s|$)/); // match == true, sonst null
+
+                                if(valueMatch){
+                                        console.log("BESTANDEN");
+                                        $('span.glyphicon').remove();
+                                        $('.timeInfo').remove();
+                                        // if( $('.glyphicon').length === "0" ){
+                                                $( '.showTime' ).append(' <span class="glyphicon glyphicon-ok" aria-hidden="true"></span><span class="timeInfo">Format OK</span>');
+                                        // }
+
+
+
+                                        timeSet = true;
+
+                                }
+
+                                console.log("valueMatch: "+valueMatch);
+                                if(valueMatch == null){
+                                        $('span.glyphicon').remove();
+                                        $('.timeInfo').remove();
+
+                                        timeSet = false;
+                                }
+
+                                if(valueMatch){
+
+                                        $('.btn-hinzufuegen').prop("disabled", false);
+
+
+                                }
+
+
+                        });
+
+
+
+                        $('.btn-hinzufuegen').click(function(event){
+
+                                event.preventDefault;
+                                $( "input[class=showday]:checked" ).each( function(i, checkedInput){
+                                        console.log(newValue);
+                                        this.value = newValue;
+                                        console.log(this.name);
+                                        timeObject[this.name].push(this.value);
+                                        console.log(timeObject);
+                                });
+
+
+
+                                 console.log(JSON.stringify(timeObject));
+                                 console.log(timeObject.mo);
+
+                                 $datesTableBody.empty();
+
+                                 $datesTableBody.append('<tr><td>'+timeObject.mo+'</td><td>'+timeObject.di+'</td><td>'+timeObject.mi+'</td><td>'+timeObject.do+'</td><td>'+timeObject.fr+'</td><td>'+timeObject.sa+'</td><td>'+timeObject.so+'</td></tr>');
+                                  $('.timeSearch')[0].reset();
+                        });
+
+
+
+
+                        // if( !($( "input[class=showday]:checked" ).length) ){
+                        //         $( '.showTime' ).empty();
+                        // }
+
+                });
+
+        });
+    </script>
+</head>
+<body class="container">
+
+    <header>
+        <% include ../partials/header %>
+    </header>
+
+    <main>
+
+
+      <%include ../partials/main-heading %>
+      <h1>Ausgewähltes Kino</h1>
+      <div class="info"></div>
+      <br>
+      <h2>Derzeitig laufende Filme</h2>
+      <div table-container>
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Titel(dt.)</th>
+                <th>Erscheinungstermin</th>
+                <th>Genre</th>
+              </tr>
+            </thead>
+            <tbody class="cineTableBody">
+
+            </tbody>
+          </table>
+        </div>
+        <br>
+
+        <%include ../partials/film-post-form%>
+<!--
+        <div class="moviePostContainer row">
+                <h2>Neuen Film hinzufügen</h2>
+                <div class="col-md-4">
+
+                        <%include ../partials/movie-post-form %>
+                </div>
+                <div class="col-md-4">
+                        <%include ../partials/timetable-post-form %>
+                </div>
+                <div class="col-md-4">
+
+                </div>
+
+        </div> -->
+
+        <div class="movieListContainer row">
+                <h2>Verfügbare Filme</h2>
+                <div class="col-md-7 movie-list" style="overflow:scroll; height:400px;">
+
+                        <table class="table table-hover">
+                                <thead>
+                                  <tr>
+                                    <th>Titel(dt.)</th>
+                                    <th>Erscheinungstermin</th>
+                                    <th>Genre</th>
+                                    <th>ID</th>
+                                  </tr>
+                                </thead>
+                                <tbody class="filmTableBody">
+
+                                </tbody>
+                        </table>
+                </div>
+                <div class="col-md-5"></div>
+
+        </div>
+
+    </main>
+
+
+
+        <!-- <%include ../partials/movie-post-form %> -->
+        <!-- <ul class="movieResults"></ul> -->
+
+
+
+    <footer>
+        <% include ../partials/footer %>
+    </footer>
+
+</body>
+</html>

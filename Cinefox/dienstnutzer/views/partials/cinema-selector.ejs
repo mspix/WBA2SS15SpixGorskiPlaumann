@@ -1,0 +1,33 @@
+
+    <script>
+        $(document).ready(function(){
+
+                var $cinemaSelector = $('.cinemaSelector');
+
+                $.ajax({
+                        url: '/kinos',
+                        method: 'GET',
+                        contentType: 'application/json',
+                        success: function(cinemaSelector) {
+                                console.log(cinemaSelector);
+
+
+                                $.each(cinemaSelector, function(i, select) {
+                                        $cinemaSelector.append('<li class="select selectID'+ i +'">'+select.bezeichnung+' - '+select.ort+' - '+select.kinoID+'</li>');
+                                });
+
+                        }
+                });
+        });
+
+
+
+    </script>
+<h2>Bitte treffen Sie eine Auswahl anhand der jeweiligen ID:</h2>
+<div class="cinemaSelector"></div>
+<br>
+<form class="IdSelectionForm" action="cinemaoperator" method="get">
+        <label>Kino-ID:</label>
+        <input type="text" name="kinoID">
+        <input type="submit"/>
+</form>

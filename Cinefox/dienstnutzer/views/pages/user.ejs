@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+	<script type="text/javascript" src="http://localhost:1338/faye/client.js"></script>
+    <script>
+		$( document ).ready(function() {
+			console.log( "ready!" );
+
+			var user = "";
+			var userID = "";
+			
+			var vorschlag = ""; 
+			var kino = "";
+			var film = "";
+			var spielplan = "";
+			
+			var client = new Faye.Client('http://localhost:1338/faye');	
+
+			$( "select" ).change(function () { 
+						
+				user = $( 'option:selected' ).val();
+				
+				$( 'h1.hello' ).empty();
+				$( 'div.newMsg' ).empty();
+				$( '.cleanUp' ).empty();
+				
+				if(user == 1){
+					$( 'h1.hello' ).html("Hi Alice");
+					
+					userID == 1;
+
+					var subscription = client.subscribe('/alice', function (message){
+						console.log(JSON.stringify(message));
+					
+						$( 'div.newMsg' ).html(	'<h4>Du hast einen Vorschlag empfangen</h4>'+
+												'<h4>Sender: ' + message.autor + '</h4>');
+								
+						vorschlag = message.vorschlag;
+						userID = vorschlag.userID;
+						
+						loadData();
+						showData();
+					
+					});			
+
+				}
+				else if(user == 2){
+					$( 'h1.hello' ).html("Hi Bob");
+					
+					userID == 2;
+					
+					var subscription = client.subscribe('/bob', function (message){
+						console.log(JSON.stringify(message));
+					
+						$( 'div.newMsg' ).html(	'<h4>Du hast einen Vorschlag empfangen</h4>'+
+												'<h4>Sender: ' + message.autor + '</h4>');
+					
+						vorschlag = message.vorschlag;
+						userID = vorschlag.userID;					
+						
+						loadData();
+						showData();
+						
+					});	
+				}
+				else if(user == 3){
+					$( 'h1.hello' ).html("Hi Albert");
+					
+					userID == 3;
+					
+					var subscription = client.subscribe('/albert', function (message){
+						console.log(JSON.stringify(message));
+					
+						$( 'div.newMsg' ).html(	'<h4>Du hast einen Vorschlag empfangen</h4>'+
+												'<h4>Sender: ' + message.autor + '</h4>');
+					
+						vorschlag = message.vorschlag;
+						userID = vorschlag.userID;
+						
+						loadData();
+						showData();
+					
+					});							
+				}					
+			}).change();
+			
+			function loadData(){
+			
+				$.ajax({
+						url: '/users/'+userID,
+						method: 'GET',
+						async: false,
+						contentType: 'application/json',
+						success: function(response) {
+								console.log("Response: "+JSON.stringify(response));
+								user = response;
+						}
+
+				});
+						
+				if( $.inArray(vorschlag.vorschlagID, user.erhalteneVorschlaege) == -1 ){
+					user.erhalteneVorschlaege.push(Number(vorschlag.vorschlagID));
+					
+					$.ajax({
+							url: '/users/'+userID,
+							method: 'PUT',
+							async: false,
+							data: JSON.stringify(user),
+							contentType: 'application/json',
+							success: function(response) {
+									console.log("Response: "+JSON.stringify(response));
+							}
+
+					});				
+				}
+				console.log(user);
+				
+				$.ajax({
+						url: '/kinos',
+						method: 'GET',
+						async: false,
+						data: 'kinoID='+vorschlag.kinoID,
+						contentType: 'application/json',
+						success: function(response) {
+								// console.log("Response: "+JSON.stringify(response));
+								kino = response[0];
+						}
+
+				});
+
+				$.ajax({
+						url: '/filme',
+						method: 'GET',
+						async: false,
+						data: 'filmID='+vorschlag.filmID,
+						contentType: 'application/json',
+						success: function(response) {
+								// console.log("Response: "+JSON.stringify(response));
+								film = response[0];
+						}
+
+				});
+
+				$.ajax({
+						url: '/spielplaene',
+						method: 'GET',
+						async: false,
+						data: 'spielplanID='+vorschlag.spielplanID,
+						contentType: 'application/json',
+						success: function(response) {
+								// console.log("Response: "+JSON.stringify(response));
+								spielplan = response[0];
+						}
+
+				});
+			
+			}
+
+			function showData(){
+				
+				$( '.cleanUp' ).empty();
+			
+				$( '.proposalZeit' ).append('<h3>Zeit</h3>'+
+										'Tag/e: '				+vorschlag.day+
+										'</br>Uhrzeit: '		+vorschlag.time+' Uhr'
+				);				
+				$( '.proposalKino' ).append('<h3>Kino</h3>'+
+										'Kino: '				+kino.bezeichnung+
+										'</br>Straße: '			+kino.straße+
+										'</br>Ort: '			+kino.ort+
+										'</br>PLZ: '			+kino.plz+
+										'</br>Kinotag: '		+kino.kinotag+
+										'</br>Reservierung: '	+kino.reservierungsHotline+
+										'</br>Preise: '			+kino.preise+
+										'</br>Bewertung: '		+kino.bewertung+
+										'</br>Website: <a href="'+kino.website+'">'+kino.website+'</a>'
+				);
+				$( '.proposalFilm' ).append('<h3>Film</h3>'+
+										'Film: '				+film.deTitel+
+										'</br>Genre: '			+film.genre+
+										'</br>Regie: '			+film.regie+
+										'</br>dauer: '			+film.dauer
+				);			
+				$( '.proposalSpielplan' ).append('<h3>Spielzeiten</h3>'+
+										'Mo: '				+spielplan.mo+
+										'</br>Di: '			+spielplan.di+
+										'</br>Mi: '			+spielplan.mi+
+										'</br>Do: '			+spielplan.do+
+										'</br>Fr: '			+spielplan.fr+
+										'</br>Sa: '			+spielplan.sa+
+										'</br>So: '			+spielplan.so+
+										'</br>in 3D: '		+(spielplan.in3D == true ? 'Ja' : 'Nein')
+				);
+				
+			}
+		
+		});
+    </script>
+</head>
+<body class="container">
+		
+    <header>
+        <% include ../partials/header %>
+
+    </header>
+
+    <main>
+
+		<%include ../partials/main-heading %>
+		
+		<div class="chooseCharacter">
+			<h4>Wähle deine Rolle</h4>
+			
+			<form class="characterForm">
+				<label for="rolle">Rolle:</label></br>
+				<select name="rolle">
+					<option value="1">Alice</option>
+					<option value="2">Bob</option>
+					<option value="3">Albert</option>
+				</select></br>
+			</form>
+			
+		</div>
+		
+		<div class="userArea">
+			<h1 class="hello"></h1>
+			<h2>schau was es Neues gibt.</h2></br>
+			
+			<div class="newMsg"></div>
+			
+			<div class="proposal">
+				<div class="proposalZeit cleanUp"></div>
+				<div class="proposalKino cleanUp"></div>
+				<div class="proposalFilm cleanUp"></div>
+				<div class="proposalSpielplan cleanUp"></div>
+			</div>
+		</div>
+		
+    </main>
+
+    <footer>
+        <% include ../partials/footer %>
+    </footer>
+
+</body>
+</html>
