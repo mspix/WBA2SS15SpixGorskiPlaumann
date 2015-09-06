@@ -534,7 +534,6 @@ app.post('/newChannel', jsonParser, function(req, res){
 
 		// Promise-Handler wenn Publishen erfolgreich
 		function() {
-			console.log("Empfänger: "+req.body.empfaenger);
 			res.writeHead(200, "OK");
 			res.write("Nachricht wurde gesendet.");
 			res.end();

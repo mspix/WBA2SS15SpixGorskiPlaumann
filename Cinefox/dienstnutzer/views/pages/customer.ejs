@@ -438,14 +438,18 @@
 					ajaxGetKino = "";
 					
 					if( stringComponent == "cine" ){
-					
-						// priority[0].searchPointer = 0;
-						// priority[0].classPointer = ".category.cineBox";
-						// priority[0].list = priority[0].list[element0ID];
-					
+										
 						proposal.kinoID = proposalPrio0listPoint.kinoID;										
 						$( "div.defineProposalContent" ).append('<div class="proposal0">'+
 																	'Kino: '+proposalPrio0listPoint.bezeichnung+
+																	'</br>Straße: '			+proposalPrio0listPoint.straße+
+																	'</br>Ort: '			+proposalPrio0listPoint.ort+
+																	'</br>PLZ: '			+proposalPrio0listPoint.plz+
+																	'</br>Kinotag: '		+proposalPrio0listPoint.kinotag+
+																	'</br>Reservierung: '	+proposalPrio0listPoint.reservierungsHotline+
+																	'</br>Preise: '			+proposalPrio0listPoint.preise+
+																	'</br>Bewertung: '		+proposalPrio0listPoint.bewertung+
+																	'</br>Website: <a href="'+proposalPrio0listPoint.website+'">'+proposalPrio0listPoint.website+'</a>'+
 																'</div>');
 						console.log('kinoID='+proposalPrio0listPoint.kinoID);										
 																
@@ -483,7 +487,6 @@
 						};
 				
 						$.when( getSpielplaeneKinoID() ).done( function(){
-							// console.log(spielplanResponse[0].filmID);
 
 							for(var spielplan in spielplanResponse){
 						
@@ -498,10 +501,26 @@
 								$movieResults.empty();
 								
 								$.each(spielplanResponse, function(i, spielplan) {
-									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectResult">'+spielplan.spielplanID+'</li>');
+									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectResult">SpielplanID: '+spielplan.spielplanID+
+															'</br>Spielzeiten'+
+															'</br>Mo: '			+spielplan.mo+
+															'</br>Di: '			+spielplan.di+
+															'</br>Mi: '			+spielplan.mi+
+															'</br>Do: '			+spielplan.do+
+															'</br>Fr: '			+spielplan.fr+
+															'</br>Sa: '			+spielplan.sa+
+															'</br>So: '			+spielplan.so+
+															'</br>Überlaenge: ' +(spielplan.ueberlaenge == true ? 'Ja' : 'Nein')+
+															'</br>In 3D: '		+(spielplan.in3D == true ? 'Ja' : 'Nein')+
+														'</li>');
 								});	
 								$.each(filmResponse, function(i, film) {
-									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectResult">'+film.deTitel+'</li>');
+									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectResult">Film :'+film.deTitel+
+															'</br>Genre: '				+film.genre+
+															'</br>Regie: '				+film.regie+
+															'</br>Dauer: '				+film.dauer+
+															'</br>Erscheinungstermin: '	+film.erscheinungstermin+	
+														'</li>');
 								});
 								
 								pointerView();
@@ -550,16 +569,41 @@
 										$( "div.proposal2" ).remove();
 										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
 																					'Film: '+proposalPrio1listPoint.deTitel+
+																					'</br>Genre: '				+proposalPrio1listPoint.genre+
+																					'</br>Regie: '				+proposalPrio1listPoint.regie+
+																					'</br>Dauer: '				+proposalPrio1listPoint.dauer+
+																					'</br>Erscheinungstermin: '	+proposalPrio1listPoint.erscheinungstermin+
 																				'</div>');
 										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
-																					'Spielplan: '+proposalPrio2listPoint.spielplanID+
+																					'SpielplanID: '+proposalPrio2listPoint.spielplanID+
+																					'</br>Spielzeiten'+
+																					'</br>Mo: '			+proposalPrio2listPoint.mo+
+																					'</br>Di: '			+proposalPrio2listPoint.di+
+																					'</br>Mi: '			+proposalPrio2listPoint.mi+
+																					'</br>Do: '			+proposalPrio2listPoint.do+
+																					'</br>Fr: '			+proposalPrio2listPoint.fr+
+																					'</br>Sa: '			+proposalPrio2listPoint.sa+
+																					'</br>So: '			+proposalPrio2listPoint.so+
+																					'</br>Überlaenge: ' +(proposalPrio2listPoint.ueberlaenge == true ? 'Ja' : 'Nein')+
+																					'</br>In 3D: '		+(proposalPrio2listPoint.in3D == true ? 'Ja' : 'Nein')+
 																				'</div>');
 																				
 										$timeResults.empty();
 										
 										$.each(spielplanResponse, function(i, spielplan) {
 											if(priority[1].list[element1ID].filmID == spielplan.filmID){
-												$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
+												$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">SpielplanID: '+spielplan.spielplanID+
+																		'</br>Spielzeiten'+
+																		'</br>Mo: '			+spielplan.mo+
+																		'</br>Di: '			+spielplan.di+
+																		'</br>Mi: '			+spielplan.mi+
+																		'</br>Do: '			+spielplan.do+
+																		'</br>Fr: '			+spielplan.fr+
+																		'</br>Sa: '			+spielplan.sa+
+																		'</br>So: '			+spielplan.so+
+																		'</br>Überlaenge: ' +(spielplan.ueberlaenge == true ? 'Ja' : 'Nein')+
+																		'</br>In 3D: '		+(spielplan.in3D == true ? 'Ja' : 'Nein')+
+																	'</li>');
 											}
 										});
 										
@@ -614,17 +658,36 @@
 										$( "div.proposal1" ).remove();
 										$( "div.proposal2" ).remove();
 										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
-																					'Spielplan: '+proposalPrio1listPoint.spielplanID+
+																					'SpielplanID: '+proposalPrio1listPoint.spielplanID+
+																					'</br>Spielzeiten'+
+																					'</br>Mo: '			+proposalPrio1listPoint.mo+
+																					'</br>Di: '			+proposalPrio1listPoint.di+
+																					'</br>Mi: '			+proposalPrio1listPoint.mi+
+																					'</br>Do: '			+proposalPrio1listPoint.do+
+																					'</br>Fr: '			+proposalPrio1listPoint.fr+
+																					'</br>Sa: '			+proposalPrio1listPoint.sa+
+																					'</br>So: '			+proposalPrio1listPoint.so+
+																					'</br>Überlaenge: ' +(proposalPrio1listPoint.ueberlaenge == true ? 'Ja' : 'Nein')+
+																					'</br>In 3D: '		+(proposalPrio1listPoint.in3D == true ? 'Ja' : 'Nein')+
 																				'</div>');									
 										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
 																					'Film: '+proposalPrio2listPoint.deTitel+
+																					'</br>Genre: '				+proposalPrio2listPoint.genre+
+																					'</br>Regie: '				+proposalPrio2listPoint.regie+
+																					'</br>Dauer: '				+proposalPrio2listPoint.dauer+
+																					'</br>Erscheinungstermin: '	+proposalPrio2listPoint.erscheinungstermin+
 																				'</div>');
 																				
 										$movieResults.empty();
 										
 										$.each(filmResponse, function(i, film) {
 											if(priority[1].list[element1ID].filmID == film.filmID){
-												$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+film.deTitel+'</li>');
+												$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">Film: '+film.deTitel+
+																		'</br>Genre: '				+film.genre+
+																		'</br>Regie: '				+film.regie+
+																		'</br>Dauer: '				+film.dauer+
+																		'</br>Erscheinungstermin: '	+film.erscheinungstermin+
+																	'</li>');
 											}
 										});
 
@@ -640,14 +703,14 @@
 																						
 					}
 					if( stringComponent == "movie" ){						
-					
-						// priority[0].searchPointer = 1;
-						// priority[0].classPointer = ".category.movieBox";
-						// priority[0].list = priority[0].list[element0ID];
-					
+										
 						proposal.filmID = proposalPrio0listPoint.filmID;											
 						$( "div.defineProposalContent" ).append('<div class="proposal0">'+
 																	'Film: '+proposalPrio0listPoint.deTitel+
+																	'</br>Genre: '				+proposalPrio0listPoint.genre+
+																	'</br>Regie: '				+proposalPrio0listPoint.regie+
+																	'</br>Dauer: '				+proposalPrio0listPoint.dauer+
+																	'</br>Erscheinungstermin: '	+proposalPrio0listPoint.erscheinungstermin+
 																'</div>');
 																
 						function getSpielplaeneFilmID(){
@@ -702,14 +765,11 @@
 								};
 				
 						$.when( getSpielplaeneFilmID() ).done( function(){
-							// console.log(spielplanResponse[0].kinoID);
 
 							for(var spielplan in spielplanResponse){
-						
-								// console.log("test");
-								// console.log(JSON.stringify(spielplanResponse[spielplan].filmID));
-							
+													
 								ajaxGetKino = getKinos(spielplan);
+								
 							}
 
 							$.when( ajaxGetKino ).done( function(){
@@ -717,10 +777,31 @@
 								$cineResults.empty();
 								
 								$.each(spielplanResponse, function(i, spielplan) {
-									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectResult">'+spielplan.spielplanID+'</li>');
+									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectResult">SpielplanID: '+spielplan.spielplanID+
+															'</br>Spielzeiten'+
+															'</br>Mo: '			+spielplan.mo+
+															'</br>Di: '			+spielplan.di+
+															'</br>Mi: '			+spielplan.mi+
+															'</br>Do: '			+spielplan.do+
+															'</br>Fr: '			+spielplan.fr+
+															'</br>Sa: '			+spielplan.sa+
+															'</br>So: '			+spielplan.so+
+															'</br>Überlaenge: ' +(spielplan.ueberlaenge == true ? 'Ja' : 'Nein')+
+															'</br>In 3D: '		+(spielplan.in3D == true ? 'Ja' : 'Nein')+
+														'</li>');
 								});	
 								$.each(kinoResponse, function(i, kino) {
-									$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectResult">'+kino.bezeichnung+'</li>');
+									$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectResult">'+
+																'Kino: '				+kino.bezeichnung+
+																'</br>Straße: '			+kino.straße+
+																'</br>Ort: '			+kino.ort+
+																'</br>PLZ: '			+kino.plz+
+																'</br>Kinotag: '		+kino.kinotag+
+																'</br>Reservierung: '	+kino.reservierungsHotline+
+																'</br>Preise: '			+kino.preise+
+																'</br>Bewertung: '		+kino.bewertung+
+																'</br>Website: <a href="'+kino.website+'">'+kino.website+'</a>'+
+														'</li>');
 								});
 								
 								pointerView();
@@ -769,16 +850,44 @@
 										$( "div.proposal2" ).remove();
 										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
 																					'Kino: '+proposalPrio1listPoint.bezeichnung+
+																					'</br>Straße: '			+proposalPrio1listPoint.straße+
+																					'</br>Ort: '			+proposalPrio1listPoint.ort+
+																					'</br>PLZ: '			+proposalPrio1listPoint.plz+
+																					'</br>Kinotag: '		+proposalPrio1listPoint.kinotag+
+																					'</br>Reservierung: '	+proposalPrio1listPoint.reservierungsHotline+
+																					'</br>Preise: '			+proposalPrio1listPoint.preise+
+																					'</br>Bewertung: '		+proposalPrio1listPoint.bewertung+
+																					'</br>Website: <a href="'+proposalPrio1listPoint.website+'">'+proposalPrio1listPoint.website+'</a>'+
 																				'</div>');
 										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
-																					'Spielplan: '+proposalPrio2listPoint.spielplanID+
+																					'SpielplanID: '+proposalPrio2listPoint.spielplanID+
+																					'</br>Mo: '			+proposalPrio2listPoint.mo+
+																					'</br>Di: '			+proposalPrio2listPoint.di+
+																					'</br>Mi: '			+proposalPrio2listPoint.mi+
+																					'</br>Do: '			+proposalPrio2listPoint.do+
+																					'</br>Fr: '			+proposalPrio2listPoint.fr+
+																					'</br>Sa: '			+proposalPrio2listPoint.sa+
+																					'</br>So: '			+proposalPrio2listPoint.so+
+																					'</br>Überlaenge: ' +(proposalPrio2listPoint.ueberlaenge == true ? 'Ja' : 'Nein')+
+																					'</br>In 3D: '		+(proposalPrio2listPoint.in3D == true ? 'Ja' : 'Nein')+
 																				'</div>');
 																				
 										$timeResults.empty();
 										
 										$.each(spielplanResponse, function(i, spielplan) {
 											if(priority[1].list[element1ID].kinoID == spielplan.kinoID){
-												$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
+												$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+
+																		'SpielplanID: '+spielplan.spielplanID+
+																		'</br>Mo: '			+spielplan.mo+
+																		'</br>Di: '			+spielplan.di+
+																		'</br>Mi: '			+spielplan.mi+
+																		'</br>Do: '			+spielplan.do+
+																		'</br>Fr: '			+spielplan.fr+
+																		'</br>Sa: '			+spielplan.sa+
+																		'</br>So: '			+spielplan.so+
+																		'</br>Überlaenge: ' +(spielplan.ueberlaenge == true ? 'Ja' : 'Nein')+
+																		'</br>In 3D: '		+(spielplan.in3D == true ? 'Ja' : 'Nein')+
+																	'</li>');
 											}
 										});
 										
@@ -830,7 +939,17 @@
 										$( "div.proposal1" ).remove();
 										$( "div.proposal2" ).remove();
 										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
-																					'Spielplan: '+proposalPrio1listPoint.spielplanID+
+																					'SpielplanID: '+proposalPrio1listPoint.spielplanID+
+																					'</br>Spielzeiten'+
+																					'</br>Mo: '			+proposalPrio1listPoint.mo+
+																					'</br>Di: '			+proposalPrio1listPoint.di+
+																					'</br>Mi: '			+proposalPrio1listPoint.mi+
+																					'</br>Do: '			+proposalPrio1listPoint.do+
+																					'</br>Fr: '			+proposalPrio1listPoint.fr+
+																					'</br>Sa: '			+proposalPrio1listPoint.sa+
+																					'</br>So: '			+proposalPrio1listPoint.so+
+																					'</br>Überlaenge: ' +(proposalPrio1listPoint.ueberlaenge == true ? 'Ja' : 'Nein')+
+																					'</br>In 3D: '		+(proposalPrio1listPoint.in3D == true ? 'Ja' : 'Nein')+
 																				'</div>');									
 										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
 																					'Kino: '+proposalPrio2listPoint.bezeichnung+
@@ -840,7 +959,17 @@
 										
 										$.each(kinoResponse, function(i, kino) {
 											if(priority[1].list[element1ID].kinoID == kino.kinoID){
-												$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kino.bezeichnung+'</li>');
+												$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kino.bezeichnung+
+																		'Kino: '+kino.bezeichnung+
+																		'</br>Straße: '			+kino.straße+
+																		'</br>Ort: '			+kino.ort+
+																		'</br>PLZ: '			+kino.plz+
+																		'</br>Kinotag: '		+kino.kinotag+
+																		'</br>Reservierung: '	+kino.reservierungsHotline+
+																		'</br>Preise: '			+kino.preise+
+																		'</br>Bewertung: '		+kino.bewertung+
+																		'</br>Website: <a href="'+kino.website+'">'+kino.website+'</a>'+
+																	'</li>');
 											}
 										});
 
@@ -855,14 +984,20 @@
 						});																
 					}
 					if( stringComponent == "time" ){
-					
-						// priority[0].searchPointer = 2;
-						// priority[0].classPointer = ".category.timeBox";
-						// priority[0].list = priority[0].list[element0ID];
-					
+									
 						proposal.spielplanID = proposalPrio0listPoint.spielplanID;										
 						$( "div.defineProposalContent" ).append('<div class="proposal0">'+
-																	'Spielplan: '+proposalPrio0listPoint.spielplanID+
+																	'SpielplanID: '+proposalPrio0listPoint.spielplanID+
+																	'Spielzeiten'+
+																	'Mo: '				+proposalPrio0listPoint.mo+
+																	'</br>Di: '			+proposalPrio0listPoint.di+
+																	'</br>Mi: '			+proposalPrio0listPoint.mi+
+																	'</br>Do: '			+proposalPrio0listPoint.do+
+																	'</br>Fr: '			+proposalPrio0listPoint.fr+
+																	'</br>Sa: '			+proposalPrio0listPoint.sa+
+																	'</br>So: '			+proposalPrio0listPoint.so+
+																	'</br>Überlaenge: ' +(proposalPrio0listPoint.ueberlaenge == true ? 'Ja' : 'Nein')+
+																	'</br>In 3D: '		+(proposalPrio0listPoint.in3D == true ? 'Ja' : 'Nein')+
 																'</div>');
 
 						function getFilmeSpielplanID(){
@@ -920,7 +1055,7 @@
 
 							// for(var spielplan in spielplanResponse){
 							
-								// ajaxGetKino = getKinoSpielplanID(spielplan);
+								// ajaxGetKino = getKinosSpielplanID(spielplan);
 							// }
 
 							$.when( getKinosSpielplanID() ).done( function(){
@@ -928,10 +1063,25 @@
 								$cineResults.empty();
 								
 								$.each(filmResponse, function(i, film) {
-									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectResult">'+film.deTitel+'</li>');
+									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectResult">'+
+															'Film: '					+film.deTitel+
+															'</br>Genre: '				+film.genre+
+															'</br>Regie: '				+film.regie+
+															'</br>Dauer: '				+film.dauer+
+															'</br>Erscheinungstermin: '	+film.erscheinungstermin+
+														'</li>');
 								});	
 								$.each(kinoResponse, function(i, kino) {
-									$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectResult">'+kino.bezeichnung+'</li>');
+									$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectResult">Kino: '+kino.bezeichnung+
+															'</br>Straße: '			+kino.straße+
+															'</br>Ort: '			+kino.ort+
+															'</br>PLZ: '			+kino.plz+
+															'</br>Kinotag: '		+kino.kinotag+
+															'</br>Reservierung: '	+kino.reservierungsHotline+
+															'</br>Preise: '			+kino.preise+
+															'</br>Bewertung: '		+kino.bewertung+
+															'</br>Website: <a href="'+kino.website+'">'+kino.website+'</a>'+
+														'</li>');
 								});
 
 								if( !($( 'div' ).filter($( "[class$='prio1']" )).length) || ($( 'div' ).filter( ".category.cineBox.prio1" ).length) ){
@@ -978,17 +1128,35 @@
 										$( "div.proposal2" ).remove();
 										
 										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
-																					'Kino: '+proposalPrio1listPoint.bezeichnung+
+																					'Kino: '				+proposalPrio1listPoint.bezeichnung+
+																					'</br>Straße: '			+proposalPrio1listPoint.straße+
+																					'</br>Ort: '			+proposalPrio1listPoint.ort+
+																					'</br>PLZ: '			+proposalPrio1listPoint.plz+
+																					'</br>Kinotag: '		+proposalPrio1listPoint.kinotag+
+																					'</br>Reservierung: '	+proposalPrio1listPoint.reservierungsHotline+
+																					'</br>Preise: '			+proposalPrio1listPoint.preise+
+																					'</br>Bewertung: '		+proposalPrio1listPoint.bewertung+
+																					'</br>Website: <a href="'+proposalPrio1listPoint.website+'">'+proposalPrio1listPoint.website+'</a>'+
 																				'</div>');
 										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
-																					'Film: '+proposalPrio2listPoint.deTitel+
+																					'Film: '					+proposalPrio2listPoint.deTitel+
+																					'</br>Genre: '				+proposalPrio2listPoint.genre+
+																					'</br>Regie: '				+proposalPrio2listPoint.regie+
+																					'</br>Dauer: '				+proposalPrio2listPoint.dauer+
+																					'</br>Erscheinungstermin: '	+proposalPrio2listPoint.erscheinungstermin+
 																				'</div>');
 																				
 										$movieResults.empty();
 										
 										$.each(filmResponse, function(i, film) {
 											if(priority[0].list[element0ID].filmID == film.filmID){
-												$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+film.deTitel+'</li>');
+												$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+
+																		'Film: '					+film.deTitel+
+																		'</br>Genre: '				+film.genre+
+																		'</br>Regie: '				+film.regie+
+																		'</br>Dauer: '				+film.dauer+
+																		'</br>Erscheinungstermin: '	+film.erscheinungstermin+
+																	+'</li>');
 											}
 										});
 										
@@ -1044,16 +1212,38 @@
 										$( "div.proposal2" ).remove();
 										$( "div.defineProposalContent" ).append('<div class="proposal1">'+
 																					'Film: '+proposalPrio1listPoint.deTitel+
+																					'</br>Genre: '				+proposalPrio1listPoint.genre+
+																					'</br>Regie: '				+proposalPrio1listPoint.regie+
+																					'</br>Dauer: '				+proposalPrio1listPoint.dauer+
+																					'</br>Erscheinungstermin: '	+proposalPrio1listPoint.erscheinungstermin+
 																				'</div>');									
 										$( "div.defineProposalContent" ).append('<div class="proposal2">'+
 																					'Kino: '+proposalPrio2listPoint.bezeichnung+
+																					'</br>Straße: '			+proposalPrio2listPoint.straße+
+																					'</br>Ort: '			+proposalPrio2listPoint.ort+
+																					'</br>PLZ: '			+proposalPrio2listPoint.plz+
+																					'</br>Kinotag: '		+proposalPrio2listPoint.kinotag+
+																					'</br>Reservierung: '	+proposalPrio2listPoint.reservierungsHotline+
+																					'</br>Preise: '			+proposalPrio2listPoint.preise+
+																					'</br>Bewertung: '		+proposalPrio2listPoint.bewertung+
+																					'</br>Website: <a href="'+proposalPrio2listPoint.website+'">'+proposalPrio2listPoint.website+'</a>'+
 																				'</div>');
 
 										$cineResults.empty();
 										
 										$.each(kinoResponse, function(i, kino) {
 											if(priority[0].list[element0ID].kinoID == kino.kinoID){
-												$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kino.bezeichnung+'</li>');
+												$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+
+																		'Kino: '+kino.bezeichnung+
+																		'</br>Straße: '			+kino.straße+
+																		'</br>Ort: '			+kino.ort+
+																		'</br>PLZ: '			+kino.plz+
+																		'</br>Kinotag: '		+kino.kinotag+
+																		'</br>Reservierung: '	+kino.reservierungsHotline+
+																		'</br>Preise: '			+kino.preise+
+																		'</br>Bewertung: '		+kino.bewertung+
+																		'</br>Website: <a href="'+kino.website+'">'+kino.website+'</a>'+
+																	'</li>');
 											}
 										});
 
@@ -1069,9 +1259,7 @@
 																
 					}
 					
-					console.log(proposal);					
-															
-					// $( "li[class^='"+stringComponent+"']" ).removeClass( "selectResult" );
+					console.log(proposal);																				
 					
 					$( "div.locked" ).remove();
 
@@ -1143,7 +1331,15 @@
 						
 						$( "div.proposal1" ).remove();
 						$( "div.defineProposalContent" ).append('<div class="proposal1">'+
-																	'Kino: '+proposalPrio1listPoint.bezeichnung+
+																	'Kino: '				+proposalPrio1listPoint.bezeichnung+
+																	'</br>Straße: '			+proposalPrio1listPoint.straße+
+																	'</br>Ort: '			+proposalPrio1listPoint.ort+
+																	'</br>PLZ: '			+proposalPrio1listPoint.plz+
+																	'</br>Kinotag: '		+proposalPrio1listPoint.kinotag+
+																	'</br>Reservierung: '	+proposalPrio1listPoint.reservierungsHotline+
+																	'</br>Preise: '			+proposalPrio1listPoint.preise+
+																	'</br>Bewertung: '		+proposalPrio1listPoint.bewertung+
+																	'</br>Website: <a href="'+proposalPrio1listPoint.website+'">'+proposalPrio1listPoint.website+'</a>'+
 																'</div>');
 						
 						$( "div.locked" ).remove();
@@ -1178,7 +1374,18 @@
 							$.each(spielplanResponse, function(i, spielplan) {
 								if(proposalPrio0listPoint.filmID == spielplan.filmID){
 									proposalPrio2listPoint = spielplanResponse[i];
-									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
+									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+
+															'SpielplanID: '		+spielplan.spielplanID+
+															'</br>Mo: '			+spielplan.mo+
+															'</br>Di: '			+spielplan.di+
+															'</br>Mi: '			+spielplan.mi+
+															'</br>Do: '			+spielplan.do+
+															'</br>Fr: '			+spielplan.fr+
+															'</br>Sa: '			+spielplan.sa+
+															'</br>So: '			+spielplan.so+
+															'</br>Überlaenge: ' +(spielplan.ueberlaenge == true ? 'Ja' : 'Nein')+
+															'</br>In 3D: '		+(spielplan.in3D == true ? 'Ja' : 'Nein')+
+														'</li>');
 									
 								}
 							});
@@ -1187,7 +1394,16 @@
 							
 							$( "div.proposal2" ).remove();							
 							$( "div.defineProposalContent" ).append('<div class="proposal2">'+
-																		'Spielplan: '+proposalPrio2listPoint.spielplanID+
+																		'SpielplanID: '		+proposalPrio2listPoint.spielplanID+
+																		'</br>Mo: '			+proposalPrio2listPoint.mo+
+																		'</br>Di: '			+proposalPrio2listPoint.di+
+																		'</br>Mi: '			+proposalPrio2listPoint.mi+
+																		'</br>Do: '			+proposalPrio2listPoint.do+
+																		'</br>Fr: '			+proposalPrio2listPoint.fr+
+																		'</br>Sa: '			+proposalPrio2listPoint.sa+
+																		'</br>So: '			+proposalPrio2listPoint.so+
+																		'</br>Überlaenge: ' +(proposalPrio2listPoint.ueberlaenge == true ? 'Ja' : 'Nein')+
+																		'</br>In 3D: '		+(proposalPrio2listPoint.in3D == true ? 'Ja' : 'Nein')+
 																	'</div>');
 																	
 							defineProposal();
@@ -1223,7 +1439,14 @@
 							// $.each(spielplanResponse, function(i, spielplan) {
 								// if(proposalPrio0listPoint.filmID == spielplan.filmID){
 									proposalPrio2listPoint = filmResponse[0];
-									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+filmResponse[0].deTitel+'</li>');
+									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+
+															'Film: '					+filmResponse[0].deTitel+
+															'</br>Genre: '				+filmResponse[0].genre+
+															'</br>Regie: '				+filmResponse[0].regie+
+															'</br>Dauer: '				+filmResponse[0].dauer+
+															'</br>Erscheinungstermin: '	+filmResponse[0].erscheinungstermin+
+															
+														'</li>');
 									
 								// }
 							// });
@@ -1233,6 +1456,10 @@
 							$( "div.proposal2" ).remove();							
 							$( "div.defineProposalContent" ).append('<div class="proposal2">'+
 																		'Film: '+proposalPrio2listPoint.deTitel+
+																		'</br>Genre: '				+proposalPrio2listPoint.genre+
+																		'</br>Regie: '				+proposalPrio2listPoint.regie+
+																		'</br>Dauer: '				+proposalPrio2listPoint.dauer+
+																		'</br>Erscheinungstermin: '	+proposalPrio2listPoint.erscheinungstermin+
 																	'</div>');	
 
 							defineProposal();
@@ -1267,6 +1494,10 @@
 						$( "div.proposal1" ).remove();
 						$( "div.defineProposalContent" ).append('<div class="proposal1">'+
 																	'Film: '+proposalPrio1listPoint.deTitel+
+																	'</br>Genre: '				+proposalPrio1listPoint.genre+
+																	'</br>Regie: '				+proposalPrio1listPoint.regie+
+																	'</br>Dauer: '				+proposalPrio1listPoint.dauer+
+																	'</br>Erscheinungstermin: '	+proposalPrio1listPoint.erscheinungstermin+
 																'</div>');
 																
 						$( "div.locked" ).remove();
@@ -1301,7 +1532,17 @@
 							$.each(spielplanResponse, function(i, spielplan) {
 								if(proposalPrio1listPoint.filmID == spielplan.filmID){
 									proposalPrio2listPoint = spielplanResponse[i];
-									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
+									$timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">SpielplanID: '+spielplan.spielplanID+
+															'Mo: '				+spielplan.mo+
+															'</br>Di: '			+spielplan.di+
+															'</br>Mi: '			+spielplan.mi+
+															'</br>Do: '			+spielplan.do+
+															'</br>Fr: '			+spielplan.fr+
+															'</br>Sa: '			+spielplan.sa+
+															'</br>So: '			+spielplan.so+
+															'</br>Überlaenge: ' +(spielplan.ueberlaenge == true ? 'Ja' : 'Nein')+
+															'</br>In 3D: '		+(spielplan.in3D == true ? 'Ja' : 'Nein')+
+														'</li>');
 									
 								}
 							});
@@ -1343,13 +1584,9 @@
 																
 							$cineResults.empty();
 							
-							// $.each(spielplanResponse, function(i, spielplan) {
-								// if(proposalPrio0listPoint.filmID == spielplan.filmID){
-									proposalPrio2listPoint = kinoResponse[0];
-									$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kinoResponse[0].bezeichnung+'</li>');
+							proposalPrio2listPoint = kinoResponse[0];
+							$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kinoResponse[0].bezeichnung+'</li>');
 									
-								// }
-							// });
 							
 							proposal.kinoID = proposalPrio2listPoint.kinoID;
 							
@@ -1417,13 +1654,8 @@
 																
 							$movieResults.empty();
 
-							// $.each(spielplanResponse, function(i, spielplan) {
-								// if(proposalPrio1listPoint.filmID == spielplan.filmID){
-									proposalPrio2listPoint = filmResponse[0];
-									$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+filmResponse[0].deTitel+'</li>');
-									
-								// }
-							// });
+							proposalPrio2listPoint = filmResponse[0];
+							$movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+filmResponse[0].deTitel+'</li>');
 							
 							proposal.filmID = proposalPrio2listPoint.filmID;
 							
@@ -1461,14 +1693,10 @@
 							priority[2].list = kinoResponse;
 																
 							$cineResults.empty();
-							
-							// $.each(spielplanResponse, function(i, spielplan) {
-								// if(proposalPrio0listPoint.filmID == spielplan.filmID){
-									proposalPrio2listPoint = kinoResponse[0];
-									$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kinoResponse[0].bezeichnung+'</li>');
+
+							proposalPrio2listPoint = kinoResponse[0];
+							$cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+kinoResponse[0].bezeichnung+'</li>');
 									
-								// }
-							// });
 							
 							proposal.kinoID = proposalPrio2listPoint.kinoID;
 							
@@ -1483,151 +1711,7 @@
 																
 					});					
 				}
-				// // Falls cineSearch priority[2] und ein Filter per Submit angewendet wird
-				// if( priority[2].searchPointer === 0 ){
-				
-					// $( "li[class^='cine']" ).addClass("selectResult");
-
-					// $cineResults.empty();
-					
-					// if(proposalPrio0listPoint.hasOwnProperty("kinoID")){
-						// for(var listPoint in priority[2].list){
-							// if(priority[2].list === proposalPrio0listPoint.kinoID){
-								// proposalPrio2listPoint = priority[2].list[listPoint];
-								// $cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+proposalPrio2listPoint.Bezeichnung+'</li>');
-							// }
-						// }
-					// }
-					// if(proposalPrio1listPoint.hasOwnProperty("kinoID")){
-						// for(var listPoint in priority[2].list){
-							// if(priority[2].list === proposalPrio1listPoint.kinoID){
-								// proposalPrio2listPoint = priority[2].list[listPoint];
-								// $cineResults.append('<li class="cineResult cine-resultID-'+ i +' selectedResult">'+proposalPrio2listPoint.Bezeichnung+'</li>');
-							// }
-						// }
-					// }					
-					// // $.each(spielplanResponse, function(i, spielplan) {
-						// // if(proposalPrio0listPoint.filmID == spielplan.filmID){
-							// // proposalPrio2listPoint = spielplanResponse[i];
-							// // $timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
-							
-						// // }
-					// // });
-					
-					// $( "li[class^='cine']" ).click(function() {
-								
-						// console.log( $( this ).attr("class") );
-	
-						// element2Array = $( this ).attr("class").split(" ");
-						// element2 = element2Array[1];
-						// element2SplittedArray = element2.split("-"); // split() statt slice() nutzen, da eine ID nicht immer einstellig ist
 						
-						// element2ID = element2SplittedArray[2];					
-						// console.log("ElementID: "+element2ID);
-						
-						
-						// proposalPrio2listPoint = priority[2].list[element2ID];	// Speichern des Listen-Inhalts
-						
-						// $( "li[class^='cine']" ).removeClass("selectedResult");
-						// $( "."+element1 ).addClass("selectedResult");
-						
-						// proposal.kinoID = proposalPrio2listPoint.kinoID;
-						
-						
-						// $( "div.proposal2" ).remove();
-						// $( "div.defineProposalContent" ).append('<div class="proposal2">'+
-																	// 'Kino: '+proposalPrio2listPoint.bezeichnung+
-																// '</div>');
-						
-						
-						// // // // // // // // Falls priority[1] bei der movieSearch liegt -> priority[2] liegt bei timeSearch
-						// // // // // // // if(priority[1].searchPointer === 1){
-						
-							// // // // // // // // priority[2].searchPointer = 2;
-							// // // // // // // // priority[2].classPointer = ".category.timeBox";
-						
-							// // // // // // // // $( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
-							// // // // // // // // $(priority[2].classPointer).addClass( "prio2" );
-						
-							// // // // // // // // $.ajax({
-								// // // // // // // // url: '/spielplaene',
-								// // // // // // // // method: 'GET',
-								// // // // // // // // async: false,
-								// // // // // // // // data: 'kinoID='+proposalPrio1listPoint.kinoID,
-								// // // // // // // // contentType: 'application/json',
-							// // // // // // // // }).done(function (response) {
-								// // // // // // // // console.log("spielplaene: "+response);
-								// // // // // // // // spielplanResponse = response;
-							// // // // // // // // }).fail(function () {
-								// // // // // // // // console.log('Error!');
-								// // // // // // // // alert('Error!');
-							// // // // // // // // });
-
-							// // // // // // // priority[2].list = spielplanResponse;
-																
-							// // // // // // // // $timeResults.empty();
-							
-							// // // // // // // // $.each(spielplanResponse, function(i, spielplan) {
-								// // // // // // // // if(proposalPrio0listPoint.filmID == spielplan.filmID){
-									// // // // // // // // proposalPrio2listPoint = spielplanResponse[i];
-									// // // // // // // // $timeResults.append('<li class="timeResult time-resultID-'+ i +' selectedResult">'+spielplan.spielplanID+'</li>');
-									
-								// // // // // // // // }
-							// // // // // // // // });
-							
-							// // // // // // // proposal.spielplanID = proposalPrio2listPoint.spielplanID;
-							
-							// // // // // // // $( "div.proposal2" ).remove();							
-							// // // // // // // $( "div.defineProposalContent" ).append('<div class="proposal2">'+
-																		// // // // // // // 'Spielplan: '+proposalPrio2listPoint.spielplanID+
-																	// // // // // // // '</div>');							
-						// // // // // // // }
-						// // // // Falls priority[1] bei der timeSearch liegt -> priority[2] liegt bei movieSearch
-						// // // if(priority[1].searchPointer === 2){
-						
-							// // // priority[2].searchPointer = 1;
-							// // // priority[2].classPointer = ".category.movieBox";
-						
-							// // // $( 'div' ).filter($( "[class$='prio2']" )).removeClass( "prio2" );
-							// // // $(priority[2].classPointer).addClass( "prio2" );
-						
-							// // // $.ajax({
-								// // // url: '/filme',
-								// // // method: 'GET',
-								// // // async: false,
-								// // // data: 'filmID='+proposalPrio0listPoint.filmID,
-								// // // contentType: 'application/json',
-							// // // }).done(function (response) {
-								// // // console.log("spielplaene: "+response);
-								// // // filmResponse = response;
-							// // // }).fail(function () {
-								// // // console.log('Error!');
-								// // // alert('Error!');
-							// // // });
-
-							// // // priority[2].list = filmResponse;
-																
-							// // // $movieResults.empty();
-							
-							// // // // $.each(spielplanResponse, function(i, spielplan) {
-								// // // // if(proposalPrio0listPoint.filmID == spielplan.filmID){
-									// // // proposalPrio2listPoint = filmResponse[0];
-									// // // $movieResults.append('<li class="movieResult movie-resultID-'+ i +' selectedResult">'+filmResponse[0].deTitel+'</li>');
-									
-								// // // // }
-							// // // // });
-							
-							// // // proposal.filmID = proposalPrio2listPoint.filmID;
-							
-							// // // $( "div.proposal2" ).remove();							
-							// // // $( "div.defineProposalContent" ).append('<div class="proposal2">'+
-																		// // // 'Film: '+proposalPrio2listPoint.deTitel+
-																	// // // '</div>');							
-						// // // }						
-
-					// });					
-				// }
-				
 			}
 			
 			
@@ -1642,7 +1726,6 @@
         $( '.cineSearch' ).on( 'submit', function( event ) {
 			event.preventDefault();		
 			$('.cineResults').empty();
-			// console.log( $( this ).serialize() );
 
 			$.ajax({
 				url: '/kinos',
@@ -1650,18 +1733,21 @@
 				data: $('.cineSearch').serialize(),
 				contentType: 'application/json',
 				success: function(cineResults) {
-					// console.log($('.cineSearch').serialize());
 					
 					cineResults = refreshPage(0, cineResults, ".category.cineBox");
 					priorityVisualise();
 					
 					$.each(cineResults, function(i, cineResult) {
-						$cineResults.append('<li class="cineResult cine-resultID-'+ i +'">'+	
+						$cineResults.append('<li class="cineResult cine-resultID-'+ i +'">'+
 												'Kino: '				+cineResult.bezeichnung+
+												'</br>Straße: '			+cineResult.straße+
+												'</br>Ort: '			+cineResult.ort+
+												'</br>PLZ: '			+cineResult.plz+
 												'</br>Kinotag: '		+cineResult.kinotag+
 												'</br>Reservierung: '	+cineResult.reservierungsHotline+
 												'</br>Preise: '			+cineResult.preise+
 												'</br>Bewertung: '		+cineResult.bewertung+
+												'</br>Website: <a href="'+cineResult.website+'">'+cineResult.website+'</a>'+
 											'</li>');
 					});
 					
@@ -1669,13 +1755,7 @@
 					pointerView();
 
 				}
-			})/*.done(function (response) {
-				console.log($('.cineSearch').serialize());
-				$.each(response, function(i, cineResult) {
-					$cineResults.append('<li>Result' + i+1 + '</li>');
-            });
-
-			})*/.fail(function () {
+			}).fail(function () {
 				console.log('Error!');
 				alert('Error!');
 			});
@@ -1686,8 +1766,7 @@
 	  
         $( '.movieSearch' ).on( 'submit', function( event ) {
 			event.preventDefault();
-			$('.movieResults').empty();
-			// console.log( $( this ).serialize() );
+			$('.movieResults').empty();			
 			
 			$.ajax({
 				url: '/filme',
@@ -1695,26 +1774,26 @@
 				data: $('.movieSearch').serialize(),
 				contentType: 'application/json',
 				success: function(movieResults) {
-					// console.log($('.movieSearch').serialize());
-					console.log("movieResults: "+JSON.stringify(movieResults));
+					
 					movieResults = refreshPage(1, movieResults, ".category.movieBox");
 					priorityVisualise();					
 					
 					$.each(movieResults, function(i, movieResult) {
-						$movieResults.append('<li class="movieResult movie-resultID-'+ i +'">'+movieResult.deTitel+'</li>');
+						$movieResults.append('<li class="movieResult movie-resultID-'+ i +'">'+
+												'<strong>Film</strong>'+
+												'Film: '					+movieResult.deTitel+
+												'</br>Genre: '				+movieResult.genre+
+												'</br>Regie: '				+movieResult.regie+
+												'</br>Dauer: '				+movieResult.dauer+
+												'</br>Erscheinungstermin: '	+movieResult.erscheinungstermin+
+											 '</li>');
 					});
 					
 					pickResult();
 					pointerView();
 					
 				}
-			})/*.done(function (response) {
-				console.log($('.movieSearch').serialize());
-				$.each(response, function(i, movieResult) {
-					$movieResults.append('<li>Result' + i+1 + '</li>');
-            });
-
-          })*/.fail(function () {
+			}).fail(function () {
 				console.log('Error!');
 				alert('Error!');
           });
@@ -1727,7 +1806,6 @@
         $( '.timeSearch' ).on( 'submit', function( event ) {
 			event.preventDefault();
 			$('.timeResults').empty();
-			console.log( $( this ).serialize() );
 
 			$.ajax({
 				url: '/spielplaene',
@@ -1735,26 +1813,30 @@
 				data: $('.timeSearch').serialize(),
 				contentType: 'application/json',
 				success: function(timeResults) {
-					// console.log($('.timeSearch').serialize());
 					
 					timeResults = refreshPage(2, timeResults, ".category.timeBox");
 					priorityVisualise();					
 
 					$.each(timeResults, function(i, timeResult) {
-						$timeResults.append('<li class="timeResult time-resultID-'+ i +'">'+timeResult.spielplanID+'</li>');
+						$timeResults.append('<li class="timeResult time-resultID-'+ i +'">SpielplanID: '+timeResult.spielplanID+
+												'<strong>Spielzeiten</strong>'+
+												'Mo: '				+timeResult.mo+
+												'</br>Di: '			+timeResult.di+
+												'</br>Mi: '			+timeResult.mi+
+												'</br>Do: '			+timeResult.do+
+												'</br>Fr: '			+timeResult.fr+
+												'</br>Sa: '			+timeResult.sa+
+												'</br>So: '			+timeResult.so+
+												'</br>Überlaenge: ' +(timeResult.ueberlaenge == true ? 'Ja' : 'Nein')+
+												'</br>In 3D: '		+(timeResult.in3D == true ? 'Ja' : 'Nein')+
+											'</li>');
 					});
 					
 					pickResult();
 					pointerView();
 									
 				}
-			})/*.done(function (response) {
-				console.log($('.timeSearch').serialize());
-				$.each(response, function(i, timeResult) {
-					$timeResults.append('<li>Result' + i+1 + '</li>');
-            });
-
-          })*/.fail(function () {
+			}).fail(function () {
 				console.log('Error!');
 				alert('Error!');
           });
@@ -1904,8 +1986,8 @@
 													'<option value="1">Alice</option>'+
 													'<option value="2">Bob</option>'+
 													'<option value="3">Albert</option>'+
-												'</select></br>'+
-												'<input type="submit"/>'+
+												'</select>'+
+												'<input class="submitProposal" type="submit" value="Fertig mit Auswahl"/>'+
 											'</form>' );
 				
 				$( "select" ).change(function () { 
@@ -1934,9 +2016,6 @@
 						
 						window.location.href = "proposalView?"+ $ ( ".selectUserForm" ).serialize() + "&vorschlagID=" + proposalID;
 						
-						// console.log($( ".selectUserForm" ));
-
-						// self.submit();						
 				});				
 				
 				$( ".submitProposal" ).click(function() {
@@ -2011,7 +2090,6 @@
 			<div class="proposalInfo"></div>
 			<div class="defineProposalContent"></div>
 			<div class="selectUser"></div>
-			<div class="submitProposal">Fertig mit Auswahl</div>
 		</div>
 		
 		<div class="categories">

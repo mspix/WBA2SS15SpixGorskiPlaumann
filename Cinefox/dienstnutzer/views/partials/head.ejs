@@ -10,18 +10,12 @@
 <script src="http://code.jquery.com/jquery-1.9.0.js"></script>
 
 
-
-
-
-
 <style>
     body    { padding-top:50px; }
 	
 	h4 {
 		font-size: 1.5em;
 	}
-
-/* 	main { overflow: auto; } */
 	
     .jumbotron { 
 		background-color: #F00;
@@ -48,55 +42,34 @@
 		margin: 10px 10px 10px 10px;
 		padding: 10px;
 		width: 300px;
-/* 		float: left; */
-/* 		border-style: solid;
-		border-width: 5px;
-		border-color: #E92525; */
 		-webkit-border-radius: 6px;
 		-moz-border-radius: 6px;
 		border-radius: 6px;			
 	}
 	  
 	.cineBox {
-/* 		position: absolute;
-		top: 370px; */
+
 	}
 
 	.movieBox {
-/*   	position: absolute;
-		top: 630px; */
+
 	}
 	  
 	.timeBox {
-/*  	position: absolute;
-		top: 865px;  */
+
 	}	  
 	  
 	.prio0 {
 		order: 0;	
-/* 		position: relative; */
-/* 		position: absolute;
-		top: 370px; */
 		background-color: #FF6B6B;
-/* 		float: left; */
 	}
 	.prio1 {
 		order: 1;	
-/* 		position: relative; */	
-/* 		position: absolute;
-		top: 370px;
-		left: 320px; */
-		background-color: #FF8F8F;
-/* 		float: left; */		
+		background-color: #FF8F8F;	
 	}
 	.prio2 {
 		order: 2;	
-/* 		position: relative;	 */
-/* 		position: absolute;
-		top: 370px;		
-		left: 640px; */
 		background-color: #FFBABA;
-/* 		float: left;	 */	
 	}
 	
 	.cineResult, .movieResult, .timeResult {
@@ -152,9 +125,11 @@
 	.proposal0, .proposal1, .proposal2 {
 		display: inline-block;
 		margin: 10px 20px 10px 20px;
+		vertical-align: top;
+		
 	}
 	
-	.proposalKino, .proposalFilm, .proposalSpielplan {
+	.proposalZeit, .proposalKino, .proposalFilm, .proposalSpielplan {
 		display: inline-block;
 		margin: 0 30px 10px 0px; 
 		vertical-align: top;
@@ -166,10 +141,10 @@
 	}
 	
 	.submitProposal {
-		display: none;
+		display: inline-block;
 		background-Color: #24AB47;
 		color: #002B0B;
-		margin: 10px;
+		margin: 20px;
 		padding: 10px;
 		border-style: solid;
 		border-width: 1px;
@@ -183,8 +158,12 @@
 		background-Color: #77B687;			
 	}
 	
+	.input[value~="Fertig"] {
+		margin-left: 10px;
+	}
+	
 	.selectResult {
-/* 		background-Color: #fff; */
+
 	}
 	
 	.selectResult:hover {
@@ -246,13 +225,6 @@
 		-webkit-border-radius: 6px;
 		-moz-border-radius: 6px;
 		border-radius: 6px;			
-	}
-	
-	input[type="text"] {
-		/* float: right; */
-		margin: 0 0 4px 0;
-		/* display: inline-block; */
-		/* clear:both; */
 	}
 	
 	label {

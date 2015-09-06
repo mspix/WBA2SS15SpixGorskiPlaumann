@@ -25,7 +25,6 @@
 			var spielplan = "";
 			
 			var freunde = [];
-			// var empfaenger = vorschlag.freunde[0];
 			
 			var client = new Faye.Client("http://localhost:1338/faye");
 			
@@ -34,7 +33,7 @@
 				var publication = client.publish('/'+$('option:selected').val().toLowerCase(), {
 					"autor" : user.vorname,
 					"empfaenger" : $('option:selected').val(),
-					"vorschlag" : JSON.stringify(vorschlag)
+					"vorschlag" : vorschlag
 				});
 				
 				publication.then(
@@ -84,20 +83,22 @@
 
 			});	
 
-			user.erstellteVorschlaege.push(Number(vorschlagID));
-			console.log(user);
-			
-			// $.ajax({
-					// url: '/users/'+userID,
-					// method: 'PUT',
-					// async: false,
-					// data: JSON.stringify(user),
-					// contentType: 'application/json',
-					// success: function(response) {
-							// console.log("Response: "+JSON.stringify(response));
-					// }
+			if( $.inArray(vorschlagID, user.erstellteVorschlaege) == -1 ){
+				user.erstellteVorschlaege.push(Number(vorschlagID));
+				
+				$.ajax({
+						url: '/users/'+userID,
+						method: 'PUT',
+						async: false,
+						data: JSON.stringify(user),
+						contentType: 'application/json',
+						success: function(response) {
+								console.log("Response: "+JSON.stringify(response));
+						}
 
-			// });
+				});				
+			}
+			console.log(user);
 			
 			$.ajax({
 					url: '/kinos',
@@ -230,12 +231,12 @@
 		<h1 class="hello"></h1>
 		<h2>dein Vorschlag ist bereit geteilt zu werden.</h2></br>
 		
-		<div class="proposalZeit"></div>
 		<div class="chooseRecipient">
 		
 		</div>
 		<div class="shareButton">Mit Freunden teilen</div>
 		<div class="proposal">
+			<div class="proposalZeit"></div>		
 			<div class="proposalKino"></div>
 			<div class="proposalFilm"></div>
 			<div class="proposalSpielplan"></div>
