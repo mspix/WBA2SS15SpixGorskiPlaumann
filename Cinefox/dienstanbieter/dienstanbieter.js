@@ -116,7 +116,7 @@ app.post('/users', function(req, res){
 
     db.set('user:'+newUser.id, JSON.stringify(newUser), function(err, rep){
       res.json(newUser);
-    db.bgsave();
+      db.bgsave();
 
     });
   });

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+	<script type="text/javascript" src="http://localhost:1338/faye/client.js"></script>
+    <script>
+		$( document ).ready(function() {
+			console.log( "ready!" );
+			
+			var query = window.location.search.substring(1);
+			console.log(query);
+			var pairs = query.split('&');
+			console.log(pairs);
+			var pair0 = pairs[0].split('=');
+			var pair1 = pairs[1].split('=');
+			var userID = pair0[1];
+			var vorschlagID = pair1[1];
+			console.log("UserID: "+userID);
+			console.log("VorschlagID: "+vorschlagID);
+
+			var user = "";
+			var vorschlag = "";
+			var kino = "";
+			var film = "";
+			var spielplan = "";
+			
+			var freunde = [];
+			// var empfaenger = vorschlag.freunde[0];
+			
+			var client = new Faye.Client("http://localhost:1338/faye");
+			
+			function publishMsg(){
+				
+				var publication = client.publish('/'+$('option:selected').val().toLowerCase(), {
+					"autor" : user.vorname,
+					"empfaenger" : $('option:selected').val(),
+					"vorschlag" : JSON.stringify(vorschlag)
+				});
+				
+				publication.then(
+				
+					function(){
+						console.log("Nachricht wurde versendet.");
+						console.log($('option:selected').val());
+					},
+					function(){
+						console.log("Nachricht wurde nicht versendet.");
+					}
+				);
+					
+			}
+			
+			$( "select" ).change(function () { 
+				empfaenger = $( 'option:selected' ).val();
+			}).change();
+			
+			$( ".shareButton" ).on( "click", function() {
+				publishMsg();
+			});
+			
+			$.ajax({
+					url: '/users/'+userID,
+					method: 'GET',
+					async: false,
+					// data: '',
+					contentType: 'application/json',
+					success: function(response) {
+							console.log("Response: "+JSON.stringify(response));
+							user = response;
+					}
+
+			});
+					
+			$.ajax({
+					url: '/vorschlaege/'+vorschlagID,
+					method: 'GET',
+					async: false,
+					// data: '/'+vorschlagID,
+					contentType: 'application/json',
+					success: function(response) {
+							console.log("Response: "+JSON.stringify(response));
+							vorschlag = response;
+					}
+
+			});	
+
+			user.erstellteVorschlaege.push(Number(vorschlagID));
+			console.log(user);
+			
+			// $.ajax({
+					// url: '/users/'+userID,
+					// method: 'PUT',
+					// async: false,
+					// data: JSON.stringify(user),
+					// contentType: 'application/json',
+					// success: function(response) {
+							// console.log("Response: "+JSON.stringify(response));
+					// }
+
+			// });
+			
+			$.ajax({
+					url: '/kinos',
+					method: 'GET',
+					async: false,
+					data: 'kinoID='+vorschlag.kinoID,
+					contentType: 'application/json',
+					success: function(response) {
+							// console.log("Response: "+JSON.stringify(response));
+							kino = response[0];
+					}
+
+			});
+
+			$.ajax({
+					url: '/filme',
+					method: 'GET',
+					async: false,
+					data: 'filmID='+vorschlag.filmID,
+					contentType: 'application/json',
+					success: function(response) {
+							// console.log("Response: "+JSON.stringify(response));
+							film = response[0];
+					}
+
+			});
+
+			$.ajax({
+					url: '/spielplaene',
+					method: 'GET',
+					async: false,
+					data: 'spielplanID='+vorschlag.spielplanID,
+					contentType: 'application/json',
+					success: function(response) {
+							// console.log("Response: "+JSON.stringify(response));
+							spielplan = response[0];
+					}
+
+			});	
+
+			$.ajax({
+					url: '/users',
+					method: 'GET',
+					async: false,
+					// data: ,
+					contentType: 'application/json',
+					success: function(response) {
+							// console.log("Response: "+JSON.stringify(response));
+							for( var f in user.freunde ){
+								for( var r in response ){
+									console.log(JSON.stringify(user.freunde[f]));
+									console.log(JSON.stringify(response[r].userID));
+									if(user.freunde[f] === response[r].userID){
+										if($.inArray(response[r].vorname, freunde) == -1){
+											freunde.push(response[r]);
+										}
+									}
+								}
+							}
+							console.log(user.freunde + " <-> " + JSON.stringify(freunde[0]) + " " + JSON.stringify(freunde[1]));
+					}
+
+			});			
+			
+			$( 'h1.hello' ).html("Hi "+user.vorname+",");
+
+			$( '.proposalZeit' ).append('<h3>Zeit</h3>'+
+									'Tag/e: '				+vorschlag.day+
+									'</br>Uhrzeit: '		+vorschlag.time+' Uhr'
+			);				
+			$( '.proposalKino' ).append('<h3>Kino</h3>'+
+									'Kino: '				+kino.bezeichnung+
+									'</br>Straße: '			+kino.straße+
+									'</br>Ort: '			+kino.ort+
+									'</br>PLZ: '			+kino.plz+
+									'</br>Kinotag: '		+kino.kinotag+
+									'</br>Reservierung: '	+kino.reservierungsHotline+
+									'</br>Preise: '			+kino.preise+
+									'</br>Bewertung: '		+kino.bewertung+
+									'</br>Website: <a href="'+kino.website+'">'+kino.website+'</a>'
+			);
+			$( '.proposalFilm' ).append('<h3>Film</h3>'+
+									'Film: '				+film.deTitel+
+									'</br>Genre: '			+film.genre+
+									'</br>Regie: '			+film.regie+
+									'</br>dauer: '			+film.dauer
+			);			
+			$( '.proposalSpielplan' ).append('<h3>Spielzeiten</h3>'+
+									'Mo: '				+spielplan.mo+
+									'</br>Di: '			+spielplan.di+
+									'</br>Mi: '			+spielplan.mi+
+									'</br>Do: '			+spielplan.do+
+									'</br>Fr: '			+spielplan.fr+
+									'</br>Sa: '			+spielplan.sa+
+									'</br>So: '			+spielplan.so+
+									'</br>in 3D: '		+(spielplan.in3D == true ? 'Ja' : 'Nein')
+			);
+			
+			$( '.chooseRecipient' ).append('<form>'+
+												'<label for="empfaenger">Empfänger:</label></br>'+
+												'<select name="empfaenger">'+
+													// '<option value="'+user.freunde[0]+'">'+freunde[0]+'</option>'+
+													// '<option value="'+user.freunde[1]+'">'+freunde[1]+'</option>'+
+												'</select></br>'+
+											'</form>'
+			);
+
+			for( var f in freunde ){
+			
+				$( 'select' ).append('<option value="'+freunde[f].vorname+'">'+freunde[f].vorname+'</option>');
+			
+			}
+			
+		
+			
+		});
+    </script>
+</head>
+<body class="container">
+
+    <header>
+        <% include ../partials/header %>
+
+    </header>
+
+    <main>
+
+		<%include ../partials/main-heading %>
+		
+		<h1 class="hello"></h1>
+		<h2>dein Vorschlag ist bereit geteilt zu werden.</h2></br>
+		
+		<div class="proposalZeit"></div>
+		<div class="chooseRecipient">
+		
+		</div>
+		<div class="shareButton">Mit Freunden teilen</div>
+		<div class="proposal">
+			<div class="proposalKino"></div>
+			<div class="proposalFilm"></div>
+			<div class="proposalSpielplan"></div>
+		</div>
+		
+    </main>
+
+    <footer>
+        <% include ../partials/footer %>
+    </footer>
+
+</body>
+</html>

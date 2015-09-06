@@ -1,0 +1,8 @@
+{
+	"userID" : 1,
+	"vorname" : "Alice",
+	"name" : "",
+	"freunde" : [2,3],
+	"erstellteVorschlaege" : [],
+	"erhalteneVorschlaege" : []	
+}

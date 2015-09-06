@@ -23,7 +23,11 @@
 
 /* 	main { overflow: auto; } */
 	
-    .jumbotron  { background-color: #F00;	}
+    .jumbotron { 
+		background-color: #F00;
+		padding-top: 5px;
+		padding-bottom: 5px;
+	}
 
     .jumbotron>.main-heading { color: #F8F8FF;	}
 
@@ -33,7 +37,8 @@
 	
 	.categories {
 	
-		display: flex;	
+		display: flex;
+		clear: both;
 	
 	}
 	  
@@ -124,7 +129,6 @@
 	}
 	
 	.defineProposal	{
-/* 		display: none; */
 		background-Color: #E9D3D3;
 		margin: 10px;
 		padding: 10px;
@@ -138,6 +142,27 @@
 	
 	.defineProposal:hover {
 		background-Color: #E9D3D3;		
+	}
+	
+	.defineProposalContent {
+		display: inline-block;
+		vertical-align: top;
+	}
+	
+	.proposal0, .proposal1, .proposal2 {
+		display: inline-block;
+		margin: 10px 20px 10px 20px;
+	}
+	
+	.proposalKino, .proposalFilm, .proposalSpielplan {
+		display: inline-block;
+		margin: 0 30px 10px 0px; 
+		vertical-align: top;
+	}
+	
+	.selectUser {
+		display: none;
+		vertical-align: top;
 	}
 	
 	.submitProposal {
@@ -181,6 +206,63 @@
 		-webkit-border-radius: 6px;
 		-moz-border-radius: 6px;
 		border-radius: 6px;				
+	}
+	
+	.chooseRecipient {
+		display: inline-block;
+	}
+	
+	.shareButton {
+		display: inline-block;
+		background-Color: #24AB47;
+		color: #002B0B;
+		margin: 10px;
+		padding: 10px;
+		border-style: solid;
+		border-width: 1px;
+		border-color: #007B21;
+		-webkit-border-radius: 8px;
+		-moz-border-radius: 8px;
+		border-radius: 8px;	
+	}
+	
+	.shareButton:hover {	
+		background-Color: #77B687;			
+	}
+	
+	.chooseCharacter {
+		background-Color: #FF8F8F;
+		margin: 0 0 20px 0;
+		padding: 20px;
+		-webkit-border-radius: 6px;
+		-moz-border-radius: 6px;
+		border-radius: 6px;			
+	}
+	
+	.userArea {
+		background-Color: #FFBABA;
+		margin: 0 0 20px 0;
+		padding: 20px;
+		-webkit-border-radius: 6px;
+		-moz-border-radius: 6px;
+		border-radius: 6px;			
+	}
+	
+	input[type="text"] {
+		/* float: right; */
+		margin: 0 0 4px 0;
+		/* display: inline-block; */
+		/* clear:both; */
+	}
+	
+	label {
+		display: inline-block;
+		width: 90px;
+		margin: 0 0 4px 0;
+	}
+	
+	.noBreak {
+		width: auto;
 	}
 	
 	
