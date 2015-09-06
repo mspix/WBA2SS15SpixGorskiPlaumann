@@ -1,0 +1,103 @@
+<div class="moviePostContainer row">
+        <h2>Neuen Film hinzufügen</h2>
+        <form class="moviePost">
+                <div class="col-md-4">
+                        <h3>Filminformationen:</h3>
+                        <label for="deTitel">Film:</label></br>
+                        <input type="text" class="film" id="deTitel" name="deTitel" size="35"/></br>
+
+                        <label for="orTitel">Original Titel:</label></br>
+                        <input type="text" class="film" id="orTitel" name="orTitel" size="35"/></br>
+
+                        <label for="erscheinungstermin">Erscheinungstermin (YYYY-MM-DD):</label></br>
+                        <input type="text" class="film" id="erscheinungstermin" name="erscheinungstermin" size="35"/></br>
+
+                        <label for="genre">Genre:</label></br>
+                        <input type="text" class="film" id="genre" name="genre" size="35"/></br>
+
+                        <label for="dauer">Dauer (min.):</label></br>
+                        <input type="text" class="film" id="dauer" name="dauer" size="35"/></br>
+
+                        <label for="kurzbeschreibung">Kurzbeschreibung:</label></br>
+                        <input type="text" class="film"id="kurzbeschreibung" name="kurzbeschreibung" size="35"/></br>
+
+                        <label for="regie">Regie</label></br>
+                        <input type="text" class="film "id="regie" name="regie" size="35"/></br>
+
+                        <label for="ot">Original-Ton:</label></br>
+                        <input type="text" class="film" id="ot" name="ot" size="35"/></br>
+
+                        <label for="thumbnail">Thumbnail:(Platzhalter)</label></br>
+                        <input type="text" class="film" id="thumbnail" name="thumbnail" size="35"/></br></br>
+                </div>
+
+                <div class="col-md-4">
+                        <h3>Spielplaninformationen:</h3>
+                        <label for="kalenderwoche">Kalenderwoche:</label></br>
+                        <input type="text" class="timetable" id="kalenderwoche" name="kalenderwoche" maxlength="2" size="1"/></br></br>
+
+                        <label for="kinoformID">Kino ID:</label></br>
+                        <input type="text" class="timetable timetableKinoID" id="kinoformID" name="kinoID" size="1" readonly="readonly"/></br></br>
+
+                        <div style="border:1px solid grey">
+                        <label for="ueberlaenge">Überlänge</label></br>
+                        <input type="radio" class="timetable" id="fa" name="ueberlaenge" value="false" checked="checked"><label for="fa">nein</label></br>
+                        <input type="radio" class="timetable" id="tr" name="ueberlaenge" value="true"><label for="tr">ja</label></br>
+                        </div></br>
+                        <div style="border:1px solid grey">
+                        <label for="in3D">In 3D</label></br>
+                        <input type="radio" class="timetable" id="fa" name="in3D" value="false" checked="checked"><label for="fa">nein</label></br>
+                        <input type="radio" class="timetable" id="tr" name="in3D" value="true"><label for="tr">ja</label></br>
+                        </div>
+
+
+
+
+                        <input type="submit" value="Submit" name="submit"/>
+
+                </div>
+        </form>
+
+                <div class="col-md-4">
+                        <form class="timeSearch">
+                                <h3>Spielzeiten:</h3>
+                                <label for="Spielzeit">Spielzeit:</label>
+                                <input class="showday" type="checkbox" name="mo" value="mo">Mo
+                                <input class="showday" type="checkbox" name="di" value="di">Di
+                                <input class="showday" type="checkbox" name="mi" value="mi">Mi
+                                <input class="showday" type="checkbox" name="do" value="do">Do
+                                <input class="showday" type="checkbox" name="fr" value="fr">Fr
+                                <input class="showday" type="checkbox" name="sa" value="sa">Sa
+                                <input class="showday" type="checkbox" name="so" value="so">So
+
+                                <label for="zeit">Zeit (hh-mm):</label></br>
+                                <input type="text" id="zeit"/>
+
+                                <div class="showTime"></div>
+              		        <div id="liveText"></div></br>
+                                <div class="hinzufuegen"><button type="button" class="btn btn-hinzufuegen">Zeit hinzufügen</button></div>
+
+
+                        </form></br>
+
+                        <div class="datesToSubmit">
+                                <table class="table table-bordered">
+                                    <thead>
+                                      <tr>
+                                        <th>Mo</th>
+                                        <th>Di</th>
+                                        <th>Mi</th>
+                                        <th>Do</th>
+                                        <th>Fr</th>
+                                        <th>Sa</th>
+                                        <th>So</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody class="datesTableBody">
+
+                                    </tbody>
+                                  </table>
+                        </div>
+                </div>
+
+</div>

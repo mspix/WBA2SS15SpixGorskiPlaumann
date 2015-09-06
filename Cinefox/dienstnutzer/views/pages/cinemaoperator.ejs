@@ -20,8 +20,23 @@
 
                 var $cineTableBody = $('.cineTableBody');
                 var $filmTableBody = $('.filmTableBody');
+                var $datesTableBody = $('.datesTableBody');
                 var $info = $('.info');
-                var $btnremove = "";
+
+                $('.btn-hinzufuegen').prop("disabled", true);
+
+                var timeObject = {
+                                        "mo": [],
+                                        "di": [],
+                                        "mi": [],
+                                        "do": [],
+                                        "fr": [],
+                                        "sa": [],
+                                        "so": []
+                                };
+
+                var respondedFilm = "";
+
 
 
                 function getCurrentCinema(){
@@ -39,6 +54,10 @@
                                                                 '</br>Bewertung: '	+currentCinema[0].bewertung+
                                                                 '</p>');
 
+                                                                $('input').filter('.timetableKinoID').each( function(n, elem){
+                                                                        $(this).val(cinemaID);
+
+                                                                });
 
 
 
@@ -176,28 +195,206 @@
 
                 $('.moviePost').on('submit', function(event){
                         event.preventDefault();
-                        console.log($('.moviePost').serialize());
-                        // console.log(query_to_json()+'!!!!!!!!!!!!!!!!!!!!!!!!!!!! hier hinschauen');
-                        // console.log(JSON.stringify(query_to_json()));
-                        var data = query_to_json();
-                        // console.log(data);
-                        // console.log(data.deTitel);
+                        var object = $('.moviePost').serialize();
+                        console.log(object);
+
+                        var film = {};
+                        var timetable1 = {};
+                        var timetable2 = {};
+
+                        $( 'input' ).filter( '.film' ).each( function(i, elem){
+
+                                elem[0] = this.name;
+                                elem[1] = this.value;
+                                film[elem[0]] = elem[1];
+                        });
+
+                        console.log(film);
+
+                        $( 'input:checked' ).filter( '.timetable' ).each( function(i, elem){
+
+                                elem[0] = this.name;
+                                elem[1] = this.value;
+                                timetable1[elem[0]] = elem[1];
+                        });
+
+                        $( 'input' ).filter( '.timetable' ).each( function(i, elem){
+
+                                elem[0] = this.name;
+                                elem[1] = this.value;
+                                timetable2[elem[0]] = elem[1];
+                        });
+
+
+                        // $('input').filter('.timetable').each(function(j, elem){
+                        //         var $element = this;
+                        //         console.log($( $element ).filter('input:checked').length);
+                        //         if( $( $element ).filter('input:checked').length ){
+                        //                 $( $element ).filter('input:checked').each( function(k, elem2){
+                        //                         elem[0] = this.name;
+                        //                         elem[1] = this.value;
+                        //                         timetable[elem[0]] = elem[1];
+                        //                         return;
+                        //                 });
+                        //         }
+                        //         console.log(this);
+                        //         elem[0] = this.name;
+                        //         elem[1] = this.value;
+                        //         timetable[elem[0]] = elem[1];
+                        // });
+
+                        console.log(timetable1);
+                        console.log(timetable2);
+
+                        var timetableobject = $.extend({},timetable2, timetable1);
+                        console.log(timetableobject);
+
+                        var neu = $.extend({},timetableobject, timeObject);
+                        console.log(JSON.stringify(neu));
+
+
+                        console.log(JSON.stringify(film));
+
+
+
+
 
 
                         $.ajax({
                                 url: '/filme',
                                 method: 'POST',
-                                data: JSON.stringify(data),
+                                data: JSON.stringify(film),
                                 contentType: 'application/json',
-                                // contentType: 'application/x-www-form-urlencoded',
-                                // dataType: 'json',
-                                success: function(whateverHappens) {
-                                        console.log(whateverHappens);
+                                success: function(incomingMovie){
+                                        respondedFilm = incomingMovie;
                                 }
 
-                        })
+
+
+                        });
+
+                        console.log(respondedFilm.filmID);
+                        // var recursiveDecoded = decodeURIComponent(object);
+                        // console.log(recursiveDecoded);
+
+                        // console.log(query_to_json()+'!!!!!!!!!!!!!!!!!!!!!!!!!!!! hier hinschauen');
+                        // console.log(JSON.stringify(query_to_json()));
+                        // var data = query_to_json();
+                        // console.log(data);
+                        // console.log(data.deTitel);
+
+
+                        // $.ajax({
+                        //         url: '/filme',
+                        //         method: 'POST',
+                        //         data: JSON.stringify(data),
+                        //         contentType: 'application/json',
+                        //         // contentType: 'application/x-www-form-urlencoded',
+                        //         // dataType: 'json',
+                        //         success: function(whateverHappens) {
+                        //                 console.log(whateverHappens);
+                        //         }
+                        //
+                        // })
                 });
 
+
+                $( "input[class=showday]" ).on( "click", function() {
+                        var buttonMsg = $( "input[class=showday]:checked" ).val() + " is checked!";
+                        var newKey = "";
+                        var newValue = "";
+                        var valueMatch = false;
+                        var button = this;
+
+
+
+                        // $( '.showTime' ).empty();
+                        // $( '.showTime' ).append('<label for="zeit">Zeit (hh-mm):</label></br>'+
+                        //                                                 '<input type="text" id="zeit"/></br>');
+
+                        console.log( buttonMsg );
+                        console.log( this );
+
+                        console.log(button.name);
+                        // newKey = this.name;
+
+                        $('#zeit').keyup(function () {
+                                //$('.showTime').text($(this).val());
+                                // $("#input-setzen").click(function(){
+                                        // $("#input1").val("Gesetzter Wert");
+                                // });
+
+
+                                console.log($(this).val());
+                                newValue = $(this).val();
+
+                                // $('span.glyphicon', '.timeInfo').remove();
+                                valueMatch = ( newValue ).match(/(^|\s)(2[0-3]|1[0-9]|0[0-9])-([0-5][0-9])(\s|$)/); // match == true, sonst null
+
+                                if(valueMatch){
+                                        console.log("BESTANDEN");
+                                        $('span.glyphicon').remove();
+                                        $('.timeInfo').remove();
+                                        // if( $('.glyphicon').length === "0" ){
+                                                $( '.showTime' ).append(' <span class="glyphicon glyphicon-ok" aria-hidden="true"></span><span class="timeInfo">Format OK</span>');
+                                        // }
+
+
+
+                                        timeSet = true;
+
+                                }
+
+                                console.log("valueMatch: "+valueMatch);
+                                if(valueMatch == null){
+                                        $('span.glyphicon').remove();
+                                        $('.timeInfo').remove();
+
+                                        timeSet = false;
+                                }
+
+                                if(valueMatch){
+
+                                        $('.btn-hinzufuegen').prop("disabled", false);
+
+
+                                }
+
+
+                        });
+
+
+
+                        $('.btn-hinzufuegen').click(function(event){
+
+                                event.preventDefault;
+                                $( "input[class=showday]:checked" ).each( function(i, checkedInput){
+                                        console.log(newValue);
+                                        this.value = newValue;
+                                        console.log(this.name);
+                                        timeObject[this.name].push(this.value);
+                                        console.log(timeObject);
+                                });
+
+
+
+                                 console.log(JSON.stringify(timeObject));
+                                 console.log(timeObject.mo);
+
+                                 $datesTableBody.empty();
+
+                                 $datesTableBody.append('<tr><td>'+timeObject.mo+'</td><td>'+timeObject.di+'</td><td>'+timeObject.mi+'</td><td>'+timeObject.do+'</td><td>'+timeObject.fr+'</td><td>'+timeObject.sa+'</td><td>'+timeObject.so+'</td></tr>');
+                                  $('.timeSearch')[0].reset();
+                        });
+
+
+
+
+                        // if( !($( "input[class=showday]:checked" ).length) ){
+                        //         $( '.showTime' ).empty();
+                        // }
+
+                });
 
         });
     </script>
@@ -232,13 +429,24 @@
         </div>
         <br>
 
+        <%include ../partials/film-post-form%>
+<!--
         <div class="moviePostContainer row">
+                <h2>Neuen Film hinzufügen</h2>
+                <div class="col-md-4">
 
-                <div class="col-md-5">
-                        <h2>Neuen Film hinzufügen</h2>
-
-                <%include ../partials/movie-post-form %>
+                        <%include ../partials/movie-post-form %>
                 </div>
+                <div class="col-md-4">
+                        <%include ../partials/timetable-post-form %>
+                </div>
+                <div class="col-md-4">
+
+                </div>
+
+        </div> -->
+
+        <div class="movieListContainer row">
                 <h2>Verfügbare Filme</h2>
                 <div class="col-md-7 movie-list" style="overflow:scroll; height:400px;">
 
@@ -255,6 +463,8 @@
                                 </tbody>
                         </table>
                 </div>
+                <div class="col-md-5"></div>
+
         </div>
 
     </main>
