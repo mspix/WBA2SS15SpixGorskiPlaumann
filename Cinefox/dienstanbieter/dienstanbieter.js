@@ -74,7 +74,7 @@ function queryFilter(dbArray, queryArray){
 									propCounter++;
 								}
 							} else if ( ( queryArray[queryProp] ==  'true' || queryArray[queryProp] == 'false' ) && queryProp == dbElementProp ){
-								// console.log('dbElementProp:'+dbElementProp+' '+dbElement[dbElementProp]+' queryProp:'+queryProp+' '+queryArray[queryProp] + ' ' + typeof(queryArray[queryProp])); 
+								// console.log('dbElementProp:'+dbElementProp+' '+dbElement[dbElementProp]+' queryProp:'+queryProp+' '+queryArray[queryProp] + ' ' + typeof(queryArray[queryProp]));
 								if( dbElement[dbElementProp] == JSON.parse(queryArray[queryProp]) ){
 									propCounter++;
 								}
@@ -372,6 +372,8 @@ app.post('/spielplaene', function(req, res){
 
     });
   });
+
+
 });
 
 
@@ -444,7 +446,7 @@ app.get('/fruit/:fruitName/kind/:fruitColor', function(req, res) {
             "apple": req.params.fruitName,
             "color": req.params.fruitColor
         }
-    }; 
+    };
 
     res.json(data);
 });

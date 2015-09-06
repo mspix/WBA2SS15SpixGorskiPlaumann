@@ -35,6 +35,7 @@
                                         "so": []
                                 };
 
+                var respondedFilmID = "";
                 var respondedFilm = "";
 
 
@@ -118,6 +119,7 @@
                                                 $filmTableBody.append('<tr><td>'+oneFilm.deTitel+
                                                                         '</td><td>'+oneFilm.erscheinungstermin+
                                                                         '</td><td>'+oneFilm.genre+
+                                                                        '</td><td>'+oneFilm.filmID+
                                                                         '</td></tr>');
                                         })
 
@@ -249,14 +251,14 @@
                         var timetableobject = $.extend({},timetable2, timetable1);
                         console.log(timetableobject);
 
-                        var neu = $.extend({},timetableobject, timeObject);
-                        console.log(JSON.stringify(neu));
+                        var stillNeedFilmId = $.extend({},timetableobject, timeObject);
+                        console.log(JSON.stringify(stillNeedFilmId));
 
 
                         console.log(JSON.stringify(film));
 
 
-
+                        var finalDatePost = "";
 
 
 
@@ -266,14 +268,39 @@
                                 data: JSON.stringify(film),
                                 contentType: 'application/json',
                                 success: function(incomingMovie){
-                                        respondedFilm = incomingMovie;
+
+
+
+                                        respondedFilm = JSON.stringify(incomingMovie);
+                                        respondedFilmID = incomingMovie.filmID;
+                                        console.log(respondedFilm+'----');
+                                        console.log(respondedFilmID+'+++++');
+                                        var filmIdElem = {};
+                                        filmIdElem['filmID'] = respondedFilmID;
+                                        console.log(JSON.stringify(filmIdElem));
+                                        finalDatePost =  $.extend({},stillNeedFilmId,filmIdElem );
+                                        console.log(JSON.stringify(finalDatePost));
+                                },
+                                complete:function(){
+                                        $.ajax({
+                                                url: '/spielplaene',
+                                                method: 'POST',
+                                                data: JSON.stringify(finalDatePost),
+                                                contentType: 'application/json',
+                                                success:function(spielplan){
+                                                        // location.reload(true);
+
+                                                        console.log(JSON.stringify(spielplan));
+                                                }
+                                        });
                                 }
+
 
 
 
                         });
 
-                        console.log(respondedFilm.filmID);
+
                         // var recursiveDecoded = decodeURIComponent(object);
                         // console.log(recursiveDecoded);
 
@@ -456,6 +483,7 @@
                                     <th>Titel(dt.)</th>
                                     <th>Erscheinungstermin</th>
                                     <th>Genre</th>
+                                    <th>ID</th>
                                   </tr>
                                 </thead>
                                 <tbody class="filmTableBody">

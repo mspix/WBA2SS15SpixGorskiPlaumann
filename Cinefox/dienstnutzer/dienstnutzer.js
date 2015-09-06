@@ -36,19 +36,19 @@ var client = new faye.Client('http://localhost:1338/faye');
 		// res.write("Nachricht wurde gesendet.");
 		// res.end();
 	// },
-	
+
 	// // Promise-Handler wenn Publishen fehlgeschlagen
 	// function (error) {
 		// res.write("Nachricht wurde nicht gesendet.");
 		// next(error);
 	// }
 // );
-	
+
 // Channel bzw. Topic "news" abonnieren
 var subscription = client.subscribe('/news', function(message){
 	console.log("Neue Nachricht von " + message.autor + " an " + message.empfaenger +": " + message.vorschlag);
-});	
-	
+});
+
 // app.use(express.static(__dirname + '/public'));  	 // legt root-Ordner fest
 
 app.set('view engine', 'ejs');
@@ -109,7 +109,7 @@ app.get('/user', function(req, res){
 
 app.post('/users', jsonParser, function(req, res){
   var newUser = req.body;
-  
+
   console.log(newUser);
 
   db.incr('id:users', function(err, rep){
@@ -177,13 +177,13 @@ app.get('/users', function(req, res){
 			  res.json(users);
 			  return;
 			}
-			
+
 			db.mget(rep, function(err, rep){
 
 				rep.forEach(function(val){
 					users.push(JSON.parse(val));
 				});
-				
+
 				// users = users.map(function(user){
 					// return {id: user.id, name: user.name};
 				// });
@@ -197,7 +197,7 @@ app.get('/users', function(req, res){
 
 app.post('/vorschlaege', jsonParser, function(req, res){
   var newVorschlag = req.body;
-  
+
   console.log(newVorschlag);
 
   db.incr('id:vorschlaege', function(err, rep){
@@ -265,13 +265,13 @@ app.get('/vorschlaege', function(req, res){
 			  res.json(vorschlaege);
 			  return;
 			}
-			
+
 			db.mget(rep, function(err, rep){
 
 				rep.forEach(function(val){
 					vorschlaege.push(JSON.parse(val));
 				});
-				
+
 				// users = users.map(function(user){
 					// return {id: user.id, name: user.name};
 				// });
@@ -428,19 +428,22 @@ app.post('/filme', jsonParser, function(req, res){
 		externalResponse.setEncoding('utf8');
    		externalResponse.on('data', function (chunk) {
        		console.log("body: " + chunk);
+
+		var userdata = JSON.parse(chunk);
+
+		var dataEdited = JSON.stringify(userdata);
+
+		res.setHeader('content-type', 'application/json');
+		res.writeHead(200);
+
+		 res.write(dataEdited);
+		 console.log(dataEdited);
+		res.end();
    		});
 	});
 
 	externalRequest.write(JSON.stringify(req.body));
 	externalRequest.end();
-
-	// res.on('data', function(chunk){
-	// 		console.log(data);
-	// 	}).on('end', function(){
-        //     		console.log('end of stream');
-        // 	});
-
-
 });
 
 app.delete('/filme/:filmID', jsonParser, function(req, res){
@@ -485,6 +488,43 @@ app.get('/spielplaene', jsonParser, function(req, res){
 
 });
 
+app.post('/spielplaene', jsonParser, function(req, res){
+
+	console.log(JSON.stringify(req.body)+'!!!');
+
+
+	var options = {
+		host: 'localhost',
+		port: 1337,
+		path: '/spielplaene',
+		method: 'POST',
+		headers: {
+        		'Content-Type': 'application/json'
+    		}
+	}
+
+	var externalRequest = http.request(options, function(externalResponse){
+		externalResponse.setEncoding('utf8');
+   		externalResponse.on('data', function (chunk) {
+       		console.log("body: " + chunk);
+
+		var userdata = JSON.parse(chunk);
+
+		var dataEdited = JSON.stringify(userdata);
+
+		res.setHeader('content-type', 'application/json');
+		res.writeHead(200);
+
+		 res.write(dataEdited);
+		 console.log(dataEdited);
+		res.end();
+   		});
+	});
+	externalRequest.write(JSON.stringify(req.body));
+	externalRequest.end();
+
+});
+
 app.post('/newChannel', jsonParser, function(req, res){
 	var newsPublication = client.publish('/'+req.body.channel.toLowerCase(), {
 		'author': req.body.author,
@@ -499,7 +539,7 @@ app.post('/newChannel', jsonParser, function(req, res){
 			res.write("Nachricht wurde gesendet.");
 			res.end();
 		},
-		
+
 		// Promise-Handler wenn Publishen fehlgeschlagen
 		function (error) {
 			console.log(error);
