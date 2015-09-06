@@ -8,20 +8,18 @@
 		
 		var $cineResults = $('.cineResults'); 		// div mit der Klasse cineResults selektiert
 		var $movieResults = $('.movieResults'); 	// div mit der Klasse movieResults selektiert
-		var $timeResults = $('.timeResults');		// div mit der Klasse timeResults selektiert
-		
-		// var $cineBox = $('.cineBox');
-		// var $movieBox = $('.movieBox');
-		// var $timeBox = $('.timeBox');		
+		var $timeResults = $('.timeResults');		// div mit der Klasse timeResults selektiert		
 		
 		var priority = [];
 		
 		var proposal = {
-						"kinoID" : "",
-						"filmID" : "",
-						"spielplanID" : "",
-						"day" : [],
-						"time" : ""
+							"userID" : "",
+							"kinoID" : "",
+							"filmID" : "",
+							"spielplanID" : "",
+							"day" : [],
+							"time" : "",
+							"kommentare" : ""
 						};
 		
 		// Die mit pickResult() ausgewählten Elemente
@@ -336,16 +334,7 @@
 			// Overview - classPointer:
 			// 0 == cineBox
 			// 1 == movieBox
-			// 2 == timeBox				
-
-			// console.log("priority[0].searchPointer: "+priority[0].searchPointer);
-			// console.log("priority[0].classPointer: "+priority[0].classPointer);
-			// // console.log("priority[0].list: "+JSON.stringify(priority[0].list));
-			// console.log("priority[1].searchPointer: "+priority[1].searchPointer);
-			// console.log("priority[1].classPointer: "+priority[1].classPointer);	
-			// // console.log("priority[1].list: "+JSON.stringify(priority[1].list));
-			// console.log("priority[2].searchPointer: "+priority[2].searchPointer);
-			// console.log("priority[2].classPointer: "+priority[2].classPointer);			
+			// 2 == timeBox						
 			
 			for(var i = 0; i < 3; i++){
 				for(var j = 0; j < 3; j++){
@@ -388,8 +377,6 @@
 			
 			if( $( 'div' ).filter($( "[class$='prio0']" )).length ){
 			
-				// console.log("prio0 is set?: "+ $( 'div' ).filter($( "[class$='prio0']" )).length );
-			
 				var classPointer = priority[0].classPointer.split(".");	// Bsp.: String == .category.cineBox wird gesplitted in [".","category","cineBox"]
 				
 				console.log(priority[0].classPointer);
@@ -401,9 +388,7 @@
 				
 				var stringComponent = prio0Class.slice(0, -3);	// Bsp.: Schneidet "Box" von "cineBox" ab - String: "cine"
 				
-				console.log(stringComponent);
-				
-				// $( "li" ).filter( $( "[class^='"+stringComponent+"']" ) ).addClass( "selectResult" ); // funktioniert auch			
+				console.log(stringComponent);		
 				
 				var element0ID = "";
 				var element1ID = "";
@@ -418,6 +403,8 @@
 				$( "li[class^='"+stringComponent+"']" ).addClass( "selectResult" );				
 				
 				$( "li[class^='"+stringComponent+"']" ).click(function() {
+				
+					$(".proposalInfo").empty();
 
 					console.log( $( this ).attr("class") );
 					
@@ -1648,14 +1635,6 @@
 				$( "div.locked" ).remove();
 				pickedResult == false;
 			}
-			
-			
-			// if( $('div').filter($( "[class$='Box']" )).length ){
-				// $('div').filter($( "[class$='Box']" )).css({
-															  // "z-index" : "3",
-															  // "background-color": "rgba(125, 125, 125, 0.5)"
-															// });
-			// }
 		
 		}
 		
@@ -1790,44 +1769,52 @@
 			var newValue = "";
 			var valueMatch = false;
 			var button = this;
+			
 			proposal.day = [];
+			timeSet = false;
+			defineProposal();
 			
 			$( '.showTime' ).empty();
-			$( '.showTime' ).append('<label for="zeit">Zeit (hh-mm):</label></br>'+
+			$( '.showTime' ).append('<label class="noBreak" for="zeit">Zeit (hh-mm):</label></br>'+
 									'<input type="text" id="zeit"/></br>');
 		
 			console.log( buttonMsg );
 			console.log( this );
 			
 			console.log(button.name);
-			// newKey = this.name;
 			
 			$('#zeit').keyup(function () {
-				//$('.showTime').text($(this).val());
-				// $("#input-setzen").click(function(){
-					// $("#input1").val("Gesetzter Wert");
-				// });
 				
 				console.log($(this).val());
 				newValue = $(this).val();
 				
-				// $('span.glyphicon', '.timeInfo').remove();
 				valueMatch = ( newValue ).match(/(^|\s)(2[0-3]|1[0-9]|0[0-9])-([0-5][0-9])(\s|$)/); // match == true, sonst null
 
 				if(valueMatch){
 					console.log("BESTANDEN");
 					$('span.glyphicon').remove();
 					$('.timeInfo').remove();
-					// if( $('.glyphicon').length === "0" ){
-						$( '.showTime' ).append(' <span class="glyphicon glyphicon-ok" aria-hidden="true"></span><span class="timeInfo"> Format OK</span>');
-					// }
+
+					$( '.showTime' ).append(' <span class="glyphicon glyphicon-ok" aria-hidden="true"></span><span class="timeInfo"> Format OK</span>');
+					
 					$( "input[class=showday]:checked" ).each( function(i, checkedInput){
 						this.value = newValue;
 						proposal.day.push(this.name);
 					});
-					proposal.time = newValue;
+					// proposal.time = newValue;
 					console.log(proposal);
-					timeSet = true;
+					if( proposalPrio0listPoint.hasOwnProperty("spielplanID") ){
+						checkTime(proposalPrio0listPoint, newValue);
+					}
+					else if( proposalPrio1listPoint.hasOwnProperty("spielplanID") ){
+						checkTime(proposalPrio1listPoint, newValue);
+					}
+					else if( proposalPrio2listPoint.hasOwnProperty("spielplanID") ){
+						checkTime(proposalPrio2listPoint, newValue);
+					}
+					// timeSet = true;
+					defineProposal();
+					
 				}	
 				console.log("valueMatch: "+valueMatch);
 				if(valueMatch == null){
@@ -1836,6 +1823,7 @@
 					proposal.day = [];
 					proposal.time = "";
 					timeSet = false;
+					defineProposal();
 				}	
 				
 			});
@@ -1847,18 +1835,117 @@
 			
 		});		
 		
-		function defineProposal(){
-			// if(activeDefineProposal == true){
-				// $(".defineProposal").css("display", "inline-block");
-			// }
-			if( $('div').filter($( ".proposal0" )).length && $('div').filter($( ".proposal1" )).length && $('div').filter($( ".proposal2" )).length ){
-				$( ".submitProposal" ).css("display", "inline-block");
-				$( ".submitProposal" ).click(function() {
+		function checkTime( proposalTime, timeToCheck ){
+	
+			var daysToCheck = [];
+			var tmpArray = [];
+			var dayCounter1 = 0;
+			var dayCounter2 = 0;
+			
+			$( "input[class=showday]:checked" ).each( function(i, checkedInput){
+				daysToCheck[i] = this.name;
+				dayCounter1++;
+			});
+			
+			for(var checkDay in daysToCheck){
 				
+				for(var day in proposalTime){
+				
+					if(Array.isArray(proposalTime[day])){ // In einem Spielplan-Objekt sind nur die Tag Arrays
+						// console.log("day: "+day);
+						// console.log("daysToCheck[checkDay]: "+daysToCheck[checkDay]);
+						if( day == daysToCheck[checkDay] ){
+							
+							tmpArray = proposalTime[day];
+
+							if( $.inArray(timeToCheck, tmpArray) > -1 ){
+								dayCounter2++;
+								
+							}
+							
+						}
+					}
+				
+				}
+			}
+	
+			// console.log("dayCounter1: "+dayCounter1);
+			// console.log("dayCounter2: "+dayCounter2);
+			
+			if(dayCounter1 === dayCounter2){
+				proposal.time = timeToCheck;
+				timeSet = true;
+			}
+			else {
+				timeSet = false;				
+			}
+			
+		}
+		
+		function defineProposal(){
+		
+			if( $('div').filter($( ".proposal0" )).length && $('div').filter($( ".proposal1" )).length && $('div').filter($( ".proposal2" )).length && !($('input:checked').filter($( ".showday" )).length) ){
+				$(".proposalInfo").empty();
+				$(".proposalInfo").html("Wähle bitte noch einen Spieltag");
+			}
+			if( $('div').filter($( ".proposal0" )).length && $('div').filter($( ".proposal1" )).length && $('input:checked').filter($( ".showday" )).length && $('div').filter($( ".proposal2" )).length && timeSet !== true ){
+				$(".proposalInfo").empty();
+				$(".proposalInfo").html("Wähle bitte noch eine Uhrzeit");
+			}
+			if( $('div').filter($( ".proposal0" )).length && $('div').filter($( ".proposal1" )).length && $('div').filter($( ".proposal2" )).length && timeSet === true ){
+				$(".proposalInfo").empty();
+				$( ".submitProposal" ).css("display", "inline-block");
+				$( ".selectUser" ).css("display", "inline-block");
+				
+				$( '.selectUserForm' ).remove();
+				$( '.selectUser' ).append(	'<form class="selectUserForm" action="proposalView" method="get">'+
+												'<label for="userID">User:</label></br>'+
+												'<select name="userID">'+
+													'<option value="1">Alice</option>'+
+													'<option value="2">Bob</option>'+
+													'<option value="3">Albert</option>'+
+												'</select></br>'+
+												'<input type="submit"/>'+
+											'</form>' );
+				
+				$( "select" ).change(function () { 
+					proposal.userID = $( 'option:selected' ).val();
+				}).change();
+				
+				$(".selectUserForm").submit(function(e) {
+					var self = this;
+					e.preventDefault();
+					
+					var proposalID = "";
+					
+                        $.ajax({
+                                url: '/vorschlaege',
+                                method: 'POST',
+								async: false,
+                                data: JSON.stringify(proposal),
+                                contentType: 'application/json',
+                                success: function(response) {
+                                        console.log("Response: "+JSON.stringify(response));
+										proposalID = response.vorschlagID;
+										
+                                }
+
+                        });
+						
+						window.location.href = "proposalView?"+ $ ( ".selectUserForm" ).serialize() + "&vorschlagID=" + proposalID;
+						
+						// console.log($( ".selectUserForm" ));
+
+						// self.submit();						
+				});				
+				
+				$( ".submitProposal" ).click(function() {
+					
 				});
 			}
 			else {
 				$(".submitProposal").css("display", "none");
+				$(".selectUser").css("display", "none");
 			}
 		}
 		
@@ -1873,7 +1960,7 @@
 			}
 			$('.cineResults').empty();
 			$('.movieResults').empty();			
-			$('.timeResults').empty();			
+			$('.timeResults').empty();		
 			for(var i = 0; i < 3; i++){
 				if( $('div').filter($( "[class$='prio"+i+"']" )).length ){
 					$('div').filter($( "[class$='prio"+i+"']" )).removeClass("prio"+i);
@@ -1884,14 +1971,13 @@
 			$( "div.proposal1" ).remove();
 			$( "div.proposal2" ).remove();
 			
-			// $( "li[class^='cine']" ).off('click');
-			// $( "li[class^='movie']" ).off('click');			
-			// $( "li[class^='time']" ).off('click');
+			$(".proposalInfo").empty();
 			
 			proposalPrio0listPoint = "";
 			proposalPrio1listPoint = "";
 			proposalPrio2listPoint = "";
 			
+			timeSet = false;
 			defineProposal();			
 			
 		});
@@ -1922,7 +2008,9 @@
 		
 		<div class="defineProposal">
 			<h4>Erstelle einen Vorschlag</h4>
+			<div class="proposalInfo"></div>
 			<div class="defineProposalContent"></div>
+			<div class="selectUser"></div>
 			<div class="submitProposal">Fertig mit Auswahl</div>
 		</div>
 		
