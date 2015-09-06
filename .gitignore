@@ -46,10 +46,6 @@ Temporary Items
 node_modules
 
 # Redis
-redis
-redis_dienstanbieter
-redis_dienstnutzer
-
 
 # Backup Files
 backup
